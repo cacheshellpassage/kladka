@@ -27,6 +27,7 @@ export function CatalogPage() {
   const [diff, setDiff] = useState<number>(0);
   const [favOnly, setFavOnly] = useState(false);
   const [sort, setSort] = useState<Sort>("name");
+  const [filtersOpen, setFiltersOpen] = useState(() => !matchMedia("(max-width: 720px)").matches);
 
   const all = useMemo(() => [...imports, ...core], [core, imports]);
   const styles = useMemo(() => [...new Set(all.map((b) => b.meta.style))], [all]);
@@ -51,6 +52,8 @@ export function CatalogPage() {
     });
     return out;
   }, [all, q, style, size, diff, favOnly, sort, favorites, locale]);
+
+  const activeFilters = (style !== "all" ? 1 : 0) + (size !== "all" ? 1 : 0) + (diff ? 1 : 0);
 
   const reset = () => {
     setQ("");
@@ -77,59 +80,73 @@ export function CatalogPage() {
             aria-label={t("catalog.search")}
           />
         </div>
-        <div className="chips" role="group" aria-label={t("catalog.style")}>
+        <div className="chips">
           <button className="chip" type="button" aria-pressed={favOnly} onClick={() => setFavOnly(!favOnly)}>
             <Icon name="star" size={16} filled={favOnly} /> {t("catalog.favorites")}
           </button>
           <button
             className="chip"
             type="button"
-            aria-pressed={style === "all"}
-            onClick={() => setStyle("all")}
+            aria-expanded={filtersOpen}
+            aria-controls="catalog-filters"
+            onClick={() => setFiltersOpen(!filtersOpen)}
           >
-            {t("catalog.all")}
+            <Icon name="layers" size={16} /> {t("catalog.filters")}
+            {activeFilters ? ` (${activeFilters})` : ""}
           </button>
-          {styles.map((s) => (
+        </div>
+        <div id="catalog-filters" className="stack" hidden={!filtersOpen} style={{ gap: 12 }}>
+          <div className="chips" role="group" aria-label={t("catalog.style")}>
             <button
-              key={s}
               className="chip"
               type="button"
-              aria-pressed={style === s}
-              onClick={() => setStyle(style === s ? "all" : s)}
+              aria-pressed={style === "all"}
+              onClick={() => setStyle("all")}
             >
-              {t(`style.${s}` as MessageKey)}
+              {t("catalog.all")}
             </button>
-          ))}
-        </div>
-        <div className="filters">
-          <label className="row small">
-            {t("catalog.size")}
-            <select value={size} onChange={(e) => setSize(e.target.value as SizeFilter)}>
-              <option value="all">{t("catalog.all")}</option>
-              <option value="small">{t("catalog.size.small")}</option>
-              <option value="medium">{t("catalog.size.medium")}</option>
-              <option value="large">{t("catalog.size.large")}</option>
-            </select>
-          </label>
-          <label className="row small">
-            {t("catalog.difficulty")}
-            <select value={diff} onChange={(e) => setDiff(Number(e.target.value))}>
-              <option value={0}>{t("catalog.all")}</option>
-              {[1, 2, 3, 4, 5].map((d) => (
-                <option key={d} value={d}>
-                  {t(`difficulty.${d}` as MessageKey)}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="row small">
-            {t("catalog.sort")}
-            <select value={sort} onChange={(e) => setSort(e.target.value as Sort)}>
-              <option value="name">{t("catalog.sort.name")}</option>
-              <option value="blocks">{t("catalog.sort.blocks")}</option>
-              <option value="difficulty">{t("catalog.sort.difficulty")}</option>
-            </select>
-          </label>
+            {styles.map((s) => (
+              <button
+                key={s}
+                className="chip"
+                type="button"
+                aria-pressed={style === s}
+                onClick={() => setStyle(style === s ? "all" : s)}
+              >
+                {t(`style.${s}` as MessageKey)}
+              </button>
+            ))}
+          </div>
+          <div className="filters">
+            <label className="row small">
+              {t("catalog.size")}
+              <select value={size} onChange={(e) => setSize(e.target.value as SizeFilter)}>
+                <option value="all">{t("catalog.all")}</option>
+                <option value="small">{t("catalog.size.small")}</option>
+                <option value="medium">{t("catalog.size.medium")}</option>
+                <option value="large">{t("catalog.size.large")}</option>
+              </select>
+            </label>
+            <label className="row small">
+              {t("catalog.difficulty")}
+              <select value={diff} onChange={(e) => setDiff(Number(e.target.value))}>
+                <option value={0}>{t("catalog.all")}</option>
+                {[1, 2, 3, 4, 5].map((d) => (
+                  <option key={d} value={d}>
+                    {t(`difficulty.${d}` as MessageKey)}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="row small">
+              {t("catalog.sort")}
+              <select value={sort} onChange={(e) => setSort(e.target.value as Sort)}>
+                <option value="name">{t("catalog.sort.name")}</option>
+                <option value="blocks">{t("catalog.sort.blocks")}</option>
+                <option value="difficulty">{t("catalog.sort.difficulty")}</option>
+              </select>
+            </label>
+          </div>
         </div>
       </div>
 

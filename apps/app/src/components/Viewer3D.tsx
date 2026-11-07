@@ -67,6 +67,7 @@ export function Viewer3D(p: Viewer3DProps) {
     v.onContextLost = () => setError(t("viewer.contextLost"));
     if (provider) v.setTextureProvider(provider);
     viewerRef.current = v;
+    if (import.meta.env.DEV) (window as unknown as { __kladkaViewer?: VoxelViewer }).__kladkaViewer = v;
     p.onReady?.(v);
     return () => {
       v.dispose();

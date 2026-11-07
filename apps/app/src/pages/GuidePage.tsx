@@ -60,6 +60,58 @@ export function GuidePage({ id }: { id: string }) {
     go(step + 1);
   }, [step, go]);
 
+  // bounding box of the current step and whether the work happens inside the building
+  const stepBox = useMemo(() => {
+    if (!build || !cur) return null;
+    const min: [number, number, number] = [Infinity, Infinity, Infinity];
+    const max: [number, number, number] = [-Infinity, -Infinity, -Infinity];
+    for (const i of cur.blocks) {
+      const c = build.model.coords(i);
+      min[0] = Math.min(min[0], c.x);
+      min[1] = Math.min(min[1], c.y);
+      min[2] = Math.min(min[2], c.z);
+      max[0] = Math.max(max[0], c.x + 1);
+      max[1] = Math.max(max[1], c.y + 1);
+      max[2] = Math.max(max[2], c.z + 1);
+    }
+    if (!Number.isFinite(min[0])) return null;
+    const { x: sx, z: sz } = build.model.size;
+    const cx = (min[0] + max[0]) / 2,
+      cz = (min[2] + max[2]) / 2;
+    const inset = 1.6;
+    const centred = cx > inset && cx < sx - inset && cz > inset && cz < sz - inset;
+    const inside =
+      cur.stage === "interior" ||
+      (centred &&
+        cur.stage !== "roof" &&
+        cur.stage !== "foundation" &&
+        max[0] - min[0] < sx - 2 &&
+        max[2] - min[2] < sz - 2);
+    return { min, max, inside };
+  }, [build, cur]);
+
+  // cutaway: hide everything above the step when the work is indoors
+  const cutaway = useMemo(() => {
+    if (!settings.autoCutaway || !build || !stepBox?.inside) return null;
+    const top = stepBox.max[1];
+    if (top >= build.model.size.y) return null;
+    return {
+      min: [0, 0, 0] as [number, number, number],
+      max: [build.model.size.x, top, build.model.size.z] as [number, number, number],
+    };
+  }, [settings.autoCutaway, build, stepBox]);
+
+  // automatic camera: fly to the blocks of the current step
+  useEffect(() => {
+    const v = viewer.current;
+    if (!settings.autoCamera || !stepBox || !cur || !v) return;
+    const lookDown = stepBox.inside || cur.stage === "foundation";
+    v.focusOn(stepBox.min, stepBox.max, {
+      interior: lookDown ? true : undefined,
+      closeness: stepBox.inside ? 0.7 : 1,
+    });
+  }, [cur, stepBox, settings.autoCamera]);
+
   // keyboard
   useEffect(() => {
     const on = (e: KeyboardEvent) => {
@@ -265,6 +317,8 @@ export function GuidePage({ id }: { id: string }) {
             showFuture={settings.showFuture}
             ghostBelowY={settings.ghostBelow && cur ? layerY : null}
             selectedPalette={selected}
+            clip={cutaway}
+            tip={cutaway ? t("guide.cutaway", { y: cutaway.max[1] - 1 }) : null}
             onReady={(v) => (viewer.current = v)}
             label={item.meta.title[locale]}
           />
@@ -372,6 +426,16 @@ export function GuidePage({ id }: { id: string }) {
               label={t("guide.showFuture")}
               checked={settings.showFuture}
               onChange={(v) => settings.set({ showFuture: v })}
+            />
+            <Switch
+              label={t("guide.autoCamera")}
+              checked={settings.autoCamera}
+              onChange={(v) => settings.set({ autoCamera: v })}
+            />
+            <Switch
+              label={t("guide.autoCutaway")}
+              checked={settings.autoCutaway}
+              onChange={(v) => settings.set({ autoCutaway: v })}
             />
             <Switch
               label={t("guide.ghostBelow")}

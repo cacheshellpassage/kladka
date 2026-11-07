@@ -52,6 +52,10 @@
   box-sizing: border-box;
 }
 
+[hidden] {
+  display: none !important;
+}
+
 html,
 body,
 #root {
@@ -194,6 +198,9 @@ main.page.wide {
 
 @media (max-width: 720px) {
   .topnav {
+    display: none;
+  }
+  .immersive .bottomnav {
     display: none;
   }
   .bottomnav {

@@ -188,6 +188,7 @@ export function SettingsPage() {
           type="file"
           accept=".zip,.jar"
           hidden
+          data-testid="resource-pack-input"
           onChange={(e) => {
             void loadPack(e.target.files?.[0]);
             e.target.value = "";

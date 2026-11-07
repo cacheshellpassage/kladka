@@ -28,6 +28,7 @@ export const en: Record<MessageKey, string> = {
   "catalog.imported": "My imports",
   "catalog.count": "{n} builds",
   "catalog.reset": "Reset filters",
+  "catalog.filters": "Filters",
   "catalog.progress": "{p}% done",
 
   "style.rustic": "Rustic",
@@ -64,6 +65,7 @@ export const en: Record<MessageKey, string> = {
   "build.loading": "Loading build…",
   "build.minutes": "≈ {n} min",
   "build.hours": "≈ {h} h {m} min",
+  "build.hoursOnly": "≈ {h} h",
   "build.stages": "Stages",
   "build.noPreview": "No preview",
   "build.warnings": "Warnings",
@@ -87,6 +89,7 @@ export const en: Record<MessageKey, string> = {
   "materials.shulkers": "shulkers",
   "materials.unit": "Units",
   "materials.stack": "{s} st. + {r}",
+  "materials.stackOnly": "{s} st.",
   "materials.shulker": "{n} shulk.",
   "materials.scope.step": "Step",
   "materials.scope.layer": "Layer",
@@ -111,6 +114,9 @@ export const en: Record<MessageKey, string> = {
   "guide.view.split": "3D + plan",
   "guide.showFuture": "Show upcoming blocks",
   "guide.ghostBelow": "Dim lower layers",
+  "guide.autoCamera": "Auto camera: follow new blocks",
+  "guide.autoCutaway": "Cutaway for indoor work (hide roof and upper floors)",
+  "guide.cutaway": "Cutaway: everything above layer Y = {y} is hidden",
   "guide.deferred": "These blocks go in after the block that holds them (e.g. hanging lanterns).",
   "guide.scaffold":
     "These blocks have nothing to rest on — place a temporary support and remove it afterwards.",

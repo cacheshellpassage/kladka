@@ -20,6 +20,8 @@ export interface Settings {
   coverStyle: ModePref;
   showFuture: boolean;
   ghostBelow: boolean;
+  autoCamera: boolean;
+  autoCutaway: boolean;
   guideView: "3d" | "2d" | "split";
   rememberResourcePack: boolean;
 }
@@ -61,6 +63,8 @@ export const DEFAULT_SETTINGS: Settings = {
   coverStyle: "classic",
   showFuture: false,
   ghostBelow: false,
+  autoCamera: true,
+  autoCutaway: true,
   guideView: "split",
   rememberResourcePack: false,
 };

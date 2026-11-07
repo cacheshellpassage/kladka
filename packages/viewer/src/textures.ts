@@ -186,9 +186,13 @@ const GENERATORS: Record<TexPattern, (c: Canvas16, k: Ctx) => void> = {
     }),
   leaves: (c, { base, acc, n }) =>
     c.fill((x, y) => {
-      const v = n(x, y, 71);
-      if (v < 0.18) return [base, 0];
-      return [v > 0.7 ? acc : mul(base, 0.85 + v * 0.3)];
+      // clumps of 2×2 leaves in three tones, a few small gaps and darker clump edges
+      const clump = n(x >> 1, y >> 1, 71);
+      if (n(x, y, 72) < 0.1 && clump < 0.55) return [base, 0];
+      const tone = clump < 0.33 ? 0.62 : clump < 0.75 ? 0.78 : 0.92;
+      const edge = (x & 1) === (y & 1) ? 0.92 : 1;
+      const col = mix(mul(base, tone * edge), acc, n(x, y, 73) > 0.88 ? 0.5 : 0);
+      return [col];
     }),
   glass: (c, { base, acc }) =>
     c.fill((x, y) => {

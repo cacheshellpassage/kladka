@@ -96,6 +96,16 @@ export class VoxelViewer {
     onDone?: () => void;
   } | null = null;
   private stepValue: number | null = null;
+  /** Camera distance that frames the whole model (set by resetCamera). */
+  private fitDistance = 30;
+  private flight: {
+    start: number;
+    duration: number;
+    fromPos: THREE.Vector3;
+    fromTarget: THREE.Vector3;
+    toPos: THREE.Vector3;
+    toTarget: THREE.Vector3;
+  } | null = null;
   private buildToken = 0;
   private showGround: boolean;
   private maxPixelRatio: number;
@@ -141,6 +151,8 @@ export class VoxelViewer {
     this.controls.maxPolarAngle = Math.PI * 0.495;
     this.controls.touches = { ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY_PAN };
     this.controls.addEventListener("change", () => (this.dirty = true));
+    // the user takes over: stop any automatic camera flight
+    this.controls.addEventListener("start", () => (this.flight = null));
 
     this.materials = createMaterials(this.mode, this.uniforms);
     this.scene.add(this.root);
@@ -228,6 +240,7 @@ export class VoxelViewer {
     tex.colorSpace = THREE.SRGBColorSpace;
     tex.magFilter = THREE.NearestFilter;
     tex.minFilter = THREE.NearestMipmapLinearFilter;
+    tex.anisotropy = Math.min(8, this.renderer.capabilities.getMaxAnisotropy());
     tex.generateMipmaps = true;
     tex.wrapS = THREE.RepeatWrapping;
     tex.wrapT = THREE.RepeatWrapping;
@@ -331,11 +344,9 @@ export class VoxelViewer {
     this.updateClipUniforms();
     this.updateComposerPasses();
     if (!this.model) return;
-    for (const [key, e] of this.chunks) {
-      if (chunkTouchesClipChange(e.origin, prev, clip)) {
-        this.buildChunk(e.origin);
-        void key;
-      }
+    // iterate over a snapshot: buildChunk() re-inserts keys, which would revisit them forever
+    for (const e of [...this.chunks.values()]) {
+      if (chunkTouchesClipChange(e.origin, prev, clip)) this.buildChunk(e.origin);
     }
     // chunks that were completely empty after clipping may need building again
     for (const o of nonEmptyChunks(this.model, CHUNK))
@@ -540,6 +551,7 @@ export class VoxelViewer {
 
   /** Camera presets: 0 = front-right, 1 = back-right, 2 = back-left, 3 = front-left, 4 = top. */
   resetCamera(preset = 0): void {
+    this.flight = null;
     const m = this.model;
     const sx = m?.size.x ?? 16,
       sy = m?.size.y ?? 16,
@@ -568,6 +580,7 @@ export class VoxelViewer {
           const z = p.dot(fwd);
           fit = Math.max(fit, z + Math.abs(p.dot(right)) / tanH, z + Math.abs(p.dot(up)) / tanV);
         }
+    this.fitDistance = fit;
     this.camera.position.copy(target).addScaledVector(back, fit);
     this.controls.target.copy(target);
     this.controls.minDistance = 2;
@@ -578,8 +591,104 @@ export class VoxelViewer {
     this.dirty = true;
   }
 
+  /**
+   * Smoothly moves the camera to frame a box of blocks (model coordinates, max exclusive).
+   * - exterior work (box near the outline of the build): camera moves to that side of the build;
+   * - interior work (box well inside the footprint): camera looks down steeply over the walls;
+   * - `minDistance` keeps some context around small steps.
+   * Any user interaction (drag, pinch, wheel) cancels the flight.
+   */
+  focusOn(
+    min: [number, number, number],
+    max: [number, number, number],
+    opts: { durationMs?: number; minDistance?: number; interior?: boolean; closeness?: number } = {},
+  ): void {
+    const m = this.model;
+    if (!m) return;
+    const off = this.root.position;
+    const center = new THREE.Vector3(
+      (min[0] + max[0]) / 2 + off.x,
+      (min[1] + max[1]) / 2 + off.y,
+      (min[2] + max[2]) / 2 + off.z,
+    );
+    const half = new THREE.Vector3((max[0] - min[0]) / 2, (max[1] - min[1]) / 2, (max[2] - min[2]) / 2);
+    // where is the work relative to the footprint?
+    const fx = center.x / Math.max(1, m.size.x / 2);
+    const fz = center.z / Math.max(1, m.size.z / 2);
+    const edge = Math.max(Math.abs(fx), Math.abs(fz)); // 0 = centre, 1 = outline
+    const interior = opts.interior ?? (edge < 0.55 && half.x < m.size.x * 0.4 && half.z < m.size.z * 0.4);
+
+    const cur = new THREE.Spherical().setFromVector3(this.camera.position.clone().sub(this.controls.target));
+    let theta = cur.theta;
+    if (!interior && edge > 0.15) {
+      const wanted = Math.atan2(center.x, center.z); // azimuth pointing from the centre to the work
+      // only swing round when the work is on a side we can't see well (> 70° away)
+      const diff = Math.atan2(Math.sin(wanted - theta), Math.cos(wanted - theta));
+      if (Math.abs(diff) > THREE.MathUtils.degToRad(70))
+        theta = theta + diff - Math.sign(diff) * THREE.MathUtils.degToRad(35);
+    }
+    const phi = interior
+      ? THREE.MathUtils.degToRad(32)
+      : THREE.MathUtils.clamp(cur.phi, THREE.MathUtils.degToRad(48), THREE.MathUtils.degToRad(72));
+
+    // distance that fits the box (plus margin) in the frustum
+    const back = new THREE.Vector3().setFromSpherical(new THREE.Spherical(1, phi, theta)).normalize();
+    const fwd = back.clone().negate();
+    const right = new THREE.Vector3().crossVectors(fwd, new THREE.Vector3(0, 1, 0)).normalize();
+    const up = new THREE.Vector3().crossVectors(right, fwd).normalize();
+    const tanV = Math.tan(THREE.MathUtils.degToRad(this.camera.fov) / 2) * 0.75;
+    const tanH = tanV * Math.max(0.3, this.camera.aspect);
+    // stay far enough to keep the building around the step in view
+    let dist = opts.minDistance ?? Math.max(9, this.fitDistance * 0.72 * (opts.closeness ?? 1));
+    for (const sx of [-1, 1])
+      for (const sy of [-1, 1])
+        for (const sz of [-1, 1]) {
+          const p = new THREE.Vector3(sx * half.x, sy * half.y, sz * half.z);
+          const z = p.dot(fwd);
+          dist = Math.max(dist, z + Math.abs(p.dot(right)) / tanH, z + Math.abs(p.dot(up)) / tanV);
+        }
+    dist = Math.min(dist, this.controls.maxDistance);
+    const toPos = center.clone().addScaledVector(back, dist);
+    this.flight = {
+      start: performance.now(),
+      duration: opts.durationMs ?? 650,
+      fromPos: this.camera.position.clone(),
+      fromTarget: this.controls.target.clone(),
+      toPos,
+      toTarget: center,
+    };
+    this.dirty = true;
+  }
+
+  isFlying(): boolean {
+    return this.flight !== null;
+  }
+
+  private stepFlight(): void {
+    const f = this.flight;
+    if (!f) return;
+    const t = Math.min(1, (performance.now() - f.start) / f.duration);
+    const e = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; // easeInOutCubic
+    // interpolate around the target (spherically) to avoid cutting through the build
+    const target = f.fromTarget.clone().lerp(f.toTarget, e);
+    const a = new THREE.Spherical().setFromVector3(f.fromPos.clone().sub(f.fromTarget));
+    const b = new THREE.Spherical().setFromVector3(f.toPos.clone().sub(f.toTarget));
+    const dTheta = Math.atan2(Math.sin(b.theta - a.theta), Math.cos(b.theta - a.theta));
+    const s = new THREE.Spherical(
+      a.radius + (b.radius - a.radius) * e,
+      a.phi + (b.phi - a.phi) * e,
+      a.theta + dTheta * e,
+    );
+    this.camera.position.copy(target).add(new THREE.Vector3().setFromSpherical(s));
+    this.controls.target.copy(target);
+    this.camera.lookAt(target);
+    this.dirty = true;
+    if (t >= 1) this.flight = null;
+  }
+
   /** Orbits the camera by an angle (radians), e.g. for keyboard controls. */
   orbit(dAzimuth: number, dElevation = 0): void {
+    this.flight = null;
     const offset = this.camera.position.clone().sub(this.controls.target);
     const sph = new THREE.Spherical().setFromVector3(offset);
     sph.theta += dAzimuth;
@@ -591,6 +700,7 @@ export class VoxelViewer {
   }
 
   zoom(factor: number): void {
+    this.flight = null;
     const offset = this.camera.position.clone().sub(this.controls.target).multiplyScalar(factor);
     const len = THREE.MathUtils.clamp(offset.length(), this.controls.minDistance, this.controls.maxDistance);
     offset.setLength(len);
@@ -706,7 +816,8 @@ export class VoxelViewer {
   private loop = (): void => {
     if (this.disposed) return;
     this.raf = requestAnimationFrame(this.loop);
-    const moved = this.controls.update();
+    this.stepFlight();
+    const moved = this.flight ? false : this.controls.update();
     if (this.animation) {
       const a = this.animation;
       const t = Math.min(1, (performance.now() - a.start) / a.duration);

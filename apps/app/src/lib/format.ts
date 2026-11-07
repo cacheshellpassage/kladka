@@ -4,13 +4,16 @@ import type { Locale, Units } from "../store/settings";
 
 export function formatMinutes(t: TFunction, minutes: number): string {
   if (minutes < 60) return t("build.minutes", { n: minutes });
-  return t("build.hours", { h: Math.floor(minutes / 60), m: minutes % 60 });
+  const h = Math.floor(minutes / 60),
+    m = minutes % 60;
+  return m ? t("build.hours", { h, m }) : t("build.hoursOnly", { h });
 }
 
 export function formatCount(t: TFunction, line: MaterialLine, units: Units): string {
-  if (units === "pieces" || line.count < line.stackSize) return `${line.count}`;
+  if (units === "pieces" || line.count < line.stackSize || line.stackSize === 1) return `${line.count}`;
   if (units === "shulkers" && line.shulkers >= 0.5)
     return t("materials.shulker", { n: line.shulkers.toFixed(line.shulkers < 10 ? 1 : 0) });
+  if (line.remainder === 0) return t("materials.stackOnly", { s: line.stacks });
   return t("materials.stack", { s: line.stacks, r: line.remainder });
 }
 

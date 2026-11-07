@@ -28,7 +28,7 @@ export function Shell({ route, wide, children }: { route: Route; wide?: boolean;
     },
   ];
   return (
-    <div className={`app ${hand === "left" ? "left-handed" : ""}`}>
+    <div className={`app ${hand === "left" ? "left-handed" : ""} ${wide ? "immersive" : ""}`}>
       <a className="sr-only" href="#main">
         Skip to content
       </a>

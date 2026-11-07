@@ -117,3 +117,42 @@ As proposed in the brief, with two small additions:
 - Storage: IndexedDB via `idb` (imports, favourites, progress, settings mirror).
 - PDF export: a minimal in-house PDF writer embedding JPEG pages (no jsPDF, ~100 lines).
 - GIF export: `gifenc` (MIT). Video: `MediaRecorder` (WebM) when the platform supports it.
+
+## D-011 Buildability rules for generated roofs (2026-11-07)
+
+- Unit tests re-simulate every plan. They showed that hip/cone roofs made only of stairs are **not placeable by
+  hand** (each ring touches the previous one only diagonally). Roof helpers now lay a ring of full blocks under every
+  next ring (`underFill`), gables with open ends or overhangs > 1 do the same, and roofs start on the ceiling layer.
+  All 36 built-in builds need 0 scaffolding blocks (test threshold: < 2 %).
+
+## D-012 Step granularity (2026-11-07)
+
+- Max 48 blocks per step; small neighbouring regions (≤ 24 blocks, bounding-box gap ≤ 3) are merged so that e.g. two
+  window panes become one step instead of two. Typical build: 40–200 steps.
+
+## D-013 Covers (2026-11-07)
+
+- 800×500 WebP covers (q 0.8) + 384×240 thumbnails, classic and cinematic, 4 angles → ≈ 5.6 MB for 36 builds.
+- Cinematic = "shaders" high quality at golden hour (sunset preset tuned for readability).
+- Rendered with the locally installed Edge (software WebGL, ~5 s per build); CI can use Playwright's Chromium.
+
+## D-014 Resource packs / client.jar (2026-11-07)
+
+- Users can load their own resource pack or `client.jar`; textures under `assets/minecraft/textures/block/` are
+  decoded locally (first animation frame, scaled to 16×16, biome tint for grass/leaves applied with fixed colours)
+  and mapped to our blocks by naming conventions (`<id>`, `<id>_top`, `<material>`, `<log>_top`, …).
+- Optional "remember on this device" stores the extracted 16×16 textures in IndexedDB; off by default.
+- Verified with a real 26.1.2 client jar on the owner's machine (1112 textures, correct mapping); no such
+  texture or screenshot is stored in the repository.
+
+## D-015 Android permissions (2026-11-07)
+
+- Kept Capacitor's default `INTERNET` permission (the WebView serves the bundle from `https://localhost`); the app
+  makes no network requests (CSP + E2E request audit + `pnpm check:offline`). Removing the permission is documented in
+  RUSTORE.md as an option to test on a device.
+
+## D-016 Local verification limits (2026-11-07)
+
+- Locally verified: unit tests, E2E (Edge), web/PWA build, offline audit, licence audit, Tauri icon generation,
+  Capacitor Android project generation. Not verified locally (no Rust / VS Build Tools / Android SDK by the owner's
+  choice): `tauri build` and Gradle builds — these run in GitHub Actions.
