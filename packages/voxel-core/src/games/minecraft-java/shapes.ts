@@ -57,8 +57,10 @@ export const DIR: Record<Face, [number, number, number]> = {
 
 /** Rotates a box defined for "north" by quarter turns clockwise (seen from above). */
 export function rotateBox(b: Box, turns: number): Box {
-  let [x0, y0, z0] = b.from;
-  let [x1, y1, z1] = b.to;
+  let [x0, , z0] = b.from;
+  let [x1, , z1] = b.to;
+  const y0 = b.from[1],
+    y1 = b.to[1];
   for (let t = 0; t < ((turns % 4) + 4) % 4; t++) {
     // (x, z) -> (16 - z, x)
     const nx0 = 16 - z1,
@@ -73,7 +75,15 @@ export function rotateBox(b: Box, turns: number): Box {
   return { ...b, from: [x0, y0, z0], to: [x1, y1, z1] };
 }
 
-function box(x0: number, y0: number, z0: number, x1: number, y1: number, z1: number, extra: Partial<Box> = {}): Box {
+function box(
+  x0: number,
+  y0: number,
+  z0: number,
+  x1: number,
+  y1: number,
+  z1: number,
+  extra: Partial<Box> = {},
+): Box {
   return { from: [x0, y0, z0], to: [x1, y1, z1], ...extra };
 }
 
@@ -189,7 +199,10 @@ export function shapeGeometry(s: BlockState, info: BlockInfo): ShapeGeometry {
     case "wall_torch":
       // defined for facing north: attached to the block in the south
       return {
-        boxes: rot([box(7, 3, 11.5, 9, 11, 13.5), box(6.5, 11, 10.5, 9.5, 13.5, 13.5, { glow: true })], p.facing),
+        boxes: rot(
+          [box(7, 3, 11.5, 9, 11, 13.5), box(6.5, 11, 10.5, 9.5, 13.5, 13.5, { glow: true })],
+          p.facing,
+        ),
       };
     case "lantern": {
       const dy = p.hanging === "true" ? 1 : 0;
@@ -206,7 +219,11 @@ export function shapeGeometry(s: BlockState, info: BlockInfo): ShapeGeometry {
     case "crop": {
       const age = Number(p.age ?? 7);
       const max = id === "beetroots" || id === "nether_wart" ? 3 : 7;
-      return { boxes: [], planes: "hash", planeHeight: Math.max(3, Math.round((16 * (age + 1)) / (max + 1))) };
+      return {
+        boxes: [],
+        planes: "hash",
+        planeHeight: Math.max(3, Math.round((16 * (age + 1)) / (max + 1))),
+      };
     }
     case "bed":
       return { boxes: [box(0, 3, 0, 16, 9, 16), box(0, 0, 0, 3, 3, 3), box(13, 0, 13, 16, 3, 16)] };
@@ -282,8 +299,10 @@ export function shapeGeometry(s: BlockState, info: BlockInfo): ShapeGeometry {
       return { boxes: [box(0, 0, 0, 16, 15, 16)] };
     case "rod": {
       const f = p.facing ?? "up";
-      if (f === "east" || f === "west") return { boxes: [box(0, 7, 7, 16, 9, 9, { glow: id === "end_rod" })] };
-      if (f === "north" || f === "south") return { boxes: [box(7, 7, 0, 9, 9, 16, { glow: id === "end_rod" })] };
+      if (f === "east" || f === "west")
+        return { boxes: [box(0, 7, 7, 16, 9, 9, { glow: id === "end_rod" })] };
+      if (f === "north" || f === "south")
+        return { boxes: [box(7, 7, 0, 9, 9, 16, { glow: id === "end_rod" })] };
       return { boxes: [box(7, 0, 7, 9, 16, 9, { glow: id === "end_rod" })] };
     }
     case "small":
@@ -291,17 +310,31 @@ export function shapeGeometry(s: BlockState, info: BlockInfo): ShapeGeometry {
       return { boxes: [box(4, 0, 4, 12, 8, 12)] };
     case "vine": {
       const boxes: Box[] = [];
-      for (const side of HORIZONTALS) if (p[side] === "true") boxes.push(...rot([box(0, 0, 0, 16, 16, 0.8)], side));
+      for (const side of HORIZONTALS)
+        if (p[side] === "true") boxes.push(...rot([box(0, 0, 0, 16, 16, 0.8)], side));
       if (p.up === "true") boxes.push(box(0, 15.2, 0, 16, 16, 16));
       if (boxes.length === 0) boxes.push(box(0, 0, 0, 16, 16, 0.8));
       return { boxes };
     }
     case "anvil": {
-      const boxes = [box(2, 0, 2, 14, 4, 14), box(4, 4, 3, 12, 5, 13), box(6, 5, 4, 10, 10, 12), box(3, 10, 0, 13, 16, 16)];
-      return { boxes: p.facing === "east" || p.facing === "west" ? boxes.map((b) => rotateBox(b, 1)) : boxes };
+      const boxes = [
+        box(2, 0, 2, 14, 4, 14),
+        box(4, 4, 3, 12, 5, 13),
+        box(6, 5, 4, 10, 10, 12),
+        box(3, 10, 0, 13, 16, 16),
+      ];
+      return {
+        boxes: p.facing === "east" || p.facing === "west" ? boxes.map((b) => rotateBox(b, 1)) : boxes,
+      };
     }
     case "lectern":
-      return { boxes: [box(0, 0, 0, 16, 2, 16), box(4, 2, 4, 12, 13, 12), ...rot([box(0, 12, 1, 16, 15, 15)], p.facing)] };
+      return {
+        boxes: [
+          box(0, 0, 0, 16, 2, 16),
+          box(4, 2, 4, 12, 13, 12),
+          ...rot([box(0, 12, 1, 16, 15, 15)], p.facing),
+        ],
+      };
     case "table":
       return { boxes: [box(0, 0, 0, 16, id === "stonecutter" ? 9 : 12, 16)] };
     case "cake":

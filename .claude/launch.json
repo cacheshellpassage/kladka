@@ -1,0 +1,13 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "app-dev",
+      "runtimeExecutable": "C:/Users/Арсений/AppData/Local/Programs/node24/node.exe",
+      "runtimeArgs": ["node_modules/vite/bin/vite.js", "--port", "5173", "--strictPort", "--host", "127.0.0.1"],
+      "url": "http://127.0.0.1:5173",
+      "cwd": "apps/app",
+      "port": 5173
+    }
+  ]
+}

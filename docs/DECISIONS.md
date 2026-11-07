@@ -19,7 +19,7 @@ Newest entries are appended at the end of each section. Dates are absolute (YYYY
 - **Sponge Schematic v3** (spec dated 2021-05-04, still current): root compound contains a `Schematic`
   compound; blocks live in `Blocks { Palette, Data (varint[]), BlockEntities[] }`; index
   `x + z*Width + y*Width*Length`; block entities are `{ Pos int[3], Id, Data }`.
-- **Sponge Schematic v2**: root compound *named* `Schematic`; top level `Palette`, `PaletteMax`,
+- **Sponge Schematic v2**: root compound _named_ `Schematic`; top level `Palette`, `PaletteMax`,
   `BlockData`, `BlockEntities` (extra fields flattened into the compound).
 - **Litematica**: checked the upstream source for MC 26.3 (`sakura-ryoko/litematica`, branch `26.3`):
   `SCHEMATIC_VERSION = 7`, `SCHEMATIC_VERSION_SUB = 1`, readers accept versions 1..7. Block states are a
@@ -32,18 +32,18 @@ Newest entries are appended at the end of each section. Dates are absolute (YYYY
 
 ## D-003 Toolchain (2026-11-07)
 
-| Tool | Version | Why |
-| --- | --- | --- |
-| Node.js | 24 LTS (24.22.2) | Active LTS; Node 26 only entered LTS on 2026-10-28, too fresh for native tooling. Installed portably in `%LOCALAPPDATA%\Programs\node24` on the dev machine (no admin rights needed). |
-| pnpm | 10.x | Workspaces, strict node_modules, fast CI cache. |
-| TypeScript | **6.0.x** (not 7.0) | `typescript-eslint` 8.72 supports `<6.1.0`; TS 7 (native Go port) is not yet supported by the lint toolchain. Strict mode everywhere. |
-| Vite | 8.x | Default bundler for React; `@vitejs/plugin-react` 6 requires Vite 8. |
-| Vitest | 5.x | Same transform pipeline as Vite. |
-| React | 19.x | UI. |
-| Zustand | 5.x | Small state store, as required. |
-| three.js | 0.187 | 3D viewer; post-processing via `three/addons` (no extra dependency). |
-| ESLint 10 + typescript-eslint 8 + Prettier 3 | | Lint/format. |
-| Playwright | 1.65 | E2E + headless rendering. Locally uses the installed Microsoft Edge (`channel: "msedge"`) so no browser download is needed; CI installs Chromium. |
+| Tool                                         | Version             | Why                                                                                                                                                                                   |
+| -------------------------------------------- | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Node.js                                      | 24 LTS (24.22.2)    | Active LTS; Node 26 only entered LTS on 2026-10-28, too fresh for native tooling. Installed portably in `%LOCALAPPDATA%\Programs\node24` on the dev machine (no admin rights needed). |
+| pnpm                                         | 10.x                | Workspaces, strict node_modules, fast CI cache.                                                                                                                                       |
+| TypeScript                                   | **6.0.x** (not 7.0) | `typescript-eslint` 8.72 supports `<6.1.0`; TS 7 (native Go port) is not yet supported by the lint toolchain. Strict mode everywhere.                                                 |
+| Vite                                         | 8.x                 | Default bundler for React; `@vitejs/plugin-react` 6 requires Vite 8.                                                                                                                  |
+| Vitest                                       | 5.x                 | Same transform pipeline as Vite.                                                                                                                                                      |
+| React                                        | 19.x                | UI.                                                                                                                                                                                   |
+| Zustand                                      | 5.x                 | Small state store, as required.                                                                                                                                                       |
+| three.js                                     | 0.187               | 3D viewer; post-processing via `three/addons` (no extra dependency).                                                                                                                  |
+| ESLint 10 + typescript-eslint 8 + Prettier 3 |                     | Lint/format.                                                                                                                                                                          |
+| Playwright                                   | 1.65                | E2E + headless rendering. Locally uses the installed Microsoft Edge (`channel: "msedge"`) so no browser download is needed; CI installs Chromium.                                     |
 
 ## D-004 Native shells (2026-11-07)
 

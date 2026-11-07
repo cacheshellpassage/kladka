@@ -24,7 +24,11 @@ function seedOf(def: TexDef): number {
 type RGB = [number, number, number];
 const rgb = (c: number): RGB => [(c >> 16) & 255, (c >> 8) & 255, c & 255];
 const mul = (c: RGB, k: number): RGB => [c[0] * k, c[1] * k, c[2] * k];
-const mix = (a: RGB, b: RGB, t: number): RGB => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t];
+const mix = (a: RGB, b: RGB, t: number): RGB => [
+  a[0] + (b[0] - a[0]) * t,
+  a[1] + (b[1] - a[1]) * t,
+  a[2] + (b[2] - a[2]) * t,
+];
 
 class Canvas16 {
   readonly data = new Uint8Array(TEX * TEX * 4);
@@ -71,7 +75,8 @@ const GENERATORS: Record<TexPattern, (c: Canvas16, k: Ctx) => void> = {
   plain: (c, { base, noisy }) => c.fill((x, y) => [noisy(base, 0.05, x, y)]),
   noise: (c, { base, acc, n, noisy }) => c.fill((x, y) => [noisy(n(x, y, 3) > 0.8 ? acc : base, 0.16, x, y)]),
   concrete: (c, { base, noisy }) => c.fill((x, y) => [noisy(base, 0.04, x, y)]),
-  terracotta: (c, { base, acc, n, noisy }) => c.fill((x, y) => [noisy(n(x, y, 5) > 0.85 ? acc : base, 0.07, x, y)]),
+  terracotta: (c, { base, acc, n, noisy }) =>
+    c.fill((x, y) => [noisy(n(x, y, 5) > 0.85 ? acc : base, 0.07, x, y)]),
   stone: (c, { base, acc, n, noisy }) =>
     c.fill((x, y) => {
       const blob = n(x >> 1, y >> 1, 7) > 0.72 || n(x, y, 9) > 0.9;
@@ -120,7 +125,8 @@ const GENERATORS: Record<TexPattern, (c: Canvas16, k: Ctx) => void> = {
       const cut = Math.floor(n(board, 0, 21) * 16);
       const vseam = x === cut;
       if (seam || vseam) return [acc];
-      const grain = 0.94 + 0.12 * Math.sin((x + n(board, 1, 22) * 10) * 0.9 + y * 0.3) * 0.5 + (n(x, y) - 0.5) * 0.06;
+      const grain =
+        0.94 + 0.12 * Math.sin((x + n(board, 1, 22) * 10) * 0.9 + y * 0.3) * 0.5 + (n(x, y) - 0.5) * 0.06;
       return [mul(base, grain * (0.95 + n(board, 3, 23) * 0.1))];
     }),
   log: (c, { base, acc, n }) =>
@@ -168,8 +174,10 @@ const GENERATORS: Record<TexPattern, (c: Canvas16, k: Ctx) => void> = {
       const d = Math.max(Math.abs(x - 7.5), Math.abs(y - 7.5));
       return [d > 6.5 || (d > 3 && d < 4.2) ? acc : noisy(base, 0.05, x, y)];
     }),
-  mosaic: (c, { base, acc, noisy }) => c.fill((x, y) => [noisy(((x >> 2) + (y >> 2)) % 2 ? base : acc, 0.05, x, y)]),
-  sandstone: (c, { base, acc, noisy }) => c.fill((x, y) => [y === 0 || y === 11 || y === 15 ? acc : noisy(base, 0.05, x, y)]),
+  mosaic: (c, { base, acc, noisy }) =>
+    c.fill((x, y) => [noisy(((x >> 2) + (y >> 2)) % 2 ? base : acc, 0.05, x, y)]),
+  sandstone: (c, { base, acc, noisy }) =>
+    c.fill((x, y) => [y === 0 || y === 11 || y === 15 ? acc : noisy(base, 0.05, x, y)]),
   shingles: (c, { base, acc, n }) =>
     c.fill((x, y) => {
       const row = y >> 2;
@@ -188,8 +196,10 @@ const GENERATORS: Record<TexPattern, (c: Canvas16, k: Ctx) => void> = {
       if ((x === y + 3 || x === y + 4) && x > 4 && x < 12) return [mix(base, [255, 255, 255], 0.6), 110];
       return [base, 55];
     }),
-  wool: (c, { base, n }) => c.fill((x, y) => [mul(base, 0.93 + ((x + y) % 3 === 0 ? 0.06 : 0) + (n(x, y) - 0.5) * 0.06)]),
-  sand: (c, { base, acc, n, noisy }) => c.fill((x, y) => [noisy(n(x, y, 81) > 0.86 ? acc : base, 0.08, x, y)]),
+  wool: (c, { base, n }) =>
+    c.fill((x, y) => [mul(base, 0.93 + ((x + y) % 3 === 0 ? 0.06 : 0) + (n(x, y) - 0.5) * 0.06)]),
+  sand: (c, { base, acc, n, noisy }) =>
+    c.fill((x, y) => [noisy(n(x, y, 81) > 0.86 ? acc : base, 0.08, x, y)]),
   dirt: (c, { base, acc, n, noisy }) =>
     c.fill((x, y) => {
       const v = n(x, y, 91);
@@ -203,7 +213,8 @@ const GENERATORS: Record<TexPattern, (c: Canvas16, k: Ctx) => void> = {
       return [mul(base, 0.9 + (n(x, y, 112) - 0.5) * 0.2)];
     }),
   path_top: (c, { base, n }) => c.fill((x, y) => [mul(base, 0.9 + n(x, y, 121) * 0.2)]),
-  farmland: (c, { base, n }) => c.fill((x, y) => [y % 4 === 0 ? mul(base, 0.7) : mul(base, 0.9 + n(x, y) * 0.2)]),
+  farmland: (c, { base, n }) =>
+    c.fill((x, y) => [y % 4 === 0 ? mul(base, 0.7) : mul(base, 0.9 + n(x, y) * 0.2)]),
   bookshelf: (c, { base, n }) => {
     const spines: RGB[] = [
       [150, 40, 30],
@@ -226,7 +237,8 @@ const GENERATORS: Record<TexPattern, (c: Canvas16, k: Ctx) => void> = {
   door: (c, { base, acc, n }) =>
     c.fill((x, y) => {
       if (border(x, y, 1)) return [acc];
-      if (y >= 2 && y <= 6 && x >= 3 && x <= 12 && x !== 7 && x !== 8) return [mix(base, [180, 210, 230], 0.5), 0];
+      if (y >= 2 && y <= 6 && x >= 3 && x <= 12 && x !== 7 && x !== 8)
+        return [mix(base, [180, 210, 230], 0.5), 0];
       if (x === 12 && y === 9) return [[40, 40, 40]];
       return [mul(base, 0.92 + n(x, y >> 2) * 0.12)];
     }),
@@ -237,7 +249,9 @@ const GENERATORS: Record<TexPattern, (c: Canvas16, k: Ctx) => void> = {
       return [base];
     }),
   crafting_top: (c, { base, acc, noisy }) =>
-    c.fill((x, y) => [border(x, y) || x === 5 || x === 10 || y === 5 || y === 10 ? acc : noisy(base, 0.08, x, y)]),
+    c.fill((x, y) => [
+      border(x, y) || x === 5 || x === 10 || y === 5 || y === 10 ? acc : noisy(base, 0.08, x, y),
+    ]),
   crafting_side: (c, { base, acc, n }) =>
     c.fill((x, y) => {
       if (y < 2) return [mul(acc, 1.1)];
@@ -263,19 +277,22 @@ const GENERATORS: Record<TexPattern, (c: Canvas16, k: Ctx) => void> = {
       if (border(x, y)) return [mul(acc, 0.8)];
       return [d > 5 && d < 6.2 ? [70, 70, 75] : mul(base, x % 4 === 0 ? 0.85 : 1)];
     }),
-  barrel_side: (c, { base, acc }) => c.fill((x, y) => [y === 2 || y === 13 ? [70, 70, 75] : x % 4 === 0 ? acc : base]),
+  barrel_side: (c, { base, acc }) =>
+    c.fill((x, y) => [y === 2 || y === 13 ? [70, 70, 75] : x % 4 === 0 ? acc : base]),
   glow: (c, { base, acc, n }) =>
     c.fill((x, y) => {
       const d = Math.hypot(x - 7.5, y - 7.5) / 10;
       return [mix(acc, base, Math.min(1, d + n(x, y) * 0.35))];
     }),
-  lamp: (c, { base, acc, n }) => c.fill((x, y) => [(x + y) % 5 === 0 || (x - y + 16) % 5 === 0 ? acc : mul(base, 0.8 + n(x, y) * 0.2)]),
+  lamp: (c, { base, acc, n }) =>
+    c.fill((x, y) => [(x + y) % 5 === 0 || (x - y + 16) % 5 === 0 ? acc : mul(base, 0.8 + n(x, y) * 0.2)]),
   water: (c, { base, acc, n }) =>
     c.fill((x, y) => {
       const wave = Math.sin(x * 0.8 + y * 0.4 + n(0, y, 141) * 3) > 0.85;
       return [wave ? acc : mul(base, 0.95 + n(x, y) * 0.1), 175];
     }),
-  lava: (c, { base, acc, n }) => c.fill((x, y) => [mix(base, acc, n(x >> 1, y >> 1, 151) * 0.8 + n(x, y) * 0.2)]),
+  lava: (c, { base, acc, n }) =>
+    c.fill((x, y) => [mix(base, acc, n(x >> 1, y >> 1, 151) * 0.8 + n(x, y) * 0.2)]),
   metal: (c, { base, acc, noisy }) =>
     c.fill((x, y) => {
       if (x === 0 || y === 0) return [mix(base, [255, 255, 255], 0.3)];
@@ -283,8 +300,11 @@ const GENERATORS: Record<TexPattern, (c: Canvas16, k: Ctx) => void> = {
       return [noisy(base, 0.04, x, y)];
     }),
   thatch: (c, { base, acc, n }) =>
-    c.fill((x, y) => [y === 3 || y === 12 ? acc : mul(base, 0.85 + n(x, 0, 161) * 0.25 + (n(x, y) - 0.5) * 0.08)]),
-  ore: (c, { base, acc, n, noisy }) => c.fill((x, y) => [noisy(n(x >> 1, y >> 1, 171) > 0.8 ? acc : base, 0.1, x, y)]),
+    c.fill((x, y) => [
+      y === 3 || y === 12 ? acc : mul(base, 0.85 + n(x, 0, 161) * 0.25 + (n(x, y) - 0.5) * 0.08),
+    ]),
+  ore: (c, { base, acc, n, noisy }) =>
+    c.fill((x, y) => [noisy(n(x >> 1, y >> 1, 171) > 0.8 ? acc : base, 0.1, x, y)]),
   scaffold: (c, { base, acc }) =>
     c.fill((x, y) => {
       if (border(x, y, 2)) return [x < 2 || x > 13 ? acc : base];
@@ -328,7 +348,6 @@ const GENERATORS: Record<TexPattern, (c: Canvas16, k: Ctx) => void> = {
       return [base, 0];
     }),
 };
-
 
 /** Average colour of a texture (for LOD/thumbnails). */
 export function averageColor(data: Uint8Array): [number, number, number] {

@@ -161,7 +161,11 @@ export function meshChunk(input: MeshInput, cx: number, cy: number, cz: number, 
     return p !== 0 && opaqueCube(p) ? 1 : 0;
   };
 
-  const builders: Record<RenderPass, Builder> = { opaque: new Builder(), cutout: new Builder(), translucent: new Builder() };
+  const builders: Record<RenderPass, Builder> = {
+    opaque: new Builder(),
+    cutout: new Builder(),
+    translucent: new Builder(),
+  };
   const passOf = (r: PaletteRender): RenderPass =>
     r.info.render === "translucent" ? "translucent" : r.info.render === "cutout" ? "cutout" : "opaque";
 
@@ -230,7 +234,7 @@ export function meshChunk(input: MeshInput, cx: number, cy: number, cz: number, 
           }
         // greedy merge
         for (let b = 0; b < dv; b++)
-          for (let a = 0; a < du; ) {
+          for (let a = 0; a < du;) {
             const mi = a + b * du;
             const key = maskKey[mi]!;
             if (key < 0) {
@@ -269,8 +273,20 @@ export function meshChunk(input: MeshInput, cx: number, cy: number, cz: number, 
             const uvs = corners.map((c) => uvFor(d, c, swap));
             const layer = r.layers[slotFor(face, r.axis)];
             const flip = aos[0]! + aos[2]! < aos[1]! + aos[3]!;
-            builders[passOf(r)].quad(corners, normal, uvs, layer, aos, st, p, r.emissive, maskRole[mi]!, flip);
-            for (let hh = 0; hh < h; hh++) for (let ww = 0; ww < w; ww++) maskKey[a + ww + (b + hh) * du] = -1;
+            builders[passOf(r)].quad(
+              corners,
+              normal,
+              uvs,
+              layer,
+              aos,
+              st,
+              p,
+              r.emissive,
+              maskRole[mi]!,
+              flip,
+            );
+            for (let hh = 0; hh < h; hh++)
+              for (let ww = 0; ww < w; ww++) maskKey[a + ww + (b + hh) * du] = -1;
             a += w;
           }
       }
@@ -303,7 +319,11 @@ export function meshChunk(input: MeshInput, cx: number, cy: number, cz: number, 
             bz1 = z + tz / 16;
           const glow = box.glow ? 1 : r.emissive;
           const layerOf = (face: FaceName) =>
-            box.glow ? r.glowLayer : box.tint !== undefined ? (r.tintLayers.get(box.tint) ?? 0) : r.layers[slotFor(face, r.axis)];
+            box.glow
+              ? r.glowLayer
+              : box.tint !== undefined
+                ? (r.tintLayers.get(box.tint) ?? 0)
+                : r.layers[slotFor(face, r.axis)];
           const target = box.glow && r.info.render === "opaque" ? builders.opaque : bld;
           const lo3 = [bx0, by0, bz0];
           const hi3 = [bx1, by1, bz1];
@@ -337,7 +357,12 @@ export function meshChunk(input: MeshInput, cx: number, cy: number, cz: number, 
                 c[v] = cv;
                 return c;
               };
-              let corners = [mk(lo3[u]!, lo3[v]!), mk(hi3[u]!, lo3[v]!), mk(hi3[u]!, hi3[v]!), mk(lo3[u]!, hi3[v]!)];
+              let corners = [
+                mk(lo3[u]!, lo3[v]!),
+                mk(hi3[u]!, lo3[v]!),
+                mk(hi3[u]!, hi3[v]!),
+                mk(lo3[u]!, hi3[v]!),
+              ];
               if (s < 0) corners = [corners[0]!, corners[3]!, corners[2]!, corners[1]!];
               const swap = swapUV(face, r.axis);
               const uvs = corners.map((c) => {
@@ -347,7 +372,17 @@ export function meshChunk(input: MeshInput, cx: number, cy: number, cz: number, 
               const normal: [number, number, number] = [0, 0, 0];
               normal[d] = s;
               const shadeBottom = face === "down" ? 0.9 : 1;
-              target.quad(corners, normal, uvs, layerOf(face), [shadeBottom, shadeBottom, shadeBottom, shadeBottom], st, p, glow, role);
+              target.quad(
+                corners,
+                normal,
+                uvs,
+                layerOf(face),
+                [shadeBottom, shadeBottom, shadeBottom, shadeBottom],
+                st,
+                p,
+                glow,
+                role,
+              );
             }
           }
         }
@@ -403,7 +438,17 @@ function emitPlanes(
     ];
     const ao = [0.85, 0.85, 1, 1];
     b.quad(c, up, uvs, layer, ao, step, pal, glow, role);
-    b.quad([c[1]!, c[0]!, c[3]!, c[2]!], up, [uvs[1]!, uvs[0]!, uvs[3]!, uvs[2]!], layer, ao, step, pal, glow, role);
+    b.quad(
+      [c[1]!, c[0]!, c[3]!, c[2]!],
+      up,
+      [uvs[1]!, uvs[0]!, uvs[3]!, uvs[2]!],
+      layer,
+      ao,
+      step,
+      pal,
+      glow,
+      role,
+    );
   }
 }
 
@@ -428,6 +473,7 @@ export function nonEmptyChunks(m: VoxelModel, size = CHUNK): Array<[number, numb
   const out: Array<[number, number, number]> = [];
   for (let cy = 0; cy < ny; cy++)
     for (let cz = 0; cz < nz; cz++)
-      for (let cx = 0; cx < nx; cx++) if (flags[cx + cz * nx + cy * nx * nz]) out.push([cx * size, cy * size, cz * size]);
+      for (let cx = 0; cx < nx; cx++)
+        if (flags[cx + cz * nx + cy * nx * nz]) out.push([cx * size, cy * size, cz * size]);
   return out;
 }

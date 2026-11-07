@@ -1,6 +1,17 @@
 /** Rural builds: barn, well, farm, stable, greenhouse, blacksmith, market stalls, fishing hut, watermill. */
 import { Builder, STONE, roofSet, woodSet, type Wood } from "../lib/builder";
-import { bush, chair, door, furniture, gableRoof, lantern, table, tree, wallTorch, windowRow } from "../lib/parts";
+import {
+  bush,
+  chair,
+  door,
+  furniture,
+  gableRoof,
+  lantern,
+  table,
+  tree,
+  wallTorch,
+  windowRow,
+} from "../lib/parts";
 
 export interface BarnParams {
   width: number;
@@ -34,8 +45,18 @@ export function barn(p: BarnParams): Builder {
   // big double door opening on the south gable (2 wide × 3 tall) with gates
   const mid = Math.floor((x0 + x1) / 2);
   for (let y = 1; y <= 3; y++) for (const x of [mid, mid + 1 - (W % 2)]) b.clear(x, y, z1);
-  b.set(mid, 1, z1, w.gate, "openings", { facing: "south", open: "false", in_wall: "false", powered: "false" });
-  b.set(mid + 1 - (W % 2), 1, z1, w.gate, "openings", { facing: "south", open: "false", in_wall: "false", powered: "false" });
+  b.set(mid, 1, z1, w.gate, "openings", {
+    facing: "south",
+    open: "false",
+    in_wall: "false",
+    powered: "false",
+  });
+  b.set(mid + 1 - (W % 2), 1, z1, w.gate, "openings", {
+    facing: "south",
+    open: "false",
+    in_wall: "false",
+    powered: "false",
+  });
   // white X braces on doors region
   for (let y = 2; y <= 3; y++) {
     b.set(mid - 1, y, z1 + 0, p.trim, "walls");
@@ -48,7 +69,8 @@ export function barn(p: BarnParams): Builder {
   }
   // hay loft floor
   b.fill(x0 + 1, wallTop, z0 + 1, x1 - 1, wallTop, z0 + Math.floor(D / 2), w.planks, "walls");
-  for (let x = x0 + 1; x <= x1 - 1; x++) for (let z = z0 + 1; z <= z0 + 2; z++) b.set(x, wallTop + 1, z, "hay_block", "interior", { axis: "y" });
+  for (let x = x0 + 1; x <= x1 - 1; x++)
+    for (let z = z0 + 1; z <= z0 + 2; z++) b.set(x, wallTop + 1, z, "hay_block", "interior", { axis: "y" });
   // gambrel roof: steep lower part then shallow upper part (ridge along z)
   const ov = 1;
   let y = wallTop + 1;
@@ -126,7 +148,8 @@ export function well(p: WellParams): Builder {
   // basin: 4×4 ring with water inside
   b.fill(c - 2, 0, c - 2, c + 1, 0, c + 1, st.block, "foundation");
   b.ring(c - 2, c - 2, c + 1, c + 1, 1, st.block, "walls");
-  for (let x = c - 1; x <= c; x++) for (let z = c - 1; z <= c; z++) b.set(x, 1, z, "water", "decor", { level: "0" });
+  for (let x = c - 1; x <= c; x++)
+    for (let z = c - 1; z <= c; z++) b.set(x, 1, z, "water", "decor", { level: "0" });
   b.ring(c - 2, c - 2, c + 1, c + 1, 2, st.slab, "walls", { type: "bottom" });
   // posts
   for (const [x, z] of [
@@ -137,7 +160,12 @@ export function well(p: WellParams): Builder {
   ] as const)
     for (let y = 2; y <= 4; y++) b.set(x, y, z, w.fence, "frame");
   // small gable roof
-  gableRoof(b, c - 2, c - 2, c + 1, c + 1, 5, roofSet(p.roofMat), { axis: "x", gable: null, overhang: 1, deck: w.planks });
+  gableRoof(b, c - 2, c - 2, c + 1, c + 1, 5, roofSet(p.roofMat), {
+    axis: "x",
+    gable: null,
+    overhang: 1,
+    deck: w.planks,
+  });
   b.set(c, 4, c - 1, "chain", "decor", { axis: "y" });
   lantern(b, c - 1, 4, c, true);
   // path around
@@ -182,7 +210,12 @@ export function farm(p: FarmParams): Builder {
   b.ring(x0 - 1, z0 - 1, x1 + 1, z1 + 1, 0, w.log, "foundation", { axis: "y" });
   b.ring(x0 - 1, z0 - 1, x1 + 1, z1 + 1, 1, w.fence, "decor");
   const gx = Math.floor((x0 + x1) / 2);
-  b.set(gx, 1, z1 + 1, w.gate, "openings", { facing: "south", open: "false", in_wall: "false", powered: "false" });
+  b.set(gx, 1, z1 + 1, w.gate, "openings", {
+    facing: "south",
+    open: "false",
+    in_wall: "false",
+    powered: "false",
+  });
   for (const [x, z] of [
     [x0 - 1, z0 - 1],
     [x1 + 1, z0 - 1],
@@ -246,8 +279,18 @@ export function stable(p: { stalls: number; wood: Wood; roofMat: string }): Buil
     const x = x0 + i * 3 + 1;
     b.set(x, 1, z0 + 1, "hay_block", "interior", { axis: "y" });
     b.set(x + 1, 1, z0 + 1, "cauldron", "interior");
-    b.set(x, 1, z1, w.gate, "openings", { facing: "south", open: "false", in_wall: "false", powered: "false" });
-    b.set(x + 1, 1, z1, w.gate, "openings", { facing: "south", open: "false", in_wall: "false", powered: "false" });
+    b.set(x, 1, z1, w.gate, "openings", {
+      facing: "south",
+      open: "false",
+      in_wall: "false",
+      powered: "false",
+    });
+    b.set(x + 1, 1, z1, w.gate, "openings", {
+      facing: "south",
+      open: "false",
+      in_wall: "false",
+      powered: "false",
+    });
     lantern(b, x, 3, z1 - 1, true);
   }
   b.fill(x0, 4, z0, x1, 4, z1, w.planks, "walls");
@@ -267,11 +310,13 @@ export function greenhouse(p: { width: number; depth: number; frame: string }): 
     z1 = M + D - 1;
   b.floor(x0, z0, x1, z1, 0, "smooth_stone");
   b.walls(x0, z0, x1, z1, 1, 4, "glass", "openings");
-  for (let x = x0; x <= x1; x += 3) for (let y = 1; y <= 4; y++) {
-    b.set(x, y, z0, p.frame, "frame");
-    b.set(x, y, z1, p.frame, "frame");
-  }
-  for (const x of [x0, x1]) for (let z = z0; z <= z1; z += 3) for (let y = 1; y <= 4; y++) b.set(x, y, z, p.frame, "frame");
+  for (let x = x0; x <= x1; x += 3)
+    for (let y = 1; y <= 4; y++) {
+      b.set(x, y, z0, p.frame, "frame");
+      b.set(x, y, z1, p.frame, "frame");
+    }
+  for (const x of [x0, x1])
+    for (let z = z0; z <= z1; z += 3) for (let y = 1; y <= 4; y++) b.set(x, y, z, p.frame, "frame");
   // glass gable roof
   let cl = z0,
     ch = z1,
@@ -295,9 +340,12 @@ export function greenhouse(p: { width: number; depth: number; frame: string }): 
     for (const z of [z0 + 1, z1 - 1]) {
       if (x === Math.floor((x0 + x1) / 2) && z === z1 - 1) continue;
       b.set(x, 0, z, "farmland", "foundation", { moisture: "7" });
-      b.set(x, 1, z, ["carrots", "potatoes", "beetroots", "wheat"][x % 4]!, "decor", { age: x % 4 === 2 ? "3" : "7" });
+      b.set(x, 1, z, ["carrots", "potatoes", "beetroots", "wheat"][x % 4]!, "decor", {
+        age: x % 4 === 2 ? "3" : "7",
+      });
     }
-  for (let x = x0 + 2; x <= x1 - 2; x += 2) b.set(x, 1, Math.floor((z0 + z1) / 2), "potted_red_tulip", "decor");
+  for (let x = x0 + 2; x <= x1 - 2; x += 2)
+    b.set(x, 1, Math.floor((z0 + z1) / 2), "potted_red_tulip", "decor");
   b.set(x0 + 1, 1, Math.floor((z0 + z1) / 2), "water_cauldron", "interior", { level: "3" });
   lantern(b, Math.floor((x0 + x1) / 2), 4, Math.floor((z0 + z1) / 2), true);
   return b;
@@ -326,7 +374,12 @@ export function blacksmith(p: { wood: Wood; stone: keyof typeof STONE; roofMat: 
   gableRoof(b, x0, z0, x1, z1, 4, roofSet(p.roofMat), { axis: "x", gable: w.planks, eaveTrim: true });
   // forge: stone block with lava-free hearth (campfire), chimney
   b.fill(x1 - 2, 1, zm + 1, x1 - 1, 1, zm + 2, st.block, "interior");
-  b.set(x1 - 2, 2, zm + 1, "campfire", "interior", { lit: "true", facing: "south", signal_fire: "false", waterlogged: "false" });
+  b.set(x1 - 2, 2, zm + 1, "campfire", "interior", {
+    lit: "true",
+    facing: "south",
+    signal_fire: "false",
+    waterlogged: "false",
+  });
   b.set(x1 - 1, 2, zm + 1, "blast_furnace", "interior", { facing: "south" });
   for (let y = 2; y <= 8; y++) b.set(x1 - 1, y, zm + 2, "bricks", y > 4 ? "roof" : "interior");
   b.set(x0 + 2, 1, zm + 2, "anvil", "interior", { facing: "east" });
@@ -383,14 +436,16 @@ export function fishingHut(p: { wood: Wood; roofMat: string }): Builder {
   const w = woodSet(p.wood);
   const b = new Builder(15, 13, 20);
   // water area (one layer)
-  for (let x = 0; x < 15; x++) for (let z = 9; z < 20; z++) b.set(x, 0, z, "water", "foundation", { level: "0" });
+  for (let x = 0; x < 15; x++)
+    for (let z = 9; z < 20; z++) b.set(x, 0, z, "water", "foundation", { level: "0" });
   // shore
   for (let x = 0; x < 15; x++) for (let z = 0; z < 9; z++) b.set(x, 0, z, "sand", "foundation");
   // pier on posts
   const px0 = 5,
     px1 = 8;
   for (let z = 7; z <= 18; z++) for (let x = px0; x <= px1; x++) b.set(x, 1, z, w.planks, "foundation");
-  for (let z = 9; z <= 18; z += 3) for (const x of [px0, px1]) b.set(x, 0, z, w.log, "foundation", { axis: "y" });
+  for (let z = 9; z <= 18; z += 3)
+    for (const x of [px0, px1]) b.set(x, 0, z, w.log, "foundation", { axis: "y" });
   for (let z = 9; z <= 18; z++) {
     b.set(px0, 2, z, w.fence, "decor");
     b.set(px1, 2, z, w.fence, "decor");
@@ -434,7 +489,8 @@ export function watermill(p: { wood: Wood; stone: keyof typeof STONE; roofMat: s
     x1 = 11,
     z1 = 11;
   // stream along the east side
-  for (let z = 0; z < 18; z++) for (let x = 13; x <= 17; x++) b.set(x, 0, z, "water", "foundation", { level: "0" });
+  for (let z = 0; z < 18; z++)
+    for (let x = 13; x <= 17; x++) b.set(x, 0, z, "water", "foundation", { level: "0" });
   b.floor(x0, z0, x1, z1, 0, st.block);
   b.walls(x0, z0, x1, z1, 1, 2, st.block, "walls");
   b.walls(x0, z0, x1, z1, 3, 6, w.planks, "walls", w.log);

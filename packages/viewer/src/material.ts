@@ -115,7 +115,11 @@ const CLASSIC_SHADE = /* glsl */ `
 export type PatchKind = "classic" | "standard" | "depth";
 
 /** Patches a material in place; returns it for chaining. */
-export function patchMaterial<T extends THREE.Material>(mat: T, uniforms: ViewerUniforms, kind: PatchKind): T {
+export function patchMaterial<T extends THREE.Material>(
+  mat: T,
+  uniforms: ViewerUniforms,
+  kind: PatchKind,
+): T {
   mat.onBeforeCompile = (shader) => {
     Object.assign(shader.uniforms, uniforms);
     shader.vertexShader = shader.vertexShader
@@ -128,7 +132,8 @@ export function patchMaterial<T extends THREE.Material>(mat: T, uniforms: Viewer
       frag = frag.replace("#include <map_fragment>", `${FRAG_SAMPLE}\nif (diffuseColor.a < 0.5) discard;`);
     } else {
       frag = frag.replace("#include <map_fragment>", FRAG_SAMPLE);
-      if (kind === "classic") frag = frag.replace("#include <color_fragment>", `#include <color_fragment>\n${CLASSIC_SHADE}`);
+      if (kind === "classic")
+        frag = frag.replace("#include <color_fragment>", `#include <color_fragment>\n${CLASSIC_SHADE}`);
       if (kind === "standard") {
         frag = frag.replace(
           "#include <emissivemap_fragment>",
@@ -162,11 +167,21 @@ export function createMaterials(mode: "classic" | "shaders", u: ViewerUniforms):
       return patchMaterial(new THREE.MeshBasicMaterial({ ...common, color: 0xffffff }), u, "classic");
     }
     return patchMaterial(
-      new THREE.MeshStandardMaterial({ ...common, color: 0xffffff, roughness: 0.92, metalness: 0, emissive: 0x000000 }),
+      new THREE.MeshStandardMaterial({
+        ...common,
+        color: 0xffffff,
+        roughness: 0.92,
+        metalness: 0,
+        emissive: 0x000000,
+      }),
       u,
       "standard",
     );
   };
-  const depth = patchMaterial(new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking }), u, "depth");
+  const depth = patchMaterial(
+    new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking }),
+    u,
+    "depth",
+  );
   return { opaque: mk("opaque"), cutout: mk("cutout"), translucent: mk("translucent"), depth };
 }

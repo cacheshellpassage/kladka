@@ -28,7 +28,9 @@ function javaSetAt(arr: BigInt64Array, bits: number, index: number, value: numbe
   const startArr = Number(startOffset >> 6n);
   const endArr = Number(((BigInt(index) + 1n) * BigInt(bits) - 1n) >> 6n);
   const startBit = Number(startOffset & 0x3fn);
-  arr[startArr] = L((arr[startArr]! & ~L(max << BigInt(startBit))) | L((BigInt(value) & max) << BigInt(startBit)));
+  arr[startArr] = L(
+    (arr[startArr]! & ~L(max << BigInt(startBit))) | L((BigInt(value) & max) << BigInt(startBit)),
+  );
   if (startArr !== endArr) {
     const endOffset = 64 - startBit;
     const j1 = bits - endOffset;
@@ -161,7 +163,10 @@ describe("output structure follows the specs", () => {
   it("our gzip output is readable by prismarine-nbt", async () => {
     const bytes = exportModel(m, "litematic").bytes;
     const { parsed } = await pnbt.parse(Buffer.from(gunzipSync(bytes)));
-    const simple = pnbt.simplify(parsed) as { Version: number; Regions: Record<string, { Size: { x: number } }> };
+    const simple = pnbt.simplify(parsed) as {
+      Version: number;
+      Regions: Record<string, { Size: { x: number } }>;
+    };
     expect(simple.Version).toBe(7);
     expect(Object.values(simple.Regions)[0]?.Size.x).toBe(m.size.x);
   });
@@ -169,7 +174,15 @@ describe("output structure follows the specs", () => {
 
 describe("Litematica import edge cases", () => {
   it("merges multiple regions with negative sizes", () => {
-    const region = (px: number, py: number, pz: number, sx: number, sy: number, sz: number, block: string) => {
+    const region = (
+      px: number,
+      py: number,
+      pz: number,
+      sx: number,
+      sy: number,
+      sz: number,
+      block: string,
+    ) => {
       const vol = Math.abs(sx * sy * sz);
       const vals = new Array<number>(vol).fill(1);
       return nbt.compound({
@@ -191,7 +204,11 @@ describe("Litematica import edge cases", () => {
       tag: nbt.compound({
         MinecraftDataVersion: nbt.int(3700),
         Version: nbt.int(6),
-        Metadata: nbt.compound({ Name: nbt.string("multi"), Author: nbt.string("t"), Description: nbt.string("") }),
+        Metadata: nbt.compound({
+          Name: nbt.string("multi"),
+          Author: nbt.string("t"),
+          Description: nbt.string(""),
+        }),
         Regions: nbt.compound({
           a: region(0, 0, 0, 2, 1, 2, "minecraft:stone"),
           // negative size: spans x 3..5 (pos 5, size -3)

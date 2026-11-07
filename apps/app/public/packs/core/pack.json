@@ -62,6 +62,22 @@
         "steps": 30,
         "difficulty": 2,
         "minutes": 15
+      },
+      "previews": {
+        "classic": [
+          "previews/starter-hut/classic-0.webp",
+          "previews/starter-hut/classic-1.webp",
+          "previews/starter-hut/classic-2.webp",
+          "previews/starter-hut/classic-3.webp"
+        ],
+        "thumb": "previews/starter-hut/classic-thumb.webp",
+        "cinematic": [
+          "previews/starter-hut/cinematic-0.webp",
+          "previews/starter-hut/cinematic-1.webp",
+          "previews/starter-hut/cinematic-2.webp",
+          "previews/starter-hut/cinematic-3.webp"
+        ],
+        "thumbCinematic": "previews/starter-hut/cinematic-thumb.webp"
       }
     },
     {
@@ -115,6 +131,22 @@
         "steps": 40,
         "difficulty": 3,
         "minutes": 25
+      },
+      "previews": {
+        "classic": [
+          "previews/oak-cottage/classic-0.webp",
+          "previews/oak-cottage/classic-1.webp",
+          "previews/oak-cottage/classic-2.webp",
+          "previews/oak-cottage/classic-3.webp"
+        ],
+        "thumb": "previews/oak-cottage/classic-thumb.webp",
+        "cinematic": [
+          "previews/oak-cottage/cinematic-0.webp",
+          "previews/oak-cottage/cinematic-1.webp",
+          "previews/oak-cottage/cinematic-2.webp",
+          "previews/oak-cottage/cinematic-3.webp"
+        ],
+        "thumbCinematic": "previews/oak-cottage/cinematic-thumb.webp"
       }
     },
     {
@@ -167,6 +199,22 @@
         "steps": 36,
         "difficulty": 3,
         "minutes": 25
+      },
+      "previews": {
+        "classic": [
+          "previews/spruce-cottage/classic-0.webp",
+          "previews/spruce-cottage/classic-1.webp",
+          "previews/spruce-cottage/classic-2.webp",
+          "previews/spruce-cottage/classic-3.webp"
+        ],
+        "thumb": "previews/spruce-cottage/classic-thumb.webp",
+        "cinematic": [
+          "previews/spruce-cottage/cinematic-0.webp",
+          "previews/spruce-cottage/cinematic-1.webp",
+          "previews/spruce-cottage/cinematic-2.webp",
+          "previews/spruce-cottage/cinematic-3.webp"
+        ],
+        "thumbCinematic": "previews/spruce-cottage/cinematic-thumb.webp"
       }
     },
     {
@@ -221,6 +269,22 @@
         "steps": 39,
         "difficulty": 3,
         "minutes": 25
+      },
+      "previews": {
+        "classic": [
+          "previews/birch-cottage/classic-0.webp",
+          "previews/birch-cottage/classic-1.webp",
+          "previews/birch-cottage/classic-2.webp",
+          "previews/birch-cottage/classic-3.webp"
+        ],
+        "thumb": "previews/birch-cottage/classic-thumb.webp",
+        "cinematic": [
+          "previews/birch-cottage/cinematic-0.webp",
+          "previews/birch-cottage/cinematic-1.webp",
+          "previews/birch-cottage/cinematic-2.webp",
+          "previews/birch-cottage/cinematic-3.webp"
+        ],
+        "thumbCinematic": "previews/birch-cottage/cinematic-thumb.webp"
       }
     },
     {
@@ -273,6 +337,22 @@
         "steps": 75,
         "difficulty": 4,
         "minutes": 55
+      },
+      "previews": {
+        "classic": [
+          "previews/family-house/classic-0.webp",
+          "previews/family-house/classic-1.webp",
+          "previews/family-house/classic-2.webp",
+          "previews/family-house/classic-3.webp"
+        ],
+        "thumb": "previews/family-house/classic-thumb.webp",
+        "cinematic": [
+          "previews/family-house/cinematic-0.webp",
+          "previews/family-house/cinematic-1.webp",
+          "previews/family-house/cinematic-2.webp",
+          "previews/family-house/cinematic-3.webp"
+        ],
+        "thumbCinematic": "previews/family-house/cinematic-thumb.webp"
       }
     },
     {
@@ -327,6 +407,22 @@
         "steps": 60,
         "difficulty": 4,
         "minutes": 35
+      },
+      "previews": {
+        "classic": [
+          "previews/medieval-house/classic-0.webp",
+          "previews/medieval-house/classic-1.webp",
+          "previews/medieval-house/classic-2.webp",
+          "previews/medieval-house/classic-3.webp"
+        ],
+        "thumb": "previews/medieval-house/classic-thumb.webp",
+        "cinematic": [
+          "previews/medieval-house/cinematic-0.webp",
+          "previews/medieval-house/cinematic-1.webp",
+          "previews/medieval-house/cinematic-2.webp",
+          "previews/medieval-house/cinematic-3.webp"
+        ],
+        "thumbCinematic": "previews/medieval-house/cinematic-thumb.webp"
       }
     },
     {
@@ -381,6 +477,22 @@
         "steps": 109,
         "difficulty": 4,
         "minutes": 65
+      },
+      "previews": {
+        "classic": [
+          "previews/merchant-house/classic-0.webp",
+          "previews/merchant-house/classic-1.webp",
+          "previews/merchant-house/classic-2.webp",
+          "previews/merchant-house/classic-3.webp"
+        ],
+        "thumb": "previews/merchant-house/classic-thumb.webp",
+        "cinematic": [
+          "previews/merchant-house/cinematic-0.webp",
+          "previews/merchant-house/cinematic-1.webp",
+          "previews/merchant-house/cinematic-2.webp",
+          "previews/merchant-house/cinematic-3.webp"
+        ],
+        "thumbCinematic": "previews/merchant-house/cinematic-thumb.webp"
       }
     },
     {
@@ -433,6 +545,22 @@
         "steps": 48,
         "difficulty": 3,
         "minutes": 40
+      },
+      "previews": {
+        "classic": [
+          "previews/nordic-longhouse/classic-0.webp",
+          "previews/nordic-longhouse/classic-1.webp",
+          "previews/nordic-longhouse/classic-2.webp",
+          "previews/nordic-longhouse/classic-3.webp"
+        ],
+        "thumb": "previews/nordic-longhouse/classic-thumb.webp",
+        "cinematic": [
+          "previews/nordic-longhouse/cinematic-0.webp",
+          "previews/nordic-longhouse/cinematic-1.webp",
+          "previews/nordic-longhouse/cinematic-2.webp",
+          "previews/nordic-longhouse/cinematic-3.webp"
+        ],
+        "thumbCinematic": "previews/nordic-longhouse/cinematic-thumb.webp"
       }
     },
     {
@@ -485,6 +613,22 @@
         "steps": 38,
         "difficulty": 3,
         "minutes": 25
+      },
+      "previews": {
+        "classic": [
+          "previews/desert-house/classic-0.webp",
+          "previews/desert-house/classic-1.webp",
+          "previews/desert-house/classic-2.webp",
+          "previews/desert-house/classic-3.webp"
+        ],
+        "thumb": "previews/desert-house/classic-thumb.webp",
+        "cinematic": [
+          "previews/desert-house/cinematic-0.webp",
+          "previews/desert-house/cinematic-1.webp",
+          "previews/desert-house/cinematic-2.webp",
+          "previews/desert-house/cinematic-3.webp"
+        ],
+        "thumbCinematic": "previews/desert-house/cinematic-thumb.webp"
       }
     },
     {
@@ -539,6 +683,22 @@
         "steps": 54,
         "difficulty": 3,
         "minutes": 35
+      },
+      "previews": {
+        "classic": [
+          "previews/beach-house/classic-0.webp",
+          "previews/beach-house/classic-1.webp",
+          "previews/beach-house/classic-2.webp",
+          "previews/beach-house/classic-3.webp"
+        ],
+        "thumb": "previews/beach-house/classic-thumb.webp",
+        "cinematic": [
+          "previews/beach-house/cinematic-0.webp",
+          "previews/beach-house/cinematic-1.webp",
+          "previews/beach-house/cinematic-2.webp",
+          "previews/beach-house/cinematic-3.webp"
+        ],
+        "thumbCinematic": "previews/beach-house/cinematic-thumb.webp"
       }
     },
     {
@@ -592,6 +752,22 @@
         "steps": 41,
         "difficulty": 3,
         "minutes": 25
+      },
+      "previews": {
+        "classic": [
+          "previews/cherry-cottage/classic-0.webp",
+          "previews/cherry-cottage/classic-1.webp",
+          "previews/cherry-cottage/classic-2.webp",
+          "previews/cherry-cottage/classic-3.webp"
+        ],
+        "thumb": "previews/cherry-cottage/classic-thumb.webp",
+        "cinematic": [
+          "previews/cherry-cottage/cinematic-0.webp",
+          "previews/cherry-cottage/cinematic-1.webp",
+          "previews/cherry-cottage/cinematic-2.webp",
+          "previews/cherry-cottage/cinematic-3.webp"
+        ],
+        "thumbCinematic": "previews/cherry-cottage/cinematic-thumb.webp"
       }
     },
     {
@@ -644,6 +820,22 @@
         "steps": 83,
         "difficulty": 4,
         "minutes": 60
+      },
+      "previews": {
+        "classic": [
+          "previews/library/classic-0.webp",
+          "previews/library/classic-1.webp",
+          "previews/library/classic-2.webp",
+          "previews/library/classic-3.webp"
+        ],
+        "thumb": "previews/library/classic-thumb.webp",
+        "cinematic": [
+          "previews/library/cinematic-0.webp",
+          "previews/library/cinematic-1.webp",
+          "previews/library/cinematic-2.webp",
+          "previews/library/cinematic-3.webp"
+        ],
+        "thumbCinematic": "previews/library/cinematic-thumb.webp"
       }
     },
     {
@@ -690,6 +882,22 @@
         "steps": 101,
         "difficulty": 3,
         "minutes": 50
+      },
+      "previews": {
+        "classic": [
+          "previews/watchtower/classic-0.webp",
+          "previews/watchtower/classic-1.webp",
+          "previews/watchtower/classic-2.webp",
+          "previews/watchtower/classic-3.webp"
+        ],
+        "thumb": "previews/watchtower/classic-thumb.webp",
+        "cinematic": [
+          "previews/watchtower/cinematic-0.webp",
+          "previews/watchtower/cinematic-1.webp",
+          "previews/watchtower/cinematic-2.webp",
+          "previews/watchtower/cinematic-3.webp"
+        ],
+        "thumbCinematic": "previews/watchtower/cinematic-thumb.webp"
       }
     },
     {
@@ -736,6 +944,22 @@
         "steps": 76,
         "difficulty": 3,
         "minutes": 40
+      },
+      "previews": {
+        "classic": [
+          "previews/mossy-watchtower/classic-0.webp",
+          "previews/mossy-watchtower/classic-1.webp",
+          "previews/mossy-watchtower/classic-2.webp",
+          "previews/mossy-watchtower/classic-3.webp"
+        ],
+        "thumb": "previews/mossy-watchtower/classic-thumb.webp",
+        "cinematic": [
+          "previews/mossy-watchtower/cinematic-0.webp",
+          "previews/mossy-watchtower/cinematic-1.webp",
+          "previews/mossy-watchtower/cinematic-2.webp",
+          "previews/mossy-watchtower/cinematic-3.webp"
+        ],
+        "thumbCinematic": "previews/mossy-watchtower/cinematic-thumb.webp"
       }
     },
     {
@@ -783,6 +1007,22 @@
         "steps": 77,
         "difficulty": 4,
         "minutes": 55
+      },
+      "previews": {
+        "classic": [
+          "previews/wizard-tower/classic-0.webp",
+          "previews/wizard-tower/classic-1.webp",
+          "previews/wizard-tower/classic-2.webp",
+          "previews/wizard-tower/classic-3.webp"
+        ],
+        "thumb": "previews/wizard-tower/classic-thumb.webp",
+        "cinematic": [
+          "previews/wizard-tower/cinematic-0.webp",
+          "previews/wizard-tower/cinematic-1.webp",
+          "previews/wizard-tower/cinematic-2.webp",
+          "previews/wizard-tower/cinematic-3.webp"
+        ],
+        "thumbCinematic": "previews/wizard-tower/cinematic-thumb.webp"
       }
     },
     {
@@ -829,6 +1069,22 @@
         "steps": 68,
         "difficulty": 4,
         "minutes": 55
+      },
+      "previews": {
+        "classic": [
+          "previews/lighthouse/classic-0.webp",
+          "previews/lighthouse/classic-1.webp",
+          "previews/lighthouse/classic-2.webp",
+          "previews/lighthouse/classic-3.webp"
+        ],
+        "thumb": "previews/lighthouse/classic-thumb.webp",
+        "cinematic": [
+          "previews/lighthouse/cinematic-0.webp",
+          "previews/lighthouse/cinematic-1.webp",
+          "previews/lighthouse/cinematic-2.webp",
+          "previews/lighthouse/cinematic-3.webp"
+        ],
+        "thumbCinematic": "previews/lighthouse/cinematic-thumb.webp"
       }
     },
     {
@@ -876,6 +1132,22 @@
         "steps": 35,
         "difficulty": 3,
         "minutes": 30
+      },
+      "previews": {
+        "classic": [
+          "previews/windmill/classic-0.webp",
+          "previews/windmill/classic-1.webp",
+          "previews/windmill/classic-2.webp",
+          "previews/windmill/classic-3.webp"
+        ],
+        "thumb": "previews/windmill/classic-thumb.webp",
+        "cinematic": [
+          "previews/windmill/cinematic-0.webp",
+          "previews/windmill/cinematic-1.webp",
+          "previews/windmill/cinematic-2.webp",
+          "previews/windmill/cinematic-3.webp"
+        ],
+        "thumbCinematic": "previews/windmill/cinematic-thumb.webp"
       }
     },
     {
@@ -920,6 +1192,22 @@
         "steps": 50,
         "difficulty": 3,
         "minutes": 40
+      },
+      "previews": {
+        "classic": [
+          "previews/watermill/classic-0.webp",
+          "previews/watermill/classic-1.webp",
+          "previews/watermill/classic-2.webp",
+          "previews/watermill/classic-3.webp"
+        ],
+        "thumb": "previews/watermill/classic-thumb.webp",
+        "cinematic": [
+          "previews/watermill/cinematic-0.webp",
+          "previews/watermill/cinematic-1.webp",
+          "previews/watermill/cinematic-2.webp",
+          "previews/watermill/cinematic-3.webp"
+        ],
+        "thumbCinematic": "previews/watermill/cinematic-thumb.webp"
       }
     },
     {
@@ -967,6 +1255,22 @@
         "steps": 50,
         "difficulty": 3,
         "minutes": 40
+      },
+      "previews": {
+        "classic": [
+          "previews/red-barn/classic-0.webp",
+          "previews/red-barn/classic-1.webp",
+          "previews/red-barn/classic-2.webp",
+          "previews/red-barn/classic-3.webp"
+        ],
+        "thumb": "previews/red-barn/classic-thumb.webp",
+        "cinematic": [
+          "previews/red-barn/cinematic-0.webp",
+          "previews/red-barn/cinematic-1.webp",
+          "previews/red-barn/cinematic-2.webp",
+          "previews/red-barn/cinematic-3.webp"
+        ],
+        "thumbCinematic": "previews/red-barn/cinematic-thumb.webp"
       }
     },
     {
@@ -1011,6 +1315,22 @@
         "steps": 10,
         "difficulty": 2,
         "minutes": 10
+      },
+      "previews": {
+        "classic": [
+          "previews/well/classic-0.webp",
+          "previews/well/classic-1.webp",
+          "previews/well/classic-2.webp",
+          "previews/well/classic-3.webp"
+        ],
+        "thumb": "previews/well/classic-thumb.webp",
+        "cinematic": [
+          "previews/well/cinematic-0.webp",
+          "previews/well/cinematic-1.webp",
+          "previews/well/cinematic-2.webp",
+          "previews/well/cinematic-3.webp"
+        ],
+        "thumbCinematic": "previews/well/cinematic-thumb.webp"
       }
     },
     {
@@ -1060,6 +1380,22 @@
         "steps": 40,
         "difficulty": 4,
         "minutes": 40
+      },
+      "previews": {
+        "classic": [
+          "previews/farm/classic-0.webp",
+          "previews/farm/classic-1.webp",
+          "previews/farm/classic-2.webp",
+          "previews/farm/classic-3.webp"
+        ],
+        "thumb": "previews/farm/classic-thumb.webp",
+        "cinematic": [
+          "previews/farm/cinematic-0.webp",
+          "previews/farm/cinematic-1.webp",
+          "previews/farm/cinematic-2.webp",
+          "previews/farm/cinematic-3.webp"
+        ],
+        "thumbCinematic": "previews/farm/cinematic-thumb.webp"
       }
     },
     {
@@ -1104,6 +1440,22 @@
         "steps": 21,
         "difficulty": 3,
         "minutes": 25
+      },
+      "previews": {
+        "classic": [
+          "previews/stable/classic-0.webp",
+          "previews/stable/classic-1.webp",
+          "previews/stable/classic-2.webp",
+          "previews/stable/classic-3.webp"
+        ],
+        "thumb": "previews/stable/classic-thumb.webp",
+        "cinematic": [
+          "previews/stable/cinematic-0.webp",
+          "previews/stable/cinematic-1.webp",
+          "previews/stable/cinematic-2.webp",
+          "previews/stable/cinematic-3.webp"
+        ],
+        "thumbCinematic": "previews/stable/cinematic-thumb.webp"
       }
     },
     {
@@ -1148,6 +1500,22 @@
         "steps": 22,
         "difficulty": 2,
         "minutes": 20
+      },
+      "previews": {
+        "classic": [
+          "previews/greenhouse/classic-0.webp",
+          "previews/greenhouse/classic-1.webp",
+          "previews/greenhouse/classic-2.webp",
+          "previews/greenhouse/classic-3.webp"
+        ],
+        "thumb": "previews/greenhouse/classic-thumb.webp",
+        "cinematic": [
+          "previews/greenhouse/cinematic-0.webp",
+          "previews/greenhouse/cinematic-1.webp",
+          "previews/greenhouse/cinematic-2.webp",
+          "previews/greenhouse/cinematic-3.webp"
+        ],
+        "thumbCinematic": "previews/greenhouse/cinematic-thumb.webp"
       }
     },
     {
@@ -1192,6 +1560,22 @@
         "steps": 27,
         "difficulty": 3,
         "minutes": 20
+      },
+      "previews": {
+        "classic": [
+          "previews/blacksmith/classic-0.webp",
+          "previews/blacksmith/classic-1.webp",
+          "previews/blacksmith/classic-2.webp",
+          "previews/blacksmith/classic-3.webp"
+        ],
+        "thumb": "previews/blacksmith/classic-thumb.webp",
+        "cinematic": [
+          "previews/blacksmith/cinematic-0.webp",
+          "previews/blacksmith/cinematic-1.webp",
+          "previews/blacksmith/cinematic-2.webp",
+          "previews/blacksmith/cinematic-3.webp"
+        ],
+        "thumbCinematic": "previews/blacksmith/cinematic-thumb.webp"
       }
     },
     {
@@ -1240,6 +1624,22 @@
         "steps": 32,
         "difficulty": 3,
         "minutes": 15
+      },
+      "previews": {
+        "classic": [
+          "previews/market/classic-0.webp",
+          "previews/market/classic-1.webp",
+          "previews/market/classic-2.webp",
+          "previews/market/classic-3.webp"
+        ],
+        "thumb": "previews/market/classic-thumb.webp",
+        "cinematic": [
+          "previews/market/cinematic-0.webp",
+          "previews/market/cinematic-1.webp",
+          "previews/market/cinematic-2.webp",
+          "previews/market/cinematic-3.webp"
+        ],
+        "thumbCinematic": "previews/market/cinematic-thumb.webp"
       }
     },
     {
@@ -1283,6 +1683,22 @@
         "steps": 40,
         "difficulty": 3,
         "minutes": 35
+      },
+      "previews": {
+        "classic": [
+          "previews/fishing-hut/classic-0.webp",
+          "previews/fishing-hut/classic-1.webp",
+          "previews/fishing-hut/classic-2.webp",
+          "previews/fishing-hut/classic-3.webp"
+        ],
+        "thumb": "previews/fishing-hut/classic-thumb.webp",
+        "cinematic": [
+          "previews/fishing-hut/cinematic-0.webp",
+          "previews/fishing-hut/cinematic-1.webp",
+          "previews/fishing-hut/cinematic-2.webp",
+          "previews/fishing-hut/cinematic-3.webp"
+        ],
+        "thumbCinematic": "previews/fishing-hut/cinematic-thumb.webp"
       }
     },
     {
@@ -1329,6 +1745,22 @@
         "steps": 41,
         "difficulty": 3,
         "minutes": 30
+      },
+      "previews": {
+        "classic": [
+          "previews/stone-bridge/classic-0.webp",
+          "previews/stone-bridge/classic-1.webp",
+          "previews/stone-bridge/classic-2.webp",
+          "previews/stone-bridge/classic-3.webp"
+        ],
+        "thumb": "previews/stone-bridge/classic-thumb.webp",
+        "cinematic": [
+          "previews/stone-bridge/cinematic-0.webp",
+          "previews/stone-bridge/cinematic-1.webp",
+          "previews/stone-bridge/cinematic-2.webp",
+          "previews/stone-bridge/cinematic-3.webp"
+        ],
+        "thumbCinematic": "previews/stone-bridge/cinematic-thumb.webp"
       }
     },
     {
@@ -1376,6 +1808,22 @@
         "steps": 77,
         "difficulty": 4,
         "minutes": 60
+      },
+      "previews": {
+        "classic": [
+          "previews/pagoda/classic-0.webp",
+          "previews/pagoda/classic-1.webp",
+          "previews/pagoda/classic-2.webp",
+          "previews/pagoda/classic-3.webp"
+        ],
+        "thumb": "previews/pagoda/classic-thumb.webp",
+        "cinematic": [
+          "previews/pagoda/cinematic-0.webp",
+          "previews/pagoda/cinematic-1.webp",
+          "previews/pagoda/cinematic-2.webp",
+          "previews/pagoda/cinematic-3.webp"
+        ],
+        "thumbCinematic": "previews/pagoda/cinematic-thumb.webp"
       }
     },
     {
@@ -1420,6 +1868,22 @@
         "steps": 56,
         "difficulty": 3,
         "minutes": 40
+      },
+      "previews": {
+        "classic": [
+          "previews/shrine/classic-0.webp",
+          "previews/shrine/classic-1.webp",
+          "previews/shrine/classic-2.webp",
+          "previews/shrine/classic-3.webp"
+        ],
+        "thumb": "previews/shrine/classic-thumb.webp",
+        "cinematic": [
+          "previews/shrine/cinematic-0.webp",
+          "previews/shrine/cinematic-1.webp",
+          "previews/shrine/cinematic-2.webp",
+          "previews/shrine/cinematic-3.webp"
+        ],
+        "thumbCinematic": "previews/shrine/cinematic-thumb.webp"
       }
     },
     {
@@ -1463,6 +1927,22 @@
         "steps": 37,
         "difficulty": 3,
         "minutes": 35
+      },
+      "previews": {
+        "classic": [
+          "previews/tea-house/classic-0.webp",
+          "previews/tea-house/classic-1.webp",
+          "previews/tea-house/classic-2.webp",
+          "previews/tea-house/classic-3.webp"
+        ],
+        "thumb": "previews/tea-house/classic-thumb.webp",
+        "cinematic": [
+          "previews/tea-house/cinematic-0.webp",
+          "previews/tea-house/cinematic-1.webp",
+          "previews/tea-house/cinematic-2.webp",
+          "previews/tea-house/cinematic-3.webp"
+        ],
+        "thumbCinematic": "previews/tea-house/cinematic-thumb.webp"
       }
     },
     {
@@ -1509,6 +1989,22 @@
         "steps": 127,
         "difficulty": 4,
         "minutes": 115
+      },
+      "previews": {
+        "classic": [
+          "previews/mini-castle/classic-0.webp",
+          "previews/mini-castle/classic-1.webp",
+          "previews/mini-castle/classic-2.webp",
+          "previews/mini-castle/classic-3.webp"
+        ],
+        "thumb": "previews/mini-castle/classic-thumb.webp",
+        "cinematic": [
+          "previews/mini-castle/cinematic-0.webp",
+          "previews/mini-castle/cinematic-1.webp",
+          "previews/mini-castle/cinematic-2.webp",
+          "previews/mini-castle/cinematic-3.webp"
+        ],
+        "thumbCinematic": "previews/mini-castle/cinematic-thumb.webp"
       }
     },
     {
@@ -1553,6 +2049,22 @@
         "steps": 72,
         "difficulty": 4,
         "minutes": 55
+      },
+      "previews": {
+        "classic": [
+          "previews/chapel/classic-0.webp",
+          "previews/chapel/classic-1.webp",
+          "previews/chapel/classic-2.webp",
+          "previews/chapel/classic-3.webp"
+        ],
+        "thumb": "previews/chapel/classic-thumb.webp",
+        "cinematic": [
+          "previews/chapel/cinematic-0.webp",
+          "previews/chapel/cinematic-1.webp",
+          "previews/chapel/cinematic-2.webp",
+          "previews/chapel/cinematic-3.webp"
+        ],
+        "thumbCinematic": "previews/chapel/cinematic-thumb.webp"
       }
     },
     {
@@ -1597,6 +2109,22 @@
         "steps": 16,
         "difficulty": 2,
         "minutes": 15
+      },
+      "previews": {
+        "classic": [
+          "previews/gazebo/classic-0.webp",
+          "previews/gazebo/classic-1.webp",
+          "previews/gazebo/classic-2.webp",
+          "previews/gazebo/classic-3.webp"
+        ],
+        "thumb": "previews/gazebo/classic-thumb.webp",
+        "cinematic": [
+          "previews/gazebo/cinematic-0.webp",
+          "previews/gazebo/cinematic-1.webp",
+          "previews/gazebo/cinematic-2.webp",
+          "previews/gazebo/cinematic-3.webp"
+        ],
+        "thumbCinematic": "previews/gazebo/cinematic-thumb.webp"
       }
     },
     {
@@ -1640,6 +2168,22 @@
         "steps": 13,
         "difficulty": 2,
         "minutes": 10
+      },
+      "previews": {
+        "classic": [
+          "previews/fountain/classic-0.webp",
+          "previews/fountain/classic-1.webp",
+          "previews/fountain/classic-2.webp",
+          "previews/fountain/classic-3.webp"
+        ],
+        "thumb": "previews/fountain/classic-thumb.webp",
+        "cinematic": [
+          "previews/fountain/cinematic-0.webp",
+          "previews/fountain/cinematic-1.webp",
+          "previews/fountain/cinematic-2.webp",
+          "previews/fountain/cinematic-3.webp"
+        ],
+        "thumbCinematic": "previews/fountain/cinematic-thumb.webp"
       }
     },
     {
@@ -1683,6 +2227,22 @@
         "steps": 45,
         "difficulty": 3,
         "minutes": 35
+      },
+      "previews": {
+        "classic": [
+          "previews/treehouse/classic-0.webp",
+          "previews/treehouse/classic-1.webp",
+          "previews/treehouse/classic-2.webp",
+          "previews/treehouse/classic-3.webp"
+        ],
+        "thumb": "previews/treehouse/classic-thumb.webp",
+        "cinematic": [
+          "previews/treehouse/cinematic-0.webp",
+          "previews/treehouse/cinematic-1.webp",
+          "previews/treehouse/cinematic-2.webp",
+          "previews/treehouse/cinematic-3.webp"
+        ],
+        "thumbCinematic": "previews/treehouse/cinematic-thumb.webp"
       }
     },
     {
@@ -1727,6 +2287,22 @@
         "steps": 37,
         "difficulty": 3,
         "minutes": 40
+      },
+      "previews": {
+        "classic": [
+          "previews/modern-villa/classic-0.webp",
+          "previews/modern-villa/classic-1.webp",
+          "previews/modern-villa/classic-2.webp",
+          "previews/modern-villa/classic-3.webp"
+        ],
+        "thumb": "previews/modern-villa/classic-thumb.webp",
+        "cinematic": [
+          "previews/modern-villa/cinematic-0.webp",
+          "previews/modern-villa/cinematic-1.webp",
+          "previews/modern-villa/cinematic-2.webp",
+          "previews/modern-villa/cinematic-3.webp"
+        ],
+        "thumbCinematic": "previews/modern-villa/cinematic-thumb.webp"
       }
     }
   ]

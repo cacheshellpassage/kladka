@@ -24,7 +24,8 @@ export function encodeVarints(values: ArrayLike<number>): Uint8Array {
 
 /** Decodes exactly `count` varints (throws if data is truncated). */
 export function decodeVarints(bytes: Uint8Array | Int8Array, count: number): Uint32Array {
-  const b = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes.buffer, bytes.byteOffset, bytes.length);
+  const b =
+    bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes.buffer, bytes.byteOffset, bytes.length);
   const out = new Uint32Array(count);
   let i = 0;
   let p = 0;

@@ -52,7 +52,8 @@ export function packBits(values: ArrayLike<number>, bits: number): BigInt64Array
 export function unpackBits(longsSigned: BigInt64Array, bits: number, count: number): Uint32Array {
   const longs = new BigUint64Array(longsSigned.buffer, longsSigned.byteOffset, longsSigned.length);
   const expected = Math.ceil((count * bits) / 64);
-  if (longs.length < expected) throw new FormatError(`BlockStates array too short (${longs.length} < ${expected})`);
+  if (longs.length < expected)
+    throw new FormatError(`BlockStates array too short (${longs.length} < ${expected})`);
   const out = new Uint32Array(count);
   const mask = (1n << BigInt(bits)) - 1n;
   for (let i = 0; i < count; i++) {
@@ -85,7 +86,10 @@ export function readLitematic(root: NbtRoot): VoxelModel {
   const t = root.tag;
   const version = getNumberOr(t, "Version", 0);
   if (version > LITEMATIC_VERSION) throw new FormatError(`Unsupported Litematica version ${version}`);
-  if (version < 4) throw new FormatError(`Litematica version ${version} predates the flattening (MC 1.13) and is not supported`);
+  if (version < 4)
+    throw new FormatError(
+      `Litematica version ${version} predates the flattening (MC 1.13) and is not supported`,
+    );
   const dataVersion = getNumberOr(t, "MinecraftDataVersion", 0);
   const regionsTag = getCompound(t, "Regions");
   const regions: RegionRead[] = [];
@@ -164,7 +168,8 @@ export function readLitematic(root: NbtRoot): VoxelModel {
       for (let z = 0; z < r.size.z; z++)
         for (let x = 0; x < r.size.x; x++, i++) {
           const v = r.data[i]!;
-          if (v >= remap.length) throw new FormatError(`Palette index ${v} out of range in region "${r.name}"`);
+          if (v >= remap.length)
+            throw new FormatError(`Palette index ${v} out of range in region "${r.name}"`);
           const p = remap[v]!;
           if (p !== 0) m.blocks[m.index(x + ox, y + oy, z + oz)] = p;
         }
@@ -209,7 +214,13 @@ export function writeLitematic(m: VoxelModel, opts: { regionName?: string } = {}
     tiles.push(tag);
   }
   const entities: NbtTag[] = m.entities.map((e) => {
-    const tag = nbt.compound({ id: nbt.string(e.id), Pos: nbt.list("double", e.pos.map((v) => nbt.double(v))) });
+    const tag = nbt.compound({
+      id: nbt.string(e.id),
+      Pos: nbt.list(
+        "double",
+        e.pos.map((v) => nbt.double(v)),
+      ),
+    });
     for (const [k, v] of e.data.value) if (k !== "Pos" && k !== "id") tag.value.set(k, v);
     return tag;
   });
@@ -221,7 +232,8 @@ export function writeLitematic(m: VoxelModel, opts: { regionName?: string } = {}
       "compound",
       palette.map((p) => {
         const c = nbt.compound({ Name: nbt.string(p.name) });
-        if (Object.keys(p.props).length) c.value.set("Properties", stringRecordToCompound(p.props as Record<string, string>));
+        if (Object.keys(p.props).length)
+          c.value.set("Properties", stringRecordToCompound(p.props as Record<string, string>));
         return c;
       }),
     ),

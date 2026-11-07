@@ -103,7 +103,8 @@ export function wizardTower(p: RoundTowerParams): Builder {
     b.circle(c, c, R, false, (x, z) => b.set(x, y, z, y % 6 === 0 ? p.accent : st.block, "walls"));
   }
   // floors every 6 blocks
-  for (let y = 6; y < p.height; y += 6) b.circle(c, c, R - 1, true, (x, z) => b.set(x, y, z, w.planks, "walls"));
+  for (let y = 6; y < p.height; y += 6)
+    b.circle(c, c, R - 1, true, (x, z) => b.set(x, y, z, w.planks, "walls"));
   // windows (4 directions)
   for (let y = 3; y < p.height; y += 6) {
     for (const [dx, dz] of [
@@ -170,7 +171,8 @@ export function lighthouse(p: LighthouseParams): Builder {
   b.circle(c, c, R + 1, false, (x, z) => b.set(x, g + 1, z, "iron_bars", "decor"));
   // lantern room
   const lr = Math.max(1, R - 1);
-  for (let y = g + 1; y <= g + 3; y++) b.circle(c, c, lr, false, (x, z) => b.set(x, y, z, "glass", "openings"));
+  for (let y = g + 1; y <= g + 3; y++)
+    b.circle(c, c, lr, false, (x, z) => b.set(x, y, z, "glass", "openings"));
   b.set(c, g + 1, c, "sea_lantern", "lighting");
   b.set(c, g + 2, c, "glowstone", "lighting");
   b.circle(c, c, lr + 1, true, (x, z) => b.set(x, g + 4, z, p.stripeB, "roof"));

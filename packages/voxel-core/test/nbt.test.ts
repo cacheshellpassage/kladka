@@ -1,7 +1,17 @@
 import { describe, expect, it } from "vitest";
 import * as pnbt from "prismarine-nbt";
 import { gunzipSync } from "fflate";
-import { decodeMutf8, encodeMutf8, nbt, nbtEquals, readNbt, readNbtFile, writeNbt, writeNbtFile, type NbtRoot } from "../src";
+import {
+  decodeMutf8,
+  encodeMutf8,
+  nbt,
+  nbtEquals,
+  readNbt,
+  readNbtFile,
+  writeNbt,
+  writeNbtFile,
+  type NbtRoot,
+} from "../src";
 
 function sample(): NbtRoot {
   return {
@@ -71,7 +81,13 @@ describe("NBT codec", () => {
         value: {
           Name: { type: "string", value: "test" },
           Pos: { type: "list", value: { type: "int", value: [1, 2, 3] } },
-          Longs: { type: "longArray", value: [[0, 5], [-1, -1]] },
+          Longs: {
+            type: "longArray",
+            value: [
+              [0, 5],
+              [-1, -1],
+            ],
+          },
         },
       } as never,
       "big",

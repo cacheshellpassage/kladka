@@ -8,7 +8,12 @@ for (const id of process.argv.slice(2)) {
   const sc = plan.steps.filter((s) => s.scaffold).flatMap((s) => s.blocks);
   const counts = new Map<string, number>();
   for (const i of sc) {
-    const k = model.palette[model.blocks[i]!]!.name.replace("minecraft:", "") + ":" + roleFromCode(plan.roles[i]!) + ":y" + model.coords(i).y;
+    const k =
+      model.palette[model.blocks[i]!]!.name.replace("minecraft:", "") +
+      ":" +
+      roleFromCode(plan.roles[i]!) +
+      ":y" +
+      model.coords(i).y;
     counts.set(k, (counts.get(k) ?? 0) + 1);
   }
   console.log(id, sc.length, [...counts].slice(0, 12));

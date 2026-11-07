@@ -43,8 +43,18 @@ export function cottage(): VoxelModel {
   // windows and door
   m.set(o + 3, 2, o, state("glass_pane"));
   m.set(o, 2, o + 3, state("glass_pane"));
-  m.set(o + 3, 1, o + W - 1, state("oak_door", { facing: "south", half: "lower", hinge: "left", open: "false" }));
-  m.set(o + 3, 2, o + W - 1, state("oak_door", { facing: "south", half: "upper", hinge: "left", open: "false" }));
+  m.set(
+    o + 3,
+    1,
+    o + W - 1,
+    state("oak_door", { facing: "south", half: "lower", hinge: "left", open: "false" }),
+  );
+  m.set(
+    o + 3,
+    2,
+    o + W - 1,
+    state("oak_door", { facing: "south", half: "upper", hinge: "left", open: "false" }),
+  );
   // torch outside next to the door (attached to wall, facing south)
   m.set(o + 2, 2, o + W, state("wall_torch", { facing: "south" }));
   // chest with block entity
@@ -70,8 +80,14 @@ export function sameBlocks(a: VoxelModel, b: VoxelModel): boolean {
     const pa = a.palette[a.blocks[i]!]!;
     const pb = b.palette[b.blocks[i]!]!;
     if (pa.name !== pb.name) return false;
-    const ka = Object.keys(pa.props).sort().map((k) => `${k}=${pa.props[k]}`).join(",");
-    const kb = Object.keys(pb.props).sort().map((k) => `${k}=${pb.props[k]}`).join(",");
+    const ka = Object.keys(pa.props)
+      .sort()
+      .map((k) => `${k}=${pa.props[k]}`)
+      .join(",");
+    const kb = Object.keys(pb.props)
+      .sort()
+      .map((k) => `${k}=${pb.props[k]}`)
+      .join(",");
     if (ka !== kb) return false;
   }
   return true;

@@ -13,7 +13,8 @@ export class FormatError extends Error {
 export const MAX_IMPORT_VOLUME = 400 * 400 * 384;
 
 export function newModel(size: Vec3, dataVersion: number): VoxelModel {
-  if (size.x <= 0 || size.y <= 0 || size.z <= 0) throw new FormatError(`Invalid size ${size.x}×${size.y}×${size.z}`);
+  if (size.x <= 0 || size.y <= 0 || size.z <= 0)
+    throw new FormatError(`Invalid size ${size.x}×${size.y}×${size.z}`);
   if (size.x * size.y * size.z > MAX_IMPORT_VOLUME) {
     throw new FormatError(`Structure is too large (${size.x}×${size.y}×${size.z})`);
   }

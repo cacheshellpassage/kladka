@@ -9,3 +9,7 @@ apps/app/src-tauri/gen
 apps/app/src-tauri/target
 apps/app/src-tauri/icons
 claude-code-prompt.md
+apps/app/dist
+apps/app/src/licenses.json
+THIRD_PARTY_LICENSES.md
+.claude

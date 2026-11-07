@@ -11,7 +11,14 @@ import { GTAOPass } from "three/addons/postprocessing/GTAOPass.js";
 import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
 import type { VoxelModel } from "@kladka/voxel-core";
 import { buildPaletteRender, type PaletteRender, type TextureProvider } from "./palette-render";
-import { CHUNK, meshChunk, nonEmptyChunks, type ClipBox, type MeshBuffers, type RenderPass as Pass } from "./mesher";
+import {
+  CHUNK,
+  meshChunk,
+  nonEmptyChunks,
+  type ClipBox,
+  type MeshBuffers,
+  type RenderPass as Pass,
+} from "./mesher";
 import { createMaterials, createUniforms, type MaterialSet, type ViewerUniforms } from "./material";
 import { PRESETS, SkyDome, type TimeOfDay } from "./environment";
 import { TEX } from "./textures";
@@ -81,7 +88,13 @@ export class VoxelViewer {
   private raf = 0;
   private disposed = false;
   private resizeObs: ResizeObserver | null = null;
-  private animation: { start: number; duration: number; from: number; to: number; onDone?: () => void } | null = null;
+  private animation: {
+    start: number;
+    duration: number;
+    from: number;
+    to: number;
+    onDone?: () => void;
+  } | null = null;
   private stepValue: number | null = null;
   private buildToken = 0;
   private showGround: boolean;
@@ -160,7 +173,11 @@ export class VoxelViewer {
    * Shows a model. `stepOf`/`roles` come from the build plan (optional).
    * Meshes are built progressively in small time slices so the UI stays responsive.
    */
-  async setModel(model: VoxelModel, plan?: { stepOf: Int32Array; roles?: Uint8Array } | null, onProgress?: (p: number) => void): Promise<void> {
+  async setModel(
+    model: VoxelModel,
+    plan?: { stepOf: Int32Array; roles?: Uint8Array } | null,
+    onProgress?: (p: number) => void,
+  ): Promise<void> {
     const token = ++this.buildToken;
     this.clearChunks();
     this.model = model;
@@ -321,7 +338,8 @@ export class VoxelViewer {
       }
     }
     // chunks that were completely empty after clipping may need building again
-    for (const o of nonEmptyChunks(this.model, CHUNK)) if (!this.chunks.has(this.chunkKey(o))) this.buildChunk(o);
+    for (const o of nonEmptyChunks(this.model, CHUNK))
+      if (!this.chunks.has(this.chunkKey(o))) this.buildChunk(o);
     this.dirty = true;
   }
 
@@ -337,8 +355,16 @@ export class VoxelViewer {
       return;
     }
     const e = 0.001;
-    this.uniforms.uClipMin.value.set(this.clip.min[0] + off.x - e, this.clip.min[1] + off.y - e, this.clip.min[2] + off.z - e);
-    this.uniforms.uClipMax.value.set(this.clip.max[0] + off.x + e, this.clip.max[1] + off.y + e, this.clip.max[2] + off.z + e);
+    this.uniforms.uClipMin.value.set(
+      this.clip.min[0] + off.x - e,
+      this.clip.min[1] + off.y - e,
+      this.clip.min[2] + off.z - e,
+    );
+    this.uniforms.uClipMax.value.set(
+      this.clip.max[0] + off.x + e,
+      this.clip.max[1] + off.y + e,
+      this.clip.max[2] + off.z + e,
+    );
   }
 
   /* ------------------------------------------------------------------ */
@@ -408,7 +434,10 @@ export class VoxelViewer {
       const shadows = this.quality !== "low";
       this.renderer.shadowMap.enabled = shadows;
       this.sun.castShadow = shadows;
-      this.sun.shadow.mapSize.set(this.quality === "high" ? 2048 : 1024, this.quality === "high" ? 2048 : 1024);
+      this.sun.shadow.mapSize.set(
+        this.quality === "high" ? 2048 : 1024,
+        this.quality === "high" ? 2048 : 1024,
+      );
       this.sun.shadow.bias = -0.0004;
       this.sun.shadow.normalBias = 0.02;
       this.sun.shadow.radius = 3;
@@ -432,7 +461,7 @@ export class VoxelViewer {
       sy = m?.size.y ?? 16,
       sz = m?.size.z ?? 16;
     const r = Math.max(8, Math.hypot(sx, sy, sz) / 2);
-    this.ground.scale.setScalar(r * 6);
+    this.ground.scale.setScalar(r * 40);
     this.ground.position.y = -0.002;
     const p = PRESETS[this.timeOfDay];
     const d = new THREE.Vector3(...p.sunDir).normalize();
@@ -447,8 +476,8 @@ export class VoxelViewer {
     cam.far = r * 8;
     cam.updateProjectionMatrix();
     if (this.scene.fog instanceof THREE.Fog) {
-      this.scene.fog.near = r * 3;
-      this.scene.fog.far = r * 9;
+      this.scene.fog.near = r * 4;
+      this.scene.fog.far = r * 14;
     }
     // classic-mode grid
     if (this.grid) {
@@ -456,7 +485,7 @@ export class VoxelViewer {
       this.grid.geometry.dispose();
       (this.grid.material as THREE.Material).dispose();
     }
-    const gsize = Math.ceil(Math.max(sx, sz) * 1.6 / 2) * 2 + 4;
+    const gsize = Math.ceil((Math.max(sx, sz) * 1.6) / 2) * 2 + 4;
     const dark = this.theme === "dark";
     this.grid = new THREE.GridHelper(gsize, gsize, dark ? 0x3a4250 : 0xb5c2cf, dark ? 0x2a303a : 0xcbd5df);
     this.grid.position.set(sx % 2 ? 0.5 : 0, -0.01, sz % 2 ? 0.5 : 0);
@@ -467,7 +496,9 @@ export class VoxelViewer {
   }
 
   private needsAO(): boolean {
-    return this.mode === "shaders" && this.quality === "high" && this.stepValue === null && this.clip === null;
+    return (
+      this.mode === "shaders" && this.quality === "high" && this.stepValue === null && this.clip === null
+    );
   }
 
   private setupComposer(): void {
@@ -513,18 +544,31 @@ export class VoxelViewer {
     const sx = m?.size.x ?? 16,
       sy = m?.size.y ?? 16,
       sz = m?.size.z ?? 16;
-    const r = Math.max(4, Math.hypot(sx, sy, sz) / 2);
-    const fov = THREE.MathUtils.degToRad(this.camera.fov);
-    const aspect = Math.max(0.5, this.camera.aspect);
-    const fit = r / Math.sin(fov / 2) / Math.min(1, aspect) * 1.02;
-    const target = new THREE.Vector3(0, sy * 0.42, 0);
-    const az = [Math.PI / 4, (3 * Math.PI) / 4, (5 * Math.PI) / 4, (7 * Math.PI) / 4][preset % 4] ?? Math.PI / 4;
-    const el = preset === 4 ? Math.PI * 0.47 : THREE.MathUtils.degToRad(28);
-    this.camera.position.set(
-      target.x + fit * Math.cos(el) * Math.sin(az),
-      target.y + fit * Math.sin(el),
-      target.z + fit * Math.cos(el) * Math.cos(az),
-    );
+    const target = new THREE.Vector3(0, sy / 2, 0);
+    const az =
+      [Math.PI / 4, (3 * Math.PI) / 4, (5 * Math.PI) / 4, (7 * Math.PI) / 4][preset % 4] ?? Math.PI / 4;
+    const el = preset === 4 ? Math.PI * 0.47 : THREE.MathUtils.degToRad(26);
+    // direction from target to camera
+    const back = new THREE.Vector3(
+      Math.cos(el) * Math.sin(az),
+      Math.sin(el),
+      Math.cos(el) * Math.cos(az),
+    ).normalize();
+    const fwd = back.clone().negate();
+    const right = new THREE.Vector3().crossVectors(fwd, new THREE.Vector3(0, 1, 0)).normalize();
+    const up = new THREE.Vector3().crossVectors(right, fwd).normalize();
+    const tanV = Math.tan(THREE.MathUtils.degToRad(this.camera.fov) / 2) * 0.9;
+    const tanH = tanV * Math.max(0.3, this.camera.aspect);
+    // smallest distance that keeps every bounding-box corner inside the frustum
+    let fit = 4;
+    for (const cx of [-sx / 2, sx / 2])
+      for (const cy of [-sy / 2, sy / 2])
+        for (const cz of [-sz / 2, sz / 2]) {
+          const p = new THREE.Vector3(cx, cy, cz);
+          const z = p.dot(fwd);
+          fit = Math.max(fit, z + Math.abs(p.dot(right)) / tanH, z + Math.abs(p.dot(up)) / tanV);
+        }
+    this.camera.position.copy(target).addScaledVector(back, fit);
     this.controls.target.copy(target);
     this.controls.minDistance = 2;
     this.controls.maxDistance = fit * 4;
@@ -560,7 +604,10 @@ export class VoxelViewer {
 
   pick(clientX: number, clientY: number): PickResult | null {
     const rect = this.renderer.domElement.getBoundingClientRect();
-    const ndc = new THREE.Vector2(((clientX - rect.left) / rect.width) * 2 - 1, -((clientY - rect.top) / rect.height) * 2 + 1);
+    const ndc = new THREE.Vector2(
+      ((clientX - rect.left) / rect.width) * 2 - 1,
+      -((clientY - rect.top) / rect.height) * 2 + 1,
+    );
     const ray = new THREE.Raycaster();
     ray.setFromCamera(ndc, this.camera);
     const meshes: THREE.Object3D[] = [];
@@ -725,10 +772,16 @@ function clipSignature(origin: [number, number, number], c: ClipBox | null): str
   return mn.join() + "|" + mx.join();
 }
 
-function chunkTouchesClipChange(origin: [number, number, number], a: ClipBox | null, b: ClipBox | null): boolean {
+function chunkTouchesClipChange(
+  origin: [number, number, number],
+  a: ClipBox | null,
+  b: ClipBox | null,
+): boolean {
   return clipSignature(origin, a) !== clipSignature(origin, b);
 }
 
 function nextFrame(): Promise<void> {
-  return new Promise((r) => (typeof requestAnimationFrame !== "undefined" ? requestAnimationFrame(() => r()) : setTimeout(r, 0)));
+  return new Promise((r) =>
+    typeof requestAnimationFrame !== "undefined" ? requestAnimationFrame(() => r()) : setTimeout(r, 0),
+  );
 }

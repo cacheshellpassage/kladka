@@ -57,7 +57,10 @@ export function readStructure(root: NbtRoot): VoxelModel {
     m.set(x, y, z, p);
     const beTag = getOptCompound(b, "nbt");
     if (beTag && p !== 0) {
-      m.blockEntities.set(m.index(x, y, z), { id: getStringOr(beTag, "id", ""), data: without(beTag, ["id", "x", "y", "z"]) });
+      m.blockEntities.set(m.index(x, y, z), {
+        id: getStringOr(beTag, "id", ""),
+        data: without(beTag, ["id", "x", "y", "z"]),
+      });
     }
   }
 
@@ -65,7 +68,11 @@ export function readStructure(root: NbtRoot): VoxelModel {
     if (e.kind !== "compound") continue;
     const pos = getIntVector(e, "pos");
     const data = getOptCompound(e, "nbt") ?? nbt.compound();
-    m.entities.push({ id: getStringOr(data, "id", ""), pos: [pos[0] ?? 0, pos[1] ?? 0, pos[2] ?? 0], data: without(data, ["id"]) });
+    m.entities.push({
+      id: getStringOr(data, "id", ""),
+      pos: [pos[0] ?? 0, pos[1] ?? 0, pos[2] ?? 0],
+      data: without(data, ["id"]),
+    });
   }
   return m;
 }
@@ -79,7 +86,8 @@ export function writeStructure(m: VoxelModel, opts: StructureWriteOptions = {}):
   const includeAir = opts.includeAir ?? true;
   const palette: NbtTag[] = m.palette.map((p) => {
     const c = nbt.compound({ Name: nbt.string(p.name) });
-    if (Object.keys(p.props).length) c.value.set("Properties", stringRecordToCompound(p.props as Record<string, string>));
+    if (Object.keys(p.props).length)
+      c.value.set("Properties", stringRecordToCompound(p.props as Record<string, string>));
     return c;
   });
   const blocks: NbtTag[] = [];
@@ -103,7 +111,10 @@ export function writeStructure(m: VoxelModel, opts: StructureWriteOptions = {}):
     const data = nbt.compound({ id: nbt.string(e.id) });
     for (const [k, v] of e.data.value) data.value.set(k, v);
     return nbt.compound({
-      pos: nbt.list("double", e.pos.map((v) => nbt.double(v))),
+      pos: nbt.list(
+        "double",
+        e.pos.map((v) => nbt.double(v)),
+      ),
       blockPos: intList(e.pos.map((v) => Math.floor(v))),
       nbt: data,
     });

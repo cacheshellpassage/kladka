@@ -222,7 +222,13 @@ export function getIntVector(c: NbtCompound, key: string): number[] {
   if (t.kind === "intArray") return Array.from(t.value);
   if (t.kind === "list") {
     return t.value.map((e) => {
-      if (e.kind === "int" || e.kind === "short" || e.kind === "byte" || e.kind === "double" || e.kind === "float")
+      if (
+        e.kind === "int" ||
+        e.kind === "short" ||
+        e.kind === "byte" ||
+        e.kind === "double" ||
+        e.kind === "float"
+      )
         return e.value;
       throw new NbtFormatError(`List "${key}" contains ${e.kind}`);
     });

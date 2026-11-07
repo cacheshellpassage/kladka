@@ -8,7 +8,14 @@ import {
   type ContentPackManifest,
   type PackBuildEntry,
 } from "@kladka/voxel-core";
-import { CATALOG, CONTENT_AUTHOR, CONTENT_DATE, CONTENT_LICENSE, buildEntry, type CatalogEntry } from "./catalog";
+import {
+  CATALOG,
+  CONTENT_AUTHOR,
+  CONTENT_DATE,
+  CONTENT_LICENSE,
+  buildEntry,
+  type CatalogEntry,
+} from "./catalog";
 
 export interface BuiltBuild {
   entry: PackBuildEntry;

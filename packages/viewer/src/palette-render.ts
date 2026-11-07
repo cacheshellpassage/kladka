@@ -67,7 +67,10 @@ export class AtlasBuilder {
   }
 }
 
-export function buildPaletteRender(palette: PaletteEntry[], provider: TextureProvider | null): { table: PaletteRender[]; atlas: AtlasBuilder } {
+export function buildPaletteRender(
+  palette: PaletteEntry[],
+  provider: TextureProvider | null,
+): { table: PaletteRender[]; atlas: AtlasBuilder } {
   const atlas = new AtlasBuilder(provider);
   // layer 0: white (used for untextured details)
   atlas.layerFor({ pattern: "plain", color: 0xffffff, accent: 0xffffff });
@@ -79,7 +82,11 @@ export function buildPaletteRender(palette: PaletteEntry[], provider: TexturePro
       side: atlas.layerFor(info.tex.side, p.name, "side", info.material),
       bottom: atlas.layerFor(info.tex.bottom, p.name, "bottom", info.material),
     };
-    const glowLayer = atlas.layerFor({ pattern: "glow", color: info.tex.side.accent ?? 0xffd860, accent: 0xffffff });
+    const glowLayer = atlas.layerFor({
+      pattern: "glow",
+      color: info.tex.side.accent ?? 0xffd860,
+      accent: 0xffffff,
+    });
     const tintLayers = new Map<number, number>();
     for (const b of geometry.boxes) {
       if (b.tint !== undefined && !tintLayers.has(b.tint)) {

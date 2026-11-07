@@ -24,7 +24,8 @@ export function countItems(m: VoxelModel, voxels: Iterable<number>): Map<string,
   }
   const items = new Map<string, number>();
   for (const [p, n] of perPalette) {
-    for (const it of game.itemsFor(m.palette[p]!)) items.set(it.item, (items.get(it.item) ?? 0) + it.count * n);
+    for (const it of game.itemsFor(m.palette[p]!))
+      items.set(it.item, (items.get(it.item) ?? 0) + it.count * n);
   }
   return items;
 }
@@ -57,6 +58,13 @@ function* allBlocks(m: VoxelModel): Generator<number> {
 }
 
 /** "3 ст. + 12" style breakdown; returns structured data so UI can localise. */
-export function stackBreakdown(count: number, stackSize = 64): { stacks: number; remainder: number; shulkers: number } {
-  return { stacks: Math.floor(count / stackSize), remainder: count % stackSize, shulkers: count / (27 * stackSize) };
+export function stackBreakdown(
+  count: number,
+  stackSize = 64,
+): { stacks: number; remainder: number; shulkers: number } {
+  return {
+    stacks: Math.floor(count / stackSize),
+    remainder: count % stackSize,
+    shulkers: count / (27 * stackSize),
+  };
 }

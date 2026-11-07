@@ -352,7 +352,9 @@ for (const w of WOOD_TYPES) {
     M[`stripped_${wood}`] = ["log", look.stripped, shade(look.stripped, 0.85)];
   }
   const leaves = isNether ? (w === "crimson" ? "nether_wart_block" : "warped_wart_block") : `${w}_leaves`;
-  M[leaves] = isNether ? ["noise", look.leaves, shade(look.leaves, 0.8)] : ["leaves", look.leaves, shade(look.leaves, 0.7)];
+  M[leaves] = isNether
+    ? ["noise", look.leaves, shade(look.leaves, 0.8)]
+    : ["leaves", look.leaves, shade(look.leaves, 0.7)];
 }
 M["azalea_leaves"] = ["leaves", 0x5a7a2a, 0x46601f];
 M["flowering_azalea_leaves"] = ["leaves", 0x5f7d2f, 0xd27fc0];

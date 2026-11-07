@@ -153,7 +153,12 @@ export function house(p: HouseParams): Builder {
       if (!isDoorCol) {
         windowRow(b, "x", zb, x, xe, wy0, wy1, glass);
         if (p.shutters) shutters(b, "x", zb, x, xe, wy0, wy1, "south", w.trapdoor);
-        if (p.flowerBoxes && f === 0) flowerBox(b, x, fy, zb, "x", xe - x + 1, "south", w.trapdoor, ["poppy", "dandelion", "azure_bluet"]);
+        if (p.flowerBoxes && f === 0)
+          flowerBox(b, x, fy, zb, "x", xe - x + 1, "south", w.trapdoor, [
+            "poppy",
+            "dandelion",
+            "azure_bluet",
+          ]);
       }
       windowRow(b, "x", za, x, xe, wy0, wy1, glass);
       if (p.shutters) shutters(b, "x", za, x, xe, wy0, wy1, "north", w.trapdoor);
@@ -183,7 +188,8 @@ export function house(p: HouseParams): Builder {
   door(b, dx, yb + 1, z1, "south", w.door);
   // steps in front of raised houses
   if (stilt > 0) {
-    for (let i = 1; i <= stilt; i++) b.set(dx, stilt - i, z1 + i, w.stairs, "foundation", { facing: "north", half: "bottom" });
+    for (let i = 1; i <= stilt; i++)
+      b.set(dx, stilt - i, z1 + i, w.stairs, "foundation", { facing: "north", half: "bottom" });
   } else {
     b.set(dx, 0, z1 + 1, w.slab, "decor", { type: "bottom" });
   }
@@ -199,7 +205,8 @@ export function house(p: HouseParams): Builder {
       b.set(x0, yb + 1, z, w.fence, "decor");
       b.set(x1, yb + 1, z, w.fence, "decor");
     }
-    for (const x of [x0, x1]) for (let y = yb + 1; y <= yb + 3; y++) b.set(x, y, pz1, w.log, "frame", { axis: "y" });
+    for (const x of [x0, x1])
+      for (let y = yb + 1; y <= yb + 3; y++) b.set(x, y, pz1, w.log, "frame", { axis: "y" });
     for (let x = x0; x <= x1; x++)
       for (let z = z1 + 1; z <= pz1; z++) b.set(x, yb + 4, z, w.slab, "roof", { type: "bottom" });
     b.clear(dx - 1, yb + 2, z1 + 1);
@@ -212,8 +219,10 @@ export function house(p: HouseParams): Builder {
   // roof
   const gableFill = p.gableFill ?? wall;
   let roofTop = topY;
-  if (p.roof === "gable-x") roofTop = gableRoof(b, x0, z0, x1, z1, topY, roof, { axis: "x", gable: gableFill, eaveTrim: true });
-  else if (p.roof === "gable-z") roofTop = gableRoof(b, x0, z0, x1, z1, topY, roof, { axis: "z", gable: gableFill, eaveTrim: true });
+  if (p.roof === "gable-x")
+    roofTop = gableRoof(b, x0, z0, x1, z1, topY, roof, { axis: "x", gable: gableFill, eaveTrim: true });
+  else if (p.roof === "gable-z")
+    roofTop = gableRoof(b, x0, z0, x1, z1, topY, roof, { axis: "z", gable: gableFill, eaveTrim: true });
   else if (p.roof === "hip") roofTop = hipRoof(b, x0, z0, x1, z1, topY, roof, 1);
   else flatRoof(b, x0, z0, x1, z1, topY, roof.block, roof.slab);
 
@@ -235,7 +244,8 @@ export function house(p: HouseParams): Builder {
     if (D >= 8) furniture(b, x0 + 1, iy, z0 + 3, "bookshelf");
   }
   if (p.carpetColor) carpet(b, x0 + 2, z0 + 3, x1 - 2, z1 - 2, iy, p.carpetColor);
-  if (p.lanterns !== false) lantern(b, Math.floor((x0 + x1) / 2), yb + fh - 1, Math.floor((z0 + z1) / 2) - 1, true);
+  if (p.lanterns !== false)
+    lantern(b, Math.floor((x0 + x1) / 2), yb + fh - 1, Math.floor((z0 + z1) / 2) - 1, true);
   for (let f = 1; f < p.floors; f++) {
     const fy = yb + f * fh + 1;
     bed(b, x1 - 1, fy, z1 - 2, "south", p.bedColor ?? "blue");

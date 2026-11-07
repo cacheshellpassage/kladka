@@ -67,15 +67,7 @@ export type RenderLayer = "opaque" | "cutout" | "translucent" | "none";
 
 /** Coarse hint used by the role classifier. */
 export type RoleHint =
-  | "structural"
-  | "frame"
-  | "opening"
-  | "interior"
-  | "decor"
-  | "light"
-  | "liquid"
-  | "fence"
-  | "nature";
+  "structural" | "frame" | "opening" | "interior" | "decor" | "light" | "liquid" | "fence" | "nature";
 
 /**
  * Where a block needs support to be placed (survival rules, simplified):
@@ -347,7 +339,13 @@ function resolve(name: string): BlockInfo {
 
   /* ---------- liquids ---------- */
   if (s === "water" || s === "lava") {
-    return mk({ shape: "liquid", render: s === "water" ? "translucent" : "opaque", full: false, hint: "liquid", emissive });
+    return mk({
+      shape: "liquid",
+      render: s === "water" ? "translucent" : "opaque",
+      full: false,
+      hint: "liquid",
+      emissive,
+    });
   }
 
   /* ---------- logs & pillars (axis aware) ---------- */
@@ -375,7 +373,8 @@ function resolve(name: string): BlockInfo {
   /* ---------- shaped variants ---------- */
   if (s.endsWith("_stairs")) return mk({ shape: "stairs", full: false });
   if (s.endsWith("_slab")) return mk({ shape: "slab", full: false });
-  if (s.endsWith("_fence_gate")) return mk({ shape: "fence_gate", full: false, render: "cutout", hint: "opening" });
+  if (s.endsWith("_fence_gate"))
+    return mk({ shape: "fence_gate", full: false, render: "cutout", hint: "opening" });
   if (s.endsWith("_fence")) return mk({ shape: "fence", full: false, hint: "fence" });
   if (
     s.endsWith("_wall") &&
@@ -397,7 +396,14 @@ function resolve(name: string): BlockInfo {
   if (s.endsWith("_door")) {
     const t = look(material);
     const door: TexDef = { pattern: "door", color: t.color, accent: t.accent ?? shade(t.color, 0.75) };
-    return mk({ shape: "door", full: false, render: "cutout", hint: "opening", attach: "below", tex: uniform(door) });
+    return mk({
+      shape: "door",
+      full: false,
+      render: "cutout",
+      hint: "opening",
+      attach: "below",
+      tex: uniform(door),
+    });
   }
   if (s.endsWith("_trapdoor")) {
     const t = look(material);
@@ -405,14 +411,20 @@ function resolve(name: string): BlockInfo {
     return mk({ shape: "trapdoor", full: false, render: "cutout", hint: "opening", tex: uniform(td) });
   }
   if (s.endsWith("_button")) return mk({ shape: "button", full: false, hint: "decor", attach: "face" });
-  if (s === "lever") return base(name, "cobblestone", { shape: "button", full: false, hint: "decor", attach: "face" });
-  if (s.endsWith("_pressure_plate")) return mk({ shape: "plate", full: false, hint: "decor", attach: "below" });
-  if (s.endsWith("_wall_hanging_sign")) return mk({ shape: "wall_sign", full: false, hint: "decor", attach: "back" });
-  if (s.endsWith("_hanging_sign")) return mk({ shape: "hanging_sign", full: false, hint: "decor", attach: "above" });
+  if (s === "lever")
+    return base(name, "cobblestone", { shape: "button", full: false, hint: "decor", attach: "face" });
+  if (s.endsWith("_pressure_plate"))
+    return mk({ shape: "plate", full: false, hint: "decor", attach: "below" });
+  if (s.endsWith("_wall_hanging_sign"))
+    return mk({ shape: "wall_sign", full: false, hint: "decor", attach: "back" });
+  if (s.endsWith("_hanging_sign"))
+    return mk({ shape: "hanging_sign", full: false, hint: "decor", attach: "above" });
   if (s.endsWith("_wall_sign")) return mk({ shape: "wall_sign", full: false, hint: "decor", attach: "back" });
   if (s.endsWith("_sign")) return mk({ shape: "sign", full: false, hint: "decor", attach: "below" });
-  if (s.endsWith("_wall_banner")) return mk({ shape: "wall_banner", full: false, hint: "decor", attach: "back", render: "cutout" });
-  if (s.endsWith("_banner")) return mk({ shape: "banner", full: false, hint: "decor", attach: "below", render: "cutout" });
+  if (s.endsWith("_wall_banner"))
+    return mk({ shape: "wall_banner", full: false, hint: "decor", attach: "back", render: "cutout" });
+  if (s.endsWith("_banner"))
+    return mk({ shape: "banner", full: false, hint: "decor", attach: "below", render: "cutout" });
   if (s.endsWith("_carpet")) return mk({ shape: "carpet", full: false, hint: "interior", attach: "below" });
   if (s.endsWith("_bed")) {
     const t = look(material);
@@ -422,7 +434,11 @@ function resolve(name: string): BlockInfo {
       full: false,
       hint: "interior",
       attach: "below",
-      tex: { top: t, side: { pattern: "planks", color: frame, accent: shade(frame, 0.8) }, bottom: look("oak_planks") },
+      tex: {
+        top: t,
+        side: { pattern: "planks", color: frame, accent: shade(frame, 0.8) },
+        bottom: look("oak_planks"),
+      },
     });
   }
   if (s === "candle" || s.endsWith("_candle")) {
@@ -440,7 +456,8 @@ function resolve(name: string): BlockInfo {
   if (s === "glass" || s.endsWith("_stained_glass") || s === "tinted_glass") {
     return mk({ render: "translucent", hint: "opening", full: false });
   }
-  if (s === "ice" || s === "slime_block" || s === "honey_block") return mk({ render: "translucent", full: false });
+  if (s === "ice" || s === "slime_block" || s === "honey_block")
+    return mk({ render: "translucent", full: false });
 
   /* ---------- explicit specials ---------- */
   switch (s) {
@@ -460,7 +477,12 @@ function resolve(name: string): BlockInfo {
       return mk({ shape: "path", full: false, tex: { top, side: look("dirt"), bottom: look("dirt") } });
     }
     case "farmland":
-      return mk({ shape: "path", full: false, hint: "nature", tex: { top: look("farmland"), side: look("dirt"), bottom: look("dirt") } });
+      return mk({
+        shape: "path",
+        full: false,
+        hint: "nature",
+        tex: { top: look("farmland"), side: look("dirt"), bottom: look("dirt") },
+      });
     case "torch":
     case "soul_torch":
     case "redstone_torch":
@@ -468,10 +490,24 @@ function resolve(name: string): BlockInfo {
     case "wall_torch":
     case "soul_wall_torch":
     case "redstone_wall_torch":
-      return mk({ shape: "wall_torch", full: false, render: "cutout", hint: "light", attach: "back", emissive });
+      return mk({
+        shape: "wall_torch",
+        full: false,
+        render: "cutout",
+        hint: "light",
+        attach: "back",
+        emissive,
+      });
     case "lantern":
     case "soul_lantern":
-      return mk({ shape: "lantern", full: false, render: "cutout", hint: "light", attach: "hanging", emissive });
+      return mk({
+        shape: "lantern",
+        full: false,
+        render: "cutout",
+        hint: "light",
+        attach: "hanging",
+        emissive,
+      });
     case "campfire":
     case "soul_campfire":
       return mk({ shape: "campfire", full: false, render: "cutout", hint: "light", emissive });
@@ -498,7 +534,13 @@ function resolve(name: string): BlockInfo {
     case "activator_rail":
       return mk({ shape: "rail", full: false, render: "cutout", hint: "decor", attach: "below" });
     case "redstone_wire":
-      return base(name, "redstone_block", { shape: "rail", full: false, render: "cutout", hint: "decor", attach: "below" });
+      return base(name, "redstone_block", {
+        shape: "rail",
+        full: false,
+        render: "cutout",
+        hint: "decor",
+        attach: "below",
+      });
     case "chest":
     case "trapped_chest":
     case "ender_chest": {
@@ -577,9 +619,10 @@ function resolve(name: string): BlockInfo {
 
   if (PLANT_IDS.has(s) || s.endsWith("_sapling") || s.endsWith("_tulip")) {
     const leafLook = look("oak_leaves");
-    const flower = /tulip|poppy|dandelion|orchid|allium|bluet|daisy|cornflower|lily|rose|peony|lilac|sunflower|petals|torchflower|blossom/.test(
-      s,
-    );
+    const flower =
+      /tulip|poppy|dandelion|orchid|allium|bluet|daisy|cornflower|lily|rose|peony|lilac|sunflower|petals|torchflower|blossom/.test(
+        s,
+      );
     const col = flower ? flowerColor(s) : leafLook.color;
     const t: TexDef = { pattern: flower ? "flower" : "plant", color: col, accent: leafLook.color };
     return base(name, material, {
@@ -594,7 +637,14 @@ function resolve(name: string): BlockInfo {
   }
   if (CROP_IDS.has(s)) {
     const t: TexDef = { pattern: "plant", color: 0x8db034, accent: 0x5f8a22 };
-    return base(name, material, { shape: "crop", full: false, render: "cutout", hint: "nature", attach: "below", tex: uniform(t) });
+    return base(name, material, {
+      shape: "crop",
+      full: false,
+      render: "cutout",
+      hint: "nature",
+      attach: "below",
+      tex: uniform(t),
+    });
   }
 
   const info = mk({ emissive, hint: light ? "light" : INTERIOR_IDS.has(s) ? "interior" : "structural" });

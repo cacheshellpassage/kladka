@@ -3,3 +3,5 @@ packages:
   - "apps/*"
 onlyBuiltDependencies:
   - esbuild
+autoInstallPeers: true
+strictPeerDependencies: false

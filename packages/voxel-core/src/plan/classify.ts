@@ -132,7 +132,11 @@ export function analyze(m: VoxelModel): Analysis {
   for (let c = 0; c < layer; c++) footprint += cols[c]!;
   if (groundY < 0) groundY = 0;
   let foundationTop = groundY;
-  while (foundationTop + 1 < sy && foundationTop + 1 <= groundY + 2 && counts[foundationTop + 1]! >= 0.7 * footprint) {
+  while (
+    foundationTop + 1 < sy &&
+    foundationTop + 1 <= groundY + 2 &&
+    counts[foundationTop + 1]! >= 0.7 * footprint
+  ) {
     foundationTop++;
   }
   // Never treat the whole build as foundation (e.g. solid cubes).
@@ -172,7 +176,8 @@ export function classifyRoles(m: VoxelModel, a: Analysis = analyze(m)): Uint8Arr
         role = "decor";
         break;
       case "nature":
-        role = y <= foundationTop && info.shape === "cube" && info.render === "opaque" ? "foundation" : "decor";
+        role =
+          y <= foundationTop && info.shape === "cube" && info.render === "opaque" ? "foundation" : "decor";
         break;
       case "fence":
         role = exteriorAdj[i] ? "decor" : "interior";
@@ -208,7 +213,13 @@ export function classifyRoles(m: VoxelModel, a: Analysis = analyze(m)): Uint8Arr
             continue;
           }
         }
-        if (y + 1 < sy && roles[i + layer] === roof && (shaped || info.shape === "cube") && exteriorAdj[i] && skyExposedBelowRoof(m, i, layer, roles, roof)) {
+        if (
+          y + 1 < sy &&
+          roles[i + layer] === roof &&
+          (shaped || info.shape === "cube") &&
+          exteriorAdj[i] &&
+          skyExposedBelowRoof(m, i, layer, roles, roof)
+        ) {
           roles[i] = roof;
         }
       }
@@ -223,7 +234,13 @@ export function classifyRoles(m: VoxelModel, a: Analysis = analyze(m)): Uint8Arr
       for (let y = foundationTop + 1; y <= sy; y++) {
         const i = x + z * sx + y * layer;
         const p = y < sy ? m.blocks[i]! : -1;
-        const ok = y < sy && p !== 0 && roles[i] === walls && infos[p]!.shape === "cube" && exteriorAdj[i] && isConvexCorner(m, a, x, y, z);
+        const ok =
+          y < sy &&
+          p !== 0 &&
+          roles[i] === walls &&
+          infos[p]!.shape === "cube" &&
+          exteriorAdj[i] &&
+          isConvexCorner(m, a, x, y, z);
         if (ok && p === runP) continue;
         if (runStart >= 0 && y - runStart >= 3 && differsFromNeighbours(m, x, runStart, z, runP)) {
           for (let yy = runStart; yy < y; yy++) roles[x + z * sx + yy * layer] = frame;
@@ -235,7 +252,13 @@ export function classifyRoles(m: VoxelModel, a: Analysis = analyze(m)): Uint8Arr
   return roles;
 }
 
-function skyExposedBelowRoof(m: VoxelModel, i: number, layer: number, roles: Uint8Array, roof: number): boolean {
+function skyExposedBelowRoof(
+  m: VoxelModel,
+  i: number,
+  layer: number,
+  roles: Uint8Array,
+  roof: number,
+): boolean {
   // a block under a roof block counts as eave underside only if it is not supporting interior space
   const below = i - layer;
   return below < 0 || m.blocks[below] === 0 || roles[below] === roof;

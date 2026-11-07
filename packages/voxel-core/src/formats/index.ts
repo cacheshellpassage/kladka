@@ -58,7 +58,9 @@ export function importBytes(bytes: Uint8Array, filename?: string): ImportResult 
     model = readStructure(root);
     format = "nbt";
   } else if (root.tag.value.has("Blocks") && root.tag.value.has("Data") && root.tag.value.has("Materials")) {
-    throw new FormatError("Legacy MCEdit .schematic (pre-1.13 numeric ids) is not supported; re-save it as .schem");
+    throw new FormatError(
+      "Legacy MCEdit .schematic (pre-1.13 numeric ids) is not supported; re-save it as .schem",
+    );
   } else {
     throw new FormatError("Unknown NBT structure: not a .schem, .litematic or structure .nbt file");
   }
@@ -66,7 +68,9 @@ export function importBytes(bytes: Uint8Array, filename?: string): ImportResult 
     warnings.push(`File extension .${ext} does not match detected format ${format}`);
   }
   if (model.dataVersion > MC_DATA_VERSION) {
-    warnings.push(`File was saved by a newer game version (DataVersion ${model.dataVersion} > ${MC_DATA_VERSION})`);
+    warnings.push(
+      `File was saved by a newer game version (DataVersion ${model.dataVersion} > ${MC_DATA_VERSION})`,
+    );
   }
   const unknown = model.palette.filter((p) => !p.name.startsWith("minecraft:")).length;
   if (unknown) warnings.push(`${unknown} block types are from mods and are shown with placeholder colours`);
@@ -79,14 +83,22 @@ export interface ExportResult {
   mime: string;
 }
 
-export function exportModel(m: VoxelModel, format: ExportFormat, opts: { includeAir?: boolean } = {}): ExportResult {
+export function exportModel(
+  m: VoxelModel,
+  format: ExportFormat,
+  opts: { includeAir?: boolean } = {},
+): ExportResult {
   switch (format) {
     case "schem":
       return { bytes: writeNbtFile(writeSpongeV3(m)), extension: "schem", mime: "application/octet-stream" };
     case "schem-v2":
       return { bytes: writeNbtFile(writeSpongeV2(m)), extension: "schem", mime: "application/octet-stream" };
     case "litematic":
-      return { bytes: writeNbtFile(writeLitematic(m)), extension: "litematic", mime: "application/octet-stream" };
+      return {
+        bytes: writeNbtFile(writeLitematic(m)),
+        extension: "litematic",
+        mime: "application/octet-stream",
+      };
     case "nbt":
       return {
         bytes: writeNbtFile(writeStructure(m, { includeAir: opts.includeAir })),

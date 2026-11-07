@@ -8,11 +8,20 @@ function model(): VoxelModel {
   return new VoxelModel({ x: 4, y: 3, z: 4 }, { materialOf: minecraftJava.materialOf });
 }
 
-function quads(m: VoxelModel, stepOf: Int32Array | null = null, clip: Parameters<typeof meshChunk>[0]["clip"] = null) {
+function quads(
+  m: VoxelModel,
+  stepOf: Int32Array | null = null,
+  clip: Parameters<typeof meshChunk>[0]["clip"] = null,
+) {
   const { table } = buildPaletteRender(m.palette, null);
   const mesh = meshChunk({ model: m, table, stepOf, roles: null, clip }, 0, 0, 0);
   const count = (p?: { indices: Uint32Array }) => (p ? p.indices.length / 6 : 0);
-  return { opaque: count(mesh.opaque), cutout: count(mesh.cutout), translucent: count(mesh.translucent), mesh };
+  return {
+    opaque: count(mesh.opaque),
+    cutout: count(mesh.cutout),
+    translucent: count(mesh.translucent),
+    mesh,
+  };
 }
 
 describe("greedy mesher", () => {
@@ -83,12 +92,58 @@ describe("greedy mesher", () => {
 
 describe("procedural textures", () => {
   const patterns: TexPattern[] = [
-    "plain", "noise", "planks", "log", "log_top", "bricks", "stone_bricks", "cobble", "stone", "tiles",
-    "polished", "smooth", "leaves", "glass", "wool", "sand", "grass_top", "grass_side", "dirt", "bookshelf",
-    "door", "trapdoor", "crafting_top", "crafting_side", "furnace", "chest", "glow", "water", "lava", "metal",
-    "thatch", "pillar", "pillar_top", "lamp", "concrete", "terracotta", "ore", "scaffold", "plant", "flower",
-    "torch", "ladder", "rail", "chiseled", "path_top", "farmland", "bars", "barrel_top", "barrel_side",
-    "sandstone", "mosaic", "shingles",
+    "plain",
+    "noise",
+    "planks",
+    "log",
+    "log_top",
+    "bricks",
+    "stone_bricks",
+    "cobble",
+    "stone",
+    "tiles",
+    "polished",
+    "smooth",
+    "leaves",
+    "glass",
+    "wool",
+    "sand",
+    "grass_top",
+    "grass_side",
+    "dirt",
+    "bookshelf",
+    "door",
+    "trapdoor",
+    "crafting_top",
+    "crafting_side",
+    "furnace",
+    "chest",
+    "glow",
+    "water",
+    "lava",
+    "metal",
+    "thatch",
+    "pillar",
+    "pillar_top",
+    "lamp",
+    "concrete",
+    "terracotta",
+    "ore",
+    "scaffold",
+    "plant",
+    "flower",
+    "torch",
+    "ladder",
+    "rail",
+    "chiseled",
+    "path_top",
+    "farmland",
+    "bars",
+    "barrel_top",
+    "barrel_side",
+    "sandstone",
+    "mosaic",
+    "shingles",
   ];
   it("generates deterministic 16×16 RGBA data for every pattern", () => {
     for (const p of patterns) {

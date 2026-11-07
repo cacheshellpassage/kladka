@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: Lint, types, unit tests, web build, E2E
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Lint
+        run: pnpm lint
+      - name: Format check
+        run: pnpm format:check
+      - name: Type-check
+        run: pnpm typecheck
+      - name: Unit tests
+        run: pnpm test
+      - name: License audit (no copyleft in shipped code)
+        run: node tools/licenses.mjs --check
+      - name: Content pack is up to date
+        run: |
+          pnpm content:build
+          git diff --exit-code -- apps/app/public/packs/core/builds apps/app/public/packs/core/pack.json || (echo "Run pnpm content:build and commit the result" && exit 1)
+      - name: Build web/PWA
+        run: pnpm build:web
+      - name: No remote URLs in the bundle
+        run: pnpm check:offline
+      - name: Install Playwright Chromium
+        run: pnpm --filter @kladka/app exec playwright install --with-deps chromium
+      - name: E2E tests
+        run: pnpm test:e2e
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e2e-report-and-screenshots
+          path: |
+            apps/app/playwright-report
+            apps/app/test-results
+          if-no-files-found: ignore
+      - uses: actions/upload-artifact@v4
+        with:
+          name: web-pwa
+          path: apps/app/dist

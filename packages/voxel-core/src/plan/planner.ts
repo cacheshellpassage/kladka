@@ -79,7 +79,17 @@ const FACING_OFFSET: Record<string, [number, number, number]> = {
   down: [0, -1, 0],
 };
 
-const TALL_PLANTS = new Set(["sunflower", "lilac", "rose_bush", "peony", "tall_grass", "large_fern", "pitcher_plant", "tall_seagrass", "tall_dry_grass"]);
+const TALL_PLANTS = new Set([
+  "sunflower",
+  "lilac",
+  "rose_bush",
+  "peony",
+  "tall_grass",
+  "large_fern",
+  "pitcher_plant",
+  "tall_seagrass",
+  "tall_dry_grass",
+]);
 
 /** Voxel index of the block this block must be attached to, or -1 (any neighbour), or -2 (ground ok). */
 function requiredSupport(m: VoxelModel, i: number, info: BlockInfo): number {
@@ -221,7 +231,7 @@ export function planBuild(m: VoxelModel, opts: PlanOptions = {}): BuildPlan {
 
   const steps: PlanStep[] = [];
   const stages: PlanStage[] = [];
-  let deferred = new Set<number>();
+  const deferred = new Set<number>();
   let cursor: [number, number, number] = [0, 0, 0];
 
   const placeWithCompanions = (i: number, out: number[]) => {
@@ -253,7 +263,13 @@ export function planBuild(m: VoxelModel, opts: PlanOptions = {}): BuildPlan {
 
   for (let si = 0; si < STAGES.length; si++) {
     const stageId = STAGES[si]!;
-    const stage: PlanStage = { id: stageId, layers: [], stepStart: steps.length, stepEnd: steps.length, blockCount: 0 };
+    const stage: PlanStage = {
+      id: stageId,
+      layers: [],
+      stepStart: steps.length,
+      stepEnd: steps.length,
+      blockCount: 0,
+    };
     for (let y = 0; y < sy; y++) {
       const group = groups.get(keyOf(si, y));
       if (!group && deferred.size === 0) continue;
@@ -263,8 +279,12 @@ export function planBuild(m: VoxelModel, opts: PlanOptions = {}): BuildPlan {
       const queue: number[] = [];
       let qh = 0;
       const enq = new Set<number>();
-      for (const i of inGroup) if (isSupported(i)) (queue.push(i), enq.add(i));
-      for (const i of deferred) if (isSupported(i)) (queue.push(i), enq.add(i));
+      for (const i of [...inGroup, ...deferred]) {
+        if (isSupported(i)) {
+          queue.push(i);
+          enq.add(i);
+        }
+      }
       // BFS placement simulation
       while (qh < queue.length) {
         const i = queue[qh++]!;
@@ -289,7 +309,8 @@ export function planBuild(m: VoxelModel, opts: PlanOptions = {}): BuildPlan {
         steps.push({ index: steps.length, stage: stageId, layer: y, blocks });
         cursor = centroid(m, blocks);
       }
-      if (extra.length) steps.push({ index: steps.length, stage: stageId, layer: y, blocks: extra, deferred: true });
+      if (extra.length)
+        steps.push({ index: steps.length, stage: stageId, layer: y, blocks: extra, deferred: true });
       layerInfo.stepEnd = steps.length;
       stage.layers.push(layerInfo);
       stage.blockCount += order.length + extra.length;
@@ -306,7 +327,13 @@ export function planBuild(m: VoxelModel, opts: PlanOptions = {}): BuildPlan {
     if (out.length) {
       const last = stages[stages.length - 1];
       const y = Math.floor(out[0]! / layer);
-      const step: PlanStep = { index: steps.length, stage: last?.id ?? "decor", layer: y, blocks: out, scaffold: true };
+      const step: PlanStep = {
+        index: steps.length,
+        stage: last?.id ?? "decor",
+        layer: y,
+        blocks: out,
+        scaffold: true,
+      };
       steps.push(step);
       if (last) {
         last.layers.push({ y, stepStart: step.index, stepEnd: step.index + 1 });
@@ -315,7 +342,6 @@ export function planBuild(m: VoxelModel, opts: PlanOptions = {}): BuildPlan {
       }
       warnings.push(`${out.length} blocks have no support and need temporary scaffolding`);
     }
-    deferred = new Set();
   }
 
   // Companions that were never placed (partner missing) – should not happen, but keep data consistent.
@@ -340,7 +366,12 @@ function centroid(m: VoxelModel, blocks: number[]): [number, number, number] {
 }
 
 /** Splits placed blocks (in valid placement order) into connected, size-limited, proximity-ordered steps. */
-function splitIntoSteps(m: VoxelModel, order: number[], maxStep: number, start: [number, number, number]): number[][] {
+function splitIntoSteps(
+  m: VoxelModel,
+  order: number[],
+  maxStep: number,
+  start: [number, number, number],
+): number[][] {
   if (order.length === 0) return [];
   const pos = new Map<number, number>();
   order.forEach((i, k) => pos.set(i, k));

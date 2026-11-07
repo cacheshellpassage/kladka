@@ -2,7 +2,16 @@
  * Block roles and build stages.
  * Role codes are stored per voxel (Uint8Array); 0 means "unknown, classify automatically".
  */
-export const ROLES = ["foundation", "frame", "walls", "openings", "roof", "interior", "decor", "lighting"] as const;
+export const ROLES = [
+  "foundation",
+  "frame",
+  "walls",
+  "openings",
+  "roof",
+  "interior",
+  "decor",
+  "lighting",
+] as const;
 export type Role = (typeof ROLES)[number];
 
 /** Stage order of construction. Lighting is placed during the decor stage. */

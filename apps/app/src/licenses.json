@@ -1,0 +1,102 @@
+[
+  {
+    "name": "@capacitor/android",
+    "version": "8.6.0",
+    "license": "MIT"
+  },
+  {
+    "name": "@capacitor/app",
+    "version": "8.1.2",
+    "license": "MIT"
+  },
+  {
+    "name": "@capacitor/core",
+    "version": "8.6.0",
+    "license": "MIT"
+  },
+  {
+    "name": "@capacitor/filesystem",
+    "version": "8.1.5",
+    "license": "MIT"
+  },
+  {
+    "name": "@capacitor/share",
+    "version": "8.0.3",
+    "license": "MIT"
+  },
+  {
+    "name": "@capacitor/synapse",
+    "version": "1.0.4",
+    "license": "ISC"
+  },
+  {
+    "name": "@tauri-apps/api",
+    "version": "2.12.4",
+    "license": "Apache-2.0 OR MIT"
+  },
+  {
+    "name": "@tauri-apps/plugin-dialog",
+    "version": "2.8.4",
+    "license": "MIT OR Apache-2.0"
+  },
+  {
+    "name": "@tauri-apps/plugin-fs",
+    "version": "2.7.1",
+    "license": "MIT OR Apache-2.0"
+  },
+  {
+    "name": "@types/react",
+    "version": "19.3.0",
+    "license": "MIT"
+  },
+  {
+    "name": "csstype",
+    "version": "3.2.3",
+    "license": "MIT"
+  },
+  {
+    "name": "fflate",
+    "version": "0.8.3",
+    "license": "MIT"
+  },
+  {
+    "name": "gifenc",
+    "version": "1.0.3",
+    "license": "MIT"
+  },
+  {
+    "name": "idb",
+    "version": "8.0.4",
+    "license": "ISC"
+  },
+  {
+    "name": "react",
+    "version": "19.3.1",
+    "license": "MIT"
+  },
+  {
+    "name": "react-dom",
+    "version": "19.3.1",
+    "license": "MIT"
+  },
+  {
+    "name": "scheduler",
+    "version": "0.28.0",
+    "license": "MIT"
+  },
+  {
+    "name": "three",
+    "version": "0.187.0",
+    "license": "MIT"
+  },
+  {
+    "name": "tslib",
+    "version": "2.9.1",
+    "license": "0BSD"
+  },
+  {
+    "name": "zustand",
+    "version": "5.1.0",
+    "license": "MIT"
+  }
+]

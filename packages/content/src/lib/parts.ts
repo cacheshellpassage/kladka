@@ -1,5 +1,5 @@
 /** Reusable building parts: roofs, openings, furniture, lighting, decoration. */
-import { Builder, DIRV, OPP, bs, type B, type Facing, type MatSet, type WoodSet } from "./builder";
+import { DIRV, OPP, bs, type B, type Builder, type Facing, type MatSet, type WoodSet } from "./builder";
 
 /* ---------------------------------------------------------------- */
 /* Roofs                                                              */
@@ -30,7 +30,16 @@ export interface GableOpts {
  * Gable roof over the wall rectangle (x0..x1, z0..z1) starting at layer y.
  * Returns the layer above the ridge.
  */
-export function gableRoof(b: Builder, x0: number, z0: number, x1: number, z1: number, y: number, mat: MatSet, o: GableOpts): number {
+export function gableRoof(
+  b: Builder,
+  x0: number,
+  z0: number,
+  x1: number,
+  z1: number,
+  y: number,
+  mat: MatSet,
+  o: GableOpts,
+): number {
   const ov = o.overhang ?? 1;
   const ext = o.extend ?? ov;
   // work in a rotated frame: "a" runs along the ridge, "c" across the slopes
@@ -127,7 +136,9 @@ export function hipRoof(
       b.ring(ax, az, bx, bz, yy - 1, mat.block, "roof");
     }
     if (ax === bx || az === bz) {
-      for (let x = ax; x <= bx; x++) for (let z = az; z <= bz; z++) b.set(x, yy, z, cap ?? mat.slab, "roof", cap ? undefined : { type: "bottom" });
+      for (let x = ax; x <= bx; x++)
+        for (let z = az; z <= bz; z++)
+          b.set(x, yy, z, cap ?? mat.slab, "roof", cap ? undefined : { type: "bottom" });
       yy++;
       break;
     }
@@ -149,13 +160,30 @@ export function hipRoof(
 }
 
 /** Flat roof: slab/blocks covering the rectangle with a parapet ring. */
-export function flatRoof(b: Builder, x0: number, z0: number, x1: number, z1: number, y: number, deck: B, parapet?: B): void {
+export function flatRoof(
+  b: Builder,
+  x0: number,
+  z0: number,
+  x1: number,
+  z1: number,
+  y: number,
+  deck: B,
+  parapet?: B,
+): void {
   b.fill(x0, y, z0, x1, y, z1, deck, "roof");
   if (parapet) b.ring(x0, z0, x1, z1, y + 1, parapet, "roof");
 }
 
 /** Cone roof over a circle (towers). */
-export function coneRoof(b: Builder, cx: number, cz: number, r: number, y: number, mat: MatSet, tip?: B): number {
+export function coneRoof(
+  b: Builder,
+  cx: number,
+  cz: number,
+  r: number,
+  y: number,
+  mat: MatSet,
+  tip?: B,
+): number {
   let yy = y;
   for (let rr = r; rr >= 0.5; rr -= 0.75) {
     if (yy > y) b.circle(cx, cz, rr, true, (x, z) => b.put(x, yy - 1, z, mat.block, "roof"));
@@ -181,14 +209,37 @@ export function coneRoof(b: Builder, cx: number, cz: number, r: number, y: numbe
 /* ---------------------------------------------------------------- */
 
 /** Door in a wall cell (x, y = lower half, z), facing outward direction `out`. */
-export function door(b: Builder, x: number, y: number, z: number, out: Facing, doorBlock: string, hinge: "left" | "right" = "left"): void {
+export function door(
+  b: Builder,
+  x: number,
+  y: number,
+  z: number,
+  out: Facing,
+  doorBlock: string,
+  hinge: "left" | "right" = "left",
+): void {
   const facing = OPP[out]; // player faces into the house when placing
   b.set(x, y, z, doorBlock, "openings", { facing, half: "lower", hinge, open: "false", powered: "false" });
-  b.set(x, y + 1, z, doorBlock, "openings", { facing, half: "upper", hinge, open: "false", powered: "false" });
+  b.set(x, y + 1, z, doorBlock, "openings", {
+    facing,
+    half: "upper",
+    hinge,
+    open: "false",
+    powered: "false",
+  });
 }
 
 /** Window of panes (or glass blocks) in a wall plane. `axis` = the axis the wall runs along. */
-export function windowRow(b: Builder, axis: "x" | "z", fixed: number, from: number, to: number, y0: number, y1: number, glass: B = "glass_pane"): void {
+export function windowRow(
+  b: Builder,
+  axis: "x" | "z",
+  fixed: number,
+  from: number,
+  to: number,
+  y0: number,
+  y1: number,
+  glass: B = "glass_pane",
+): void {
   for (let y = y0; y <= y1; y++)
     for (let t = from; t <= to; t++) {
       const [x, z] = axis === "x" ? [t, fixed] : [fixed, t];
@@ -197,13 +248,27 @@ export function windowRow(b: Builder, axis: "x" | "z", fixed: number, from: numb
 }
 
 /** Shutters (open trapdoors) on both sides of a window, mounted on the outside wall face. */
-export function shutters(b: Builder, axis: "x" | "z", fixed: number, from: number, to: number, y0: number, y1: number, out: Facing, trapdoor: string): void {
+export function shutters(
+  b: Builder,
+  axis: "x" | "z",
+  fixed: number,
+  from: number,
+  to: number,
+  y0: number,
+  y1: number,
+  out: Facing,
+  trapdoor: string,
+): void {
   const [ox, oz] = DIRV[out];
   for (let y = y0; y <= y1; y++) {
     const ends = [from - 1, to + 1];
     for (const t of ends) {
       const [x, z] = axis === "x" ? [t, fixed] : [fixed, t];
-      b.put(x + ox, y, z + oz, trapdoor, "decor", { facing: out, half: y === y0 ? "bottom" : "top", open: "true" });
+      b.put(x + ox, y, z + oz, trapdoor, "decor", {
+        facing: out,
+        half: y === y0 ? "bottom" : "top",
+        open: "true",
+      });
     }
   }
 }
@@ -218,10 +283,23 @@ export function wallTorch(b: Builder, x: number, y: number, z: number, facing: F
 }
 
 export function lantern(b: Builder, x: number, y: number, z: number, hanging: boolean, soul = false): void {
-  b.set(x, y, z, soul ? "soul_lantern" : "lantern", "lighting", { hanging: String(hanging), waterlogged: "false" });
+  b.set(x, y, z, soul ? "soul_lantern" : "lantern", "lighting", {
+    hanging: String(hanging),
+    waterlogged: "false",
+  });
 }
 
-export function flowerBox(b: Builder, x: number, y: number, z: number, axis: "x" | "z", len: number, out: Facing, trapdoor: string, flowers: string[]): void {
+export function flowerBox(
+  b: Builder,
+  x: number,
+  y: number,
+  z: number,
+  axis: "x" | "z",
+  len: number,
+  out: Facing,
+  trapdoor: string,
+  flowers: string[],
+): void {
   const [ox, oz] = DIRV[out];
   for (let t = 0; t < len; t++) {
     const [x1, z1] = axis === "x" ? [x + t, z] : [x, z + t];
@@ -236,7 +314,11 @@ export function bush(b: Builder, x: number, y: number, z: number, leaves: string
     for (let dx = -r; dx <= r; dx++)
       for (let dz = -r; dz <= r; dz++) {
         if (Math.abs(dx) + Math.abs(dz) + dy > r + (dy === 0 ? 1 : 0)) continue;
-        b.put(x + dx, y + dy, z + dz, leaves, "decor", { persistent: "true", distance: "1", waterlogged: "false" });
+        b.put(x + dx, y + dy, z + dz, leaves, "decor", {
+          persistent: "true",
+          distance: "1",
+          waterlogged: "false",
+        });
       }
 }
 
@@ -248,7 +330,11 @@ export function tree(b: Builder, x: number, y: number, z: number, w: WoodSet, he
     for (let dx = -r; dx <= r; dx++)
       for (let dz = -r; dz <= r; dz++) {
         if (Math.abs(dx) === r && Math.abs(dz) === r && (dy === 1 || (x + z + dy) % 2 === 0)) continue;
-        b.put(x + dx, top + dy, z + dz, w.leaves, "decor", { persistent: "true", distance: "1", waterlogged: "false" });
+        b.put(x + dx, top + dy, z + dz, w.leaves, "decor", {
+          persistent: "true",
+          distance: "1",
+          waterlogged: "false",
+        });
       }
   }
 }
@@ -281,7 +367,15 @@ export function furniture(b: Builder, x: number, y: number, z: number, block: st
   b.set(x, y, z, block, "interior", facing ? { facing } : undefined);
 }
 
-export function carpet(b: Builder, x0: number, z0: number, x1: number, z1: number, y: number, color: string): void {
+export function carpet(
+  b: Builder,
+  x0: number,
+  z0: number,
+  x1: number,
+  z1: number,
+  y: number,
+  color: string,
+): void {
   for (let x = x0; x <= x1; x++) for (let z = z0; z <= z1; z++) b.put(x, y, z, `${color}_carpet`, "interior");
 }
 

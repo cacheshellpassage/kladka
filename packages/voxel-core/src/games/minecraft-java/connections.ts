@@ -40,7 +40,9 @@ function connectsFence(self: BlockState, other: BlockState, side: Horizontal): b
 
 function connectsPane(other: BlockState): boolean {
   const oi = blockInfo(other.name);
-  return oi.shape === "pane" || oi.shape === "wall" || isSolid(other) || shortId(other.name).includes("glass");
+  return (
+    oi.shape === "pane" || oi.shape === "wall" || isSolid(other) || shortId(other.name).includes("glass")
+  );
 }
 
 function connectsWall(other: BlockState, side: Horizontal): boolean {
@@ -129,7 +131,9 @@ export function finalizeConnections(m: VoxelModel): number {
         const straightNS = conn.north && conn.south && !conn.east && !conn.west;
         const straightEW = conn.east && conn.west && !conn.north && !conn.south;
         const needsPost =
-          aboveInfo.shape === "torch" || aboveInfo.shape === "lantern" || (aboveInfo.shape === "wall" && above.props.up === "true");
+          aboveInfo.shape === "torch" ||
+          aboveInfo.shape === "lantern" ||
+          (aboveInfo.shape === "wall" && above.props.up === "true");
         patch.up = String(!(straightNS || straightEW) || needsPost);
         next = withProps(st, patch);
         break;

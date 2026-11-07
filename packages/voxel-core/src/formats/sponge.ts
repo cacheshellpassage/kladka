@@ -24,7 +24,12 @@ export function isSpongeRoot(root: NbtRoot): boolean {
   const t = root.tag;
   const inner = getOptCompound(t, "Schematic");
   const s = inner && !t.value.has("Width") ? inner : t;
-  return s.value.has("Width") && s.value.has("Height") && s.value.has("Length") && (s.value.has("Palette") || s.value.has("Blocks") || s.value.has("BlockData"));
+  return (
+    s.value.has("Width") &&
+    s.value.has("Height") &&
+    s.value.has("Length") &&
+    (s.value.has("Palette") || s.value.has("Blocks") || s.value.has("BlockData"))
+  );
 }
 
 export function readSponge(root: NbtRoot): VoxelModel {
@@ -89,7 +94,8 @@ export function readSponge(root: NbtRoot): VoxelModel {
       const [x, y, z] = [pos[0] ?? 0, pos[1] ?? 0, pos[2] ?? 0];
       if (!m.inBounds(x, y, z)) continue;
       const id = getStringOr(t, "Id", getStringOr(t, "id", ""));
-      const data = version >= 3 ? (getOptCompound(t, "Data") ?? nbt.compound()) : without(t, ["Pos", "Id", "id"]);
+      const data =
+        version >= 3 ? (getOptCompound(t, "Data") ?? nbt.compound()) : without(t, ["Pos", "Id", "id"]);
       m.blockEntities.set(m.index(x, y, z), { id, data });
     }
   }
@@ -139,7 +145,9 @@ export function writeSpongeV3(m: VoxelModel): NbtRoot {
   const blockEntities: NbtTag[] = [];
   for (const [i, be] of [...m.blockEntities].sort((a, b) => a[0] - b[0])) {
     const c = m.coords(i);
-    blockEntities.push(nbt.compound({ Pos: nbt.intArray([c.x, c.y, c.z]), Id: nbt.string(be.id), Data: be.data }));
+    blockEntities.push(
+      nbt.compound({ Pos: nbt.intArray([c.x, c.y, c.z]), Id: nbt.string(be.id), Data: be.data }),
+    );
   }
   const schematic = nbt.compound({
     Version: nbt.int(3),
@@ -162,7 +170,10 @@ export function writeSpongeV3(m: VoxelModel): NbtRoot {
         "compound",
         m.entities.map((e) =>
           nbt.compound({
-            Pos: nbt.list("double", e.pos.map((v) => nbt.double(v))),
+            Pos: nbt.list(
+              "double",
+              e.pos.map((v) => nbt.double(v)),
+            ),
             Id: nbt.string(e.id),
             Data: e.data,
           }),
@@ -200,7 +211,13 @@ export function writeSpongeV2(m: VoxelModel): NbtRoot {
       nbt.list(
         "compound",
         m.entities.map((e) => {
-          const t = nbt.compound({ Pos: nbt.list("double", e.pos.map((v) => nbt.double(v))), Id: nbt.string(e.id) });
+          const t = nbt.compound({
+            Pos: nbt.list(
+              "double",
+              e.pos.map((v) => nbt.double(v)),
+            ),
+            Id: nbt.string(e.id),
+          });
           for (const [k, v] of e.data.value) if (k !== "Pos" && k !== "Id") t.value.set(k, v);
           return t;
         }),

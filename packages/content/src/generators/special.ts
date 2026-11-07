@@ -1,8 +1,27 @@
 /** Landmarks: bridge, pagoda, shrine gate, tea house, mini castle, chapel, gazebo, fountain, treehouse, modern villa. */
 import { Builder, STONE, roofSet, woodSet, type Wood } from "../lib/builder";
-import { bed, bush, chair, door, furniture, gableRoof, hipRoof, lantern, table, tree, wallTorch, windowRow } from "../lib/parts";
+import {
+  bed,
+  bush,
+  chair,
+  door,
+  furniture,
+  gableRoof,
+  hipRoof,
+  lantern,
+  table,
+  tree,
+  wallTorch,
+  windowRow,
+} from "../lib/parts";
 
-export function bridge(p: { length: number; width: number; stone: keyof typeof STONE; wood: Wood; arches: number }): Builder {
+export function bridge(p: {
+  length: number;
+  width: number;
+  stone: keyof typeof STONE;
+  wood: Wood;
+  arches: number;
+}): Builder {
   const st = STONE[p.stone]!;
   const w = woodSet(p.wood);
   const L = p.length,
@@ -12,7 +31,8 @@ export function bridge(p: { length: number; width: number; stone: keyof typeof S
   const z0 = 3,
     z1 = 3 + Wd - 1;
   // water under the bridge
-  for (let x = 4; x < L; x++) for (let z = 0; z < Wd + 6; z++) b.set(x, 0, z, "water", "foundation", { level: "0" });
+  for (let x = 4; x < L; x++)
+    for (let z = 0; z < Wd + 6; z++) b.set(x, 0, z, "water", "foundation", { level: "0" });
   // deck follows a gentle arc
   const deckY = (x: number) => Math.round(rise * Math.sin((Math.PI * (x - 2)) / (L - 1))) + 2;
   for (let x = 2; x < L + 2; x++) {
@@ -30,14 +50,16 @@ export function bridge(p: { length: number; width: number; stone: keyof typeof S
       for (let z = z0; z <= z1; z++) b.set(x, yy, z, st.block, "foundation");
     }
     // piers between arches go down into the water
-    if (local < 1 / span || x === 2 || x === L + 1) for (let yy = 0; yy < y; yy++) for (let z = z0; z <= z1; z++) b.set(x, yy, z, st.block, "foundation");
+    if (local < 1 / span || x === 2 || x === L + 1)
+      for (let yy = 0; yy < y; yy++) for (let z = z0; z <= z1; z++) b.set(x, yy, z, st.block, "foundation");
   }
   // stairs at both ends
   for (const [x, f] of [
     [1, "east"],
     [L + 2, "west"],
   ] as const)
-    for (let z = z0 + 1; z <= z1 - 1; z++) b.set(x, 1, z, st.stairs, "foundation", { facing: f, half: "bottom" });
+    for (let z = z0 + 1; z <= z1 - 1; z++)
+      b.set(x, 1, z, st.stairs, "foundation", { facing: f, half: "bottom" });
   // lamp posts
   for (const x of [3, Math.floor(L / 2) + 2, L]) {
     const y = deckY(x) + 1;
@@ -50,7 +72,14 @@ export function bridge(p: { length: number; width: number; stone: keyof typeof S
   return b;
 }
 
-export function pagoda(p: { tiers: number; base: number; wood: Wood; wall: string; roofMat: string; pillar: string }): Builder {
+export function pagoda(p: {
+  tiers: number;
+  base: number;
+  wood: Wood;
+  wall: string;
+  roofMat: string;
+  pillar: string;
+}): Builder {
   const size = p.base + 8;
   const tierH = 4;
   const b = new Builder(size, p.tiers * (tierH + 2) + 10, size);
@@ -61,7 +90,8 @@ export function pagoda(p: { tiers: number; base: number; wood: Wood; wall: strin
   const h0 = Math.floor(p.base / 2) + 1;
   b.fill(c - h0 - 1, 0, c - h0 - 1, c + h0 + 1, 0, c + h0 + 1, "stone_bricks", "foundation");
   b.fill(c - h0, 1, c - h0, c + h0, 1, c + h0, "polished_andesite", "foundation");
-  for (let x = c - 1; x <= c + 1; x++) b.set(x, 1, c + h0 + 1, "stone_brick_stairs", "foundation", { facing: "north", half: "bottom" });
+  for (let x = c - 1; x <= c + 1; x++)
+    b.set(x, 1, c + h0 + 1, "stone_brick_stairs", "foundation", { facing: "north", half: "bottom" });
   let y = 2;
   for (let t = 0; t < p.tiers; t++) {
     const h = Math.max(1, Math.floor(p.base / 2) - t);
@@ -84,7 +114,16 @@ export function pagoda(p: { tiers: number; base: number; wood: Wood; wall: strin
       ["z", x0],
       ["z", x1],
     ] as const)
-      windowRow(b, ax, fx, c - (h > 2 ? 1 : 0), c + (h > 2 ? 1 : 0), y + 1, y + 1, t === 0 && ax === "x" && fx === z1 ? "air" : `${w.trapdoor}`);
+      windowRow(
+        b,
+        ax,
+        fx,
+        c - (h > 2 ? 1 : 0),
+        c + (h > 2 ? 1 : 0),
+        y + 1,
+        y + 1,
+        t === 0 && ax === "x" && fx === z1 ? "air" : `${w.trapdoor}`,
+      );
     if (t === 0) door(b, c, y, z1, "south", w.door);
     // floor slab & flared roof
     const ry = y + tierH - 1;
@@ -118,7 +157,15 @@ export function pagoda(p: { tiers: number; base: number; wood: Wood; wall: strin
     y = ry + 2;
   }
   // spire
-  for (let i = 0; i < 3; i++) b.set(c, y - 1 + i, c, i === 2 ? "lightning_rod" : "chain", "roof", i === 2 ? { facing: "up" } : { axis: "y" });
+  for (let i = 0; i < 3; i++)
+    b.set(
+      c,
+      y - 1 + i,
+      c,
+      i === 2 ? "lightning_rod" : "chain",
+      "roof",
+      i === 2 ? { facing: "up" } : { axis: "y" },
+    );
   // garden
   tree(b, 1, 0, 1, woodSet("cherry"), 4, 2);
   bush(b, size - 2, 0, size - 2, "azalea_leaves", 1);
@@ -130,7 +177,9 @@ export function shrine(p: { wood: Wood; gate: string; roofMat: string }): Builde
   const w = woodSet(p.wood);
   const roof = roofSet(p.roofMat);
   // gravel path
-  for (let z = 0; z < 21; z++) for (let x = 6; x <= 10; x++) b.set(x, 0, z, x === 6 || x === 10 ? "stone_bricks" : "gravel", "foundation");
+  for (let z = 0; z < 21; z++)
+    for (let x = 6; x <= 10; x++)
+      b.set(x, 0, z, x === 6 || x === 10 ? "stone_bricks" : "gravel", "foundation");
   // torii gate at the front
   const gz = 17;
   for (const x of [5, 11]) {
@@ -177,13 +226,15 @@ export function teaHouse(p: { wood: Wood; roofMat: string }): Builder {
     z0 = 4,
     z1 = 11;
   // raised wooden deck on stone footings
-  for (let x = x0 - 1; x <= x1 + 1; x += 3) for (let z = z0 - 1; z <= z1 + 1; z += 3) b.set(x, 0, z, "stone_bricks", "foundation");
+  for (let x = x0 - 1; x <= x1 + 1; x += 3)
+    for (let z = z0 - 1; z <= z1 + 1; z += 3) b.set(x, 0, z, "stone_bricks", "foundation");
   b.fill(x0 - 1, 1, z0 - 1, x1 + 1, 1, z1 + 1, w.planks, "foundation");
   b.walls(x0, z0, x1, z1, 2, 4, "white_terracotta", "walls", "stripped_spruce_log");
-  for (let x = x0 + 3; x < x1; x += 3) for (let y = 2; y <= 4; y++) {
-    b.set(x, y, z0, "stripped_spruce_log", "frame", { axis: "y" });
-    b.set(x, y, z1, "stripped_spruce_log", "frame", { axis: "y" });
-  }
+  for (let x = x0 + 3; x < x1; x += 3)
+    for (let y = 2; y <= 4; y++) {
+      b.set(x, y, z0, "stripped_spruce_log", "frame", { axis: "y" });
+      b.set(x, y, z1, "stripped_spruce_log", "frame", { axis: "y" });
+    }
   // sliding panel openings
   for (let x = x0 + 1; x <= x1 - 1; x++) if ((x - x0) % 3 !== 0) b.set(x, 3, z1, "glass_pane", "openings");
   for (let x = x0 + 1; x <= x1 - 1; x++) if ((x - x0) % 3 !== 0) b.set(x, 3, z0, "glass_pane", "openings");
@@ -199,14 +250,21 @@ export function teaHouse(p: { wood: Wood; roofMat: string }): Builder {
   b.set(x0 + 4, 2, z0 + 2, "flower_pot", "interior");
   lantern(b, x0 + 4, 4, z0 + 4, true);
   // pond in front
-  for (let x = 3; x <= 7; x++) for (let z = 13; z <= 15; z++) b.set(x, 0, z, "water", "decor", { level: "0" });
+  for (let x = 3; x <= 7; x++)
+    for (let z = 13; z <= 15; z++) b.set(x, 0, z, "water", "decor", { level: "0" });
   b.set(5, 1, 14, "lily_pad", "decor");
   bush(b, 15, 0, 14, "cherry_leaves", 1);
   bush(b, 1, 0, 2, "azalea_leaves", 1);
   return b;
 }
 
-export function castle(p: { size: number; stone: keyof typeof STONE; wood: Wood; roofMat: string; banner: string }): Builder {
+export function castle(p: {
+  size: number;
+  stone: keyof typeof STONE;
+  wood: Wood;
+  roofMat: string;
+  banner: string;
+}): Builder {
   const S = p.size;
   const b = new Builder(S + 8, 26, S + 8);
   const st = STONE[p.stone]!;
@@ -231,7 +289,10 @@ export function castle(p: { size: number; stone: keyof typeof STONE; wood: Wood;
     [x0, z1],
     [x1, z1],
   ] as const) {
-    for (let y = 0; y <= wallH + 3; y++) b.circle(cx, cz, 2, y === 0, (x, z) => b.set(x, y, z, y === 0 ? "cobblestone" : st.block, y === 0 ? "foundation" : "walls"));
+    for (let y = 0; y <= wallH + 3; y++)
+      b.circle(cx, cz, 2, y === 0, (x, z) =>
+        b.set(x, y, z, y === 0 ? "cobblestone" : st.block, y === 0 ? "foundation" : "walls"),
+      );
     b.circle(cx, cz, 1.2, true, (x, z) => b.set(x, wallH + 3, z, w.planks, "walls"));
     const top = wallH + 4;
     b.circle(cx, cz, 2, false, (x, z) => {
@@ -246,7 +307,8 @@ export function castle(p: { size: number; stone: keyof typeof STONE; wood: Wood;
   // gatehouse in the south wall
   const gx = Math.floor((x0 + x1) / 2);
   for (let y = 1; y <= 3; y++) for (let x = gx - 1; x <= gx + 1; x++) b.clear(x, y, z1);
-  for (let x = gx - 1; x <= gx + 1; x++) b.set(x, 4, z1, st.stairs, "walls", { facing: "south", half: "top" });
+  for (let x = gx - 1; x <= gx + 1; x++)
+    b.set(x, 4, z1, st.stairs, "walls", { facing: "south", half: "top" });
   for (let x = gx - 1; x <= gx + 1; x++) b.set(x, 3, z1, "iron_bars", "openings");
   wallTorch(b, gx - 2, 3, z1 + 1, "south");
   wallTorch(b, gx + 2, 3, z1 + 1, "south");
@@ -364,7 +426,8 @@ export function gazebo(p: { wood: Wood; roofMat: string; radius: number }): Buil
   chair(b, c - 1, 2, c, w, "east");
   chair(b, c + 1, 2, c, w, "west");
   lantern(b, c, 4, c - 1, true);
-  for (let i = -1; i <= 1; i++) b.set(c + i, 1, c + R + 1, "stone_brick_stairs", "foundation", { facing: "north", half: "bottom" });
+  for (let i = -1; i <= 1; i++)
+    b.set(c + i, 1, c + R + 1, "stone_brick_stairs", "foundation", { facing: "north", half: "bottom" });
   return b;
 }
 
@@ -392,7 +455,14 @@ export function treehouse(p: { wood: Wood; roofMat: string }): Builder {
   const b = new Builder(17, 24, 17);
   const c = 8;
   // trunk 2×2
-  for (let y = 0; y <= 14; y++) for (const [dx, dz] of [[0, 0], [1, 0], [0, 1], [1, 1]] as const) b.set(c + dx, y, c + dz, w.wood, "frame", { axis: "y" });
+  for (let y = 0; y <= 14; y++)
+    for (const [dx, dz] of [
+      [0, 0],
+      [1, 0],
+      [0, 1],
+      [1, 1],
+    ] as const)
+      b.set(c + dx, y, c + dz, w.wood, "frame", { axis: "y" });
   // platform
   const py = 8;
   b.fill(c - 4, py, c - 4, c + 5, py, c + 5, w.planks, "walls");
@@ -427,7 +497,11 @@ export function treehouse(p: { wood: Wood; roofMat: string }): Builder {
     for (let dx = -r; dx <= r + 1; dx++)
       for (let dz = -r; dz <= r + 1; dz++) {
         if (Math.hypot(dx - 0.5, dz - 0.5) > r + 0.3) continue;
-        b.put(c + dx, 15 + dy, c + dz, w.leaves, "decor", { persistent: "true", distance: "1", waterlogged: "false" });
+        b.put(c + dx, 15 + dy, c + dz, w.leaves, "decor", {
+          persistent: "true",
+          distance: "1",
+          waterlogged: "false",
+        });
       }
   }
   b.set(x0 + 1, py + 1, z0 + 1, "chest", "interior", { facing: "south" });
@@ -447,7 +521,8 @@ export function modernVilla(p: { wall: string; accent: string; glass: string }):
   b.floor(x0, z0, x1, z1, 0, "smooth_stone");
   // ground floor: walls with large windows
   b.walls(x0, z0, x1, z1, 1, 3, p.wall, "walls");
-  for (let x = x0 + 1; x <= x1 - 1; x++) for (let y = 1; y <= 3; y++) if (x < x1 - 5 || y > 1) b.set(x, y, z1, p.glass, "openings");
+  for (let x = x0 + 1; x <= x1 - 1; x++)
+    for (let y = 1; y <= 3; y++) if (x < x1 - 5 || y > 1) b.set(x, y, z1, p.glass, "openings");
   door(b, x1 - 3, 1, z1, "south", "iron_door");
   b.fill(x0, 4, z0, x1, 4, z1, p.accent, "walls");
   // cantilevered upper floor shifted east
@@ -464,7 +539,8 @@ export function modernVilla(p: { wall: string; accent: string; glass: string }):
   for (let x = x0; x < ux0; x++) b.set(x, 5, z1, p.glass, "decor");
   for (let z = z0; z <= z1; z++) b.set(x0, 5, z, p.glass, "decor");
   // pool
-  for (let x = x0; x <= x0 + 6; x++) for (let z = z1 + 2; z <= z1 + 4; z++) b.set(x, 0, z, "water", "decor", { level: "0" });
+  for (let x = x0; x <= x0 + 6; x++)
+    for (let z = z1 + 2; z <= z1 + 4; z++) b.set(x, 0, z, "water", "decor", { level: "0" });
   b.ring(x0 - 1, z1 + 1, x0 + 7, z1 + 5, 0, "smooth_quartz", "foundation");
   // interior
   b.set(x0 + 2, 1, z0 + 1, "white_bed", "interior", { facing: "north", part: "head", occupied: "false" });

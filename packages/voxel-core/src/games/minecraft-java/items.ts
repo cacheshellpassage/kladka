@@ -84,7 +84,8 @@ export function itemsFor(state: BlockState): ItemCount[] {
   if (info.shape === "bed" && p.part === "head") return [];
   if (info.shape === "slab" && p.type === "double") return [{ item: s, count: 2 }];
   if (s.endsWith("_wall_sign")) return [{ item: s.replace(/_wall_sign$/, "_sign"), count: 1 }];
-  if (s.endsWith("_wall_hanging_sign")) return [{ item: s.replace(/_wall_hanging_sign$/, "_hanging_sign"), count: 1 }];
+  if (s.endsWith("_wall_hanging_sign"))
+    return [{ item: s.replace(/_wall_hanging_sign$/, "_hanging_sign"), count: 1 }];
   if (s.endsWith("_wall_banner")) return [{ item: s.replace(/_wall_banner$/, "_banner"), count: 1 }];
   if (s.endsWith("_wall_head")) return [{ item: s.replace(/_wall_head$/, "_head"), count: 1 }];
   if (s.endsWith("_wall_skull")) return [{ item: s.replace(/_wall_skull$/, "_skull"), count: 1 }];
@@ -93,7 +94,11 @@ export function itemsFor(state: BlockState): ItemCount[] {
     const plant = s.slice(7);
     return [
       { item: "flower_pot", count: 1 },
-      { item: plant === "azalea_bush" ? "azalea" : plant === "flowering_azalea_bush" ? "flowering_azalea" : plant, count: 1 },
+      {
+        item:
+          plant === "azalea_bush" ? "azalea" : plant === "flowering_azalea_bush" ? "flowering_azalea" : plant,
+        count: 1,
+      },
     ];
   }
   if (s.endsWith("candle") && p.candles) return [{ item: s, count: Number(p.candles) || 1 }];
@@ -104,12 +109,21 @@ export function itemsFor(state: BlockState): ItemCount[] {
     return [{ item: s, count: Number(p.flower_amount) || 1 }];
   if ((s === "pink_petals" || s === "leaf_litter") && p.segment_amount)
     return [{ item: s, count: Number(p.segment_amount) || 1 }];
-  if (s.endsWith("_candle_cake")) return [{ item: "cake", count: 1 }, { item: s.replace(/_cake$/, ""), count: 1 }];
-  if (s === "candle_cake") return [{ item: "cake", count: 1 }, { item: "candle", count: 1 }];
+  if (s.endsWith("_candle_cake"))
+    return [
+      { item: "cake", count: 1 },
+      { item: s.replace(/_cake$/, ""), count: 1 },
+    ];
+  if (s === "candle_cake")
+    return [
+      { item: "cake", count: 1 },
+      { item: "candle", count: 1 },
+    ];
   return [{ item: s, count: 1 }];
 }
 
-const STACK_1 = /(_bed|_bucket|_shulker_box|^shulker_box|_boat|_sword|_pickaxe|_axe|_shovel|_hoe|^cake|_minecart)$/;
+const STACK_1 =
+  /(_bed|_bucket|_shulker_box|^shulker_box|_boat|_sword|_pickaxe|_axe|_shovel|_hoe|^cake|_minecart)$/;
 const STACK_16 = /(_sign|_hanging_sign|_banner|^snowball|^ender_pearl|^egg|^armor_stand|^honey_bottle)$/;
 
 export function stackSize(item: string): number {

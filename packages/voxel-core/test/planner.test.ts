@@ -156,7 +156,8 @@ describe("planner edge cases", () => {
     for (let y = 0; y < 40; y++)
       for (let z = 0; z < 64; z++)
         for (let x = 0; x < 64; x++)
-          if (x === 0 || z === 0 || x === 63 || z === 63 || y === 0 || y === 39) m.set(x, y, z, state("stone_bricks"));
+          if (x === 0 || z === 0 || x === 63 || z === 63 || y === 0 || y === 39)
+            m.set(x, y, z, state("stone_bricks"));
     const t = performance.now();
     const plan = planBuild(m);
     const ms = performance.now() - t;
