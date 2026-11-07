@@ -412,7 +412,59 @@ function splitIntoSteps(m: VoxelModel, order: number[], maxStep: number, start: 
     result.push(chunks[best]!);
     cur = cents[best]!;
   }
-  return result;
+  return mergeSmallNeighbours(m, result, Math.min(maxStep, MERGE_LIMIT));
+}
+
+/** Small regions closer than this many blocks (bounding-box gap) are merged into one step. */
+const MERGE_GAP = 3;
+const MERGE_LIMIT = 24;
+
+/**
+ * Merges consecutive small steps that are spatially close (e.g. the panes of neighbouring windows),
+ * so the user gets fewer, more meaningful steps. Order inside each part is preserved, so the merged
+ * step is still buildable (parts are independent regions).
+ */
+function mergeSmallNeighbours(m: VoxelModel, steps: number[][], limit: number): number[][] {
+  if (steps.length < 2) return steps;
+  const box = (s: number[]) => {
+    const b = { x0: Infinity, y0: Infinity, z0: Infinity, x1: -Infinity, y1: -Infinity, z1: -Infinity };
+    for (const i of s) {
+      const c = m.coords(i);
+      b.x0 = Math.min(b.x0, c.x);
+      b.y0 = Math.min(b.y0, c.y);
+      b.z0 = Math.min(b.z0, c.z);
+      b.x1 = Math.max(b.x1, c.x);
+      b.y1 = Math.max(b.y1, c.y);
+      b.z1 = Math.max(b.z1, c.z);
+    }
+    return b;
+  };
+  const gap = (a: ReturnType<typeof box>, b: ReturnType<typeof box>) =>
+    Math.max(0, a.x0 - b.x1, b.x0 - a.x1, a.y0 - b.y1, b.y0 - a.y1, a.z0 - b.z1, b.z0 - a.z1);
+  const out: number[][] = [];
+  let cur = steps[0]!;
+  let curBox = box(cur);
+  for (let k = 1; k < steps.length; k++) {
+    const next = steps[k]!;
+    const nb = box(next);
+    if (cur.length + next.length <= limit && gap(curBox, nb) <= MERGE_GAP) {
+      cur = cur.concat(next);
+      curBox = {
+        x0: Math.min(curBox.x0, nb.x0),
+        y0: Math.min(curBox.y0, nb.y0),
+        z0: Math.min(curBox.z0, nb.z0),
+        x1: Math.max(curBox.x1, nb.x1),
+        y1: Math.max(curBox.y1, nb.y1),
+        z1: Math.max(curBox.z1, nb.z1),
+      };
+    } else {
+      out.push(cur);
+      cur = next;
+      curBox = nb;
+    }
+  }
+  out.push(cur);
+  return out;
 }
 
 /** Steps index range of the full plan, convenient for UI. */

@@ -1,0 +1,267 @@
+/**
+ * Catalogue of built-in builds. Every entry is produced by a parametric generator written for this
+ * project; all content is original and dedicated to the public domain (CC0 1.0).
+ */
+import type { BuildMeta, BuildStyle, LocalizedText, VoxelModel } from "@kladka/voxel-core";
+import type { Builder } from "./lib/builder";
+import { house } from "./generators/house";
+import { lighthouse, watchtower, windmill, wizardTower } from "./generators/towers";
+import { barn, blacksmith, farm, fishingHut, greenhouse, marketStalls, stable, watermill, well } from "./generators/rural";
+import { bridge, castle, chapel, fountain, gazebo, modernVilla, pagoda, shrine, teaHouse, treehouse } from "./generators/special";
+
+export const CONTENT_AUTHOR = "Kladka built-in generators";
+export const CONTENT_LICENSE = "CC0-1.0";
+export const CONTENT_DATE = "2026-11-07";
+
+export interface CatalogEntry {
+  id: string;
+  title: LocalizedText;
+  description: LocalizedText;
+  style: BuildStyle;
+  tags: string[];
+  generator: string;
+  params: Record<string, unknown>;
+  make: () => Builder;
+}
+
+function entry<P>(
+  id: string,
+  title: LocalizedText,
+  description: LocalizedText,
+  style: BuildStyle,
+  tags: string[],
+  generator: string,
+  fn: (p: P) => Builder,
+  params: NoInfer<P>,
+): CatalogEntry {
+  return { id, title, description, style, tags, generator, params: params as Record<string, unknown>, make: () => fn(params) };
+}
+
+export const CATALOG: CatalogEntry[] = [
+  entry("starter-hut", { ru: "Домик новичка", en: "Starter Hut" }, {
+    ru: "Маленький дубовый домик на первую ночь: кровать, верстак, печь и сундук.",
+    en: "A tiny oak hut for your first night: bed, crafting table, furnace and chest.",
+  }, "rustic", ["small", "starter", "oak"], "house", house, {
+    width: 5, depth: 5, floors: 1, wood: "oak", roof: "gable-x", roofMat: "spruce", base: "cobblestone", lanterns: true,
+  }),
+  entry("oak-cottage", { ru: "Дубовый коттедж", en: "Oak Cottage" }, {
+    ru: "Уютный коттедж с ставнями, цветочными ящиками и садом.",
+    en: "A cosy cottage with shutters, flower boxes and a little garden.",
+  }, "rustic", ["cottage", "oak", "garden"], "house", house, {
+    width: 9, depth: 7, floors: 1, wood: "oak", roof: "gable-x", roofMat: "dark_oak", base: "cobblestone",
+    shutters: true, flowerBoxes: true, garden: true, chimney: "bricks", carpetColor: "red",
+  }),
+  entry("spruce-cottage", { ru: "Еловый коттедж", en: "Spruce Cottage" }, {
+    ru: "Тёмный еловый дом с каменным цоколем, крыльцом и трубой.",
+    en: "A dark spruce house on a stone base with a porch and chimney.",
+  }, "nordic", ["cottage", "spruce", "porch"], "house", house, {
+    width: 9, depth: 7, floors: 1, wood: "spruce", roof: "gable-x", roofMat: "deepslate_tiles", base: "stone_bricks",
+    porch: true, chimney: "cobblestone", carpetColor: "brown", bedColor: "green",
+  }),
+  entry("birch-cottage", { ru: "Берёзовый домик", en: "Birch Cottage" }, {
+    ru: "Светлый домик из берёзы и камня с вальмовой крышей.",
+    en: "A bright birch-and-stone cottage with a hipped roof.",
+  }, "rustic", ["cottage", "birch", "hip roof"], "house", house, {
+    width: 7, depth: 7, floors: 1, wood: "birch", wall: "birch_planks", frame: "stripped_birch_log", roof: "hip",
+    roofMat: "spruce", base: "stone_bricks", shutters: true, garden: true, bedColor: "light_blue", carpetColor: "light_gray",
+  }),
+  entry("family-house", { ru: "Семейный дом", en: "Family House" }, {
+    ru: "Двухэтажный дом с лестницей, спальнями на втором этаже и крыльцом.",
+    en: "A two-storey house with a ladder, upstairs bedrooms and a porch.",
+  }, "rustic", ["two floors", "oak", "porch"], "house", house, {
+    width: 11, depth: 9, floors: 2, wood: "oak", roof: "gable-x", roofMat: "spruce", base: "stone_bricks", porch: true,
+    shutters: true, chimney: "bricks", carpetColor: "orange",
+  }),
+  entry("medieval-house", { ru: "Средневековый дом", en: "Medieval House" }, {
+    ru: "Фахверковый дом: тёмный каркас, светлая штукатурка и выступающий второй этаж.",
+    en: "Timber-framed house: dark frame, light plaster and a jettied upper floor.",
+  }, "medieval", ["timber frame", "two floors", "dark oak"], "house", house, {
+    width: 9, depth: 7, floors: 2, wood: "dark_oak", wall: "white_terracotta", frame: "stripped_dark_oak_log", posts: 2,
+    roof: "gable-x", roofMat: "deepslate_tiles", gableFill: "white_terracotta", base: "cobblestone", jetty: true, chimney: "stone_bricks",
+  }),
+  entry("merchant-house", { ru: "Дом купца", en: "Merchant's House" }, {
+    ru: "Высокий фахверковый дом на три этажа с кирпичной трубой.",
+    en: "A tall three-storey timber-framed house with a brick chimney.",
+  }, "medieval", ["timber frame", "three floors", "spruce"], "house", house, {
+    width: 9, depth: 9, floors: 3, wood: "spruce", wall: "white_terracotta", frame: "stripped_spruce_log", posts: 2,
+    roof: "gable-z", roofMat: "dark_oak", gableFill: "spruce_planks", base: "stone_bricks", jetty: true, chimney: "bricks",
+  }),
+  entry("nordic-longhouse", { ru: "Северный длинный дом", en: "Nordic Longhouse" }, {
+    ru: "Вытянутый дом из ели с крутой крышей и тёплым очагом.",
+    en: "A long spruce hall with a steep roof and a warm hearth.",
+  }, "nordic", ["long", "spruce", "hall"], "house", house, {
+    width: 15, depth: 7, floors: 1, floorHeight: 5, wood: "spruce", roof: "gable-x", roofMat: "dark_oak", base: "cobbled_deepslate",
+    shutters: true, chimney: "cobblestone", carpetColor: "red",
+  }),
+  entry("desert-house", { ru: "Дом в пустыне", en: "Desert House" }, {
+    ru: "Песчаниковый дом с плоской крышей-террасой.",
+    en: "A sandstone house with a flat roof terrace.",
+  }, "desert", ["sandstone", "flat roof"], "house", house, {
+    width: 9, depth: 9, floors: 1, floorHeight: 5, wood: "acacia", wall: "smooth_sandstone", frame: "cut_sandstone",
+    roof: "flat", roofMat: "sandstone", base: "sandstone", carpetColor: "orange", bedColor: "yellow",
+  }),
+  entry("beach-house", { ru: "Пляжный домик", en: "Beach House" }, {
+    ru: "Домик на сваях из берёзы с верандой и голубыми акцентами.",
+    en: "A birch house on stilts with a veranda and light-blue accents.",
+  }, "coastal", ["stilts", "birch", "beach"], "house", house, {
+    width: 9, depth: 7, floors: 1, wood: "birch", wall: "birch_planks", frame: "stripped_birch_log", roof: "gable-z",
+    roofMat: "prismarine_bricks", base: "sand", stilts: 3, porch: true, carpetColor: "light_blue", bedColor: "cyan",
+  }),
+  entry("cherry-cottage", { ru: "Вишнёвый домик", en: "Cherry Cottage" }, {
+    ru: "Нежно-розовый домик из вишнёвого дерева с садом.",
+    en: "A soft pink cherry-wood cottage with a garden.",
+  }, "fantasy", ["cherry", "garden", "small"], "house", house, {
+    width: 7, depth: 7, floors: 1, wood: "cherry", roof: "gable-z", roofMat: "dark_oak", base: "mossy_stone_bricks",
+    shutters: true, garden: true, flowerBoxes: true, bedColor: "pink", carpetColor: "pink",
+  }),
+  entry("library", { ru: "Библиотека", en: "Library" }, {
+    ru: "Кирпичная библиотека на два этажа с вальмовой крышей.",
+    en: "A two-storey brick library with a hipped roof.",
+  }, "medieval", ["bricks", "two floors", "books"], "house", house, {
+    width: 11, depth: 11, floors: 2, floorHeight: 5, wood: "dark_oak", wall: "bricks", frame: "stone_bricks",
+    roof: "hip", roofMat: "deepslate_tiles", base: "stone_bricks", carpetColor: "green",
+  }),
+  entry("watchtower", { ru: "Сторожевая башня", en: "Watchtower" }, {
+    ru: "Каменная башня с бойницами и деревянной смотровой площадкой.",
+    en: "A stone tower with arrow slits and a wooden lookout.",
+  }, "medieval", ["tower", "stone", "tall"], "watchtower", watchtower, {
+    size: 5, height: 14, stone: "stone_bricks", wood: "spruce", roofMat: "spruce",
+  }),
+  entry("mossy-watchtower", { ru: "Старая башня", en: "Old Mossy Tower" }, {
+    ru: "Невысокая замшелая башня из булыжника.",
+    en: "A short mossy cobblestone tower.",
+  }, "medieval", ["tower", "cobblestone", "ruin"], "watchtower", watchtower, {
+    size: 5, height: 10, stone: "mossy_cobblestone", wood: "dark_oak", roofMat: "dark_oak",
+  }),
+  entry("wizard-tower", { ru: "Башня мага", en: "Wizard Tower" }, {
+    ru: "Круглая башня с остроконечной крышей, библиотекой и столом зачарования.",
+    en: "A round tower with a pointed roof, books and an enchanting table.",
+  }, "fantasy", ["tower", "round", "magic"], "wizardTower", wizardTower, {
+    radius: 4, height: 18, stone: "stone_bricks", roofMat: "deepslate_tiles", accent: "purpur_block", wood: "dark_oak",
+  }),
+  entry("lighthouse", { ru: "Маяк", en: "Lighthouse" }, {
+    ru: "Полосатый маяк с галереей и светящейся лампой.",
+    en: "A striped lighthouse with a gallery and a glowing lamp.",
+  }, "coastal", ["tower", "round", "sea"], "lighthouse", lighthouse, {
+    radius: 4, height: 22, stripeA: "white_concrete", stripeB: "red_concrete", base: "stone_bricks",
+  }),
+  entry("windmill", { ru: "Ветряная мельница", en: "Windmill" }, {
+    ru: "Каменно-деревянная мельница с крыльями из шерсти.",
+    en: "A stone-and-timber windmill with wool sails.",
+  }, "farm", ["mill", "round", "farm"], "windmill", windmill, {
+    radius: 4, height: 12, wall: "white_terracotta", wood: "spruce", roofMat: "dark_oak", sail: "white_wool",
+  }),
+  entry("watermill", { ru: "Водяная мельница", en: "Watermill" }, {
+    ru: "Мельница у ручья с большим колесом.",
+    en: "A streamside mill with a big water wheel.",
+  }, "farm", ["mill", "water", "spruce"], "watermill", watermill, {
+    wood: "spruce", stone: "cobblestone", roofMat: "dark_oak",
+  }),
+  entry("red-barn", { ru: "Красный амбар", en: "Red Barn" }, {
+    ru: "Амбар с ломаной крышей, сеновалом и большими воротами.",
+    en: "A barn with a gambrel roof, hay loft and big doors.",
+  }, "farm", ["barn", "large", "farm"], "barn", barn, {
+    width: 11, depth: 13, wall: "red_terracotta", trim: "white_terracotta", wood: "dark_oak", roofMat: "dark_oak",
+  }),
+  entry("well", { ru: "Колодец", en: "Village Well" }, {
+    ru: "Каменный колодец с навесом и фонарём.",
+    en: "A stone well with a little roof and a lantern.",
+  }, "rustic", ["small", "village", "water"], "well", well, { stone: "cobblestone", wood: "oak", roofMat: "spruce" }),
+  entry("farm", { ru: "Ферма", en: "Crop Farm" }, {
+    ru: "Огороженное поле с пшеницей, морковью и картофелем, сарай и пугало.",
+    en: "A fenced field with wheat, carrots and potatoes, a shed and a scarecrow.",
+  }, "farm", ["farm", "crops", "field"], "farm", farm, {
+    width: 17, depth: 11, wood: "oak", crops: ["wheat", "carrots", "potatoes"],
+  }),
+  entry("stable", { ru: "Конюшня", en: "Horse Stable" }, {
+    ru: "Конюшня на четыре стойла с сеном и поилками.",
+    en: "A four-stall stable with hay and water troughs.",
+  }, "farm", ["stable", "animals", "spruce"], "stable", stable, { stalls: 4, wood: "spruce", roofMat: "dark_oak" }),
+  entry("greenhouse", { ru: "Теплица", en: "Greenhouse" }, {
+    ru: "Стеклянная теплица с грядками и цветами.",
+    en: "A glass greenhouse with planting beds and flowers.",
+  }, "farm", ["glass", "garden", "crops"], "greenhouse", greenhouse, { width: 9, depth: 11, frame: "stripped_oak_log" }),
+  entry("blacksmith", { ru: "Кузница", en: "Blacksmith" }, {
+    ru: "Мастерская с горном, наковальней и точилом.",
+    en: "A workshop with a forge, anvil and grindstone.",
+  }, "medieval", ["workshop", "village", "stone"], "blacksmith", blacksmith, {
+    wood: "spruce", stone: "cobblestone", roofMat: "dark_oak",
+  }),
+  entry("market", { ru: "Рыночные прилавки", en: "Market Stalls" }, {
+    ru: "Ряд прилавков с полосатыми навесами.",
+    en: "A row of stalls with striped awnings.",
+  }, "medieval", ["market", "village", "colorful"], "marketStalls", marketStalls, {
+    count: 3, wood: "spruce", colors: ["red", "blue", "lime"],
+  }),
+  entry("fishing-hut", { ru: "Рыбацкая хижина", en: "Fishing Hut" }, {
+    ru: "Хижина на берегу с деревянным причалом.",
+    en: "A shoreline hut with a wooden pier.",
+  }, "coastal", ["water", "pier", "spruce"], "fishingHut", fishingHut, { wood: "spruce", roofMat: "spruce" }),
+  entry("stone-bridge", { ru: "Каменный мост", en: "Stone Bridge" }, {
+    ru: "Арочный мост через реку с фонарями.",
+    en: "An arched river bridge with lamp posts.",
+  }, "medieval", ["bridge", "stone", "water"], "bridge", bridge, {
+    length: 21, width: 5, stone: "stone_bricks", wood: "spruce", arches: 3,
+  }),
+  entry("pagoda", { ru: "Пагода", en: "Pagoda" }, {
+    ru: "Трёхъярусная пагода с изогнутыми крышами и сакурой.",
+    en: "A three-tier pagoda with flared roofs and a cherry tree.",
+  }, "japanese", ["tower", "tiers", "cherry"], "pagoda", pagoda, {
+    tiers: 3, base: 9, wood: "dark_oak", wall: "white_terracotta", roofMat: "deepslate_tiles", pillar: "red_terracotta",
+  }),
+  entry("shrine", { ru: "Святилище с воротами", en: "Shrine with Gate" }, {
+    ru: "Небольшое святилище, ворота-арка и каменные фонари.",
+    en: "A small shrine, an arch gate and stone lanterns.",
+  }, "japanese", ["gate", "shrine", "garden"], "shrine", shrine, { wood: "spruce", gate: "red_terracotta", roofMat: "dark_oak" }),
+  entry("tea-house", { ru: "Чайный домик", en: "Tea House" }, {
+    ru: "Домик на помосте у пруда с раздвижными панелями.",
+    en: "A raised tea house by a pond with sliding panels.",
+  }, "japanese", ["pond", "garden", "small"], "teaHouse", teaHouse, { wood: "spruce", roofMat: "deepslate_tiles" }),
+  entry("mini-castle", { ru: "Мини-замок", en: "Mini Castle" }, {
+    ru: "Крепостная стена с четырьмя башнями, воротами и донжоном.",
+    en: "A curtain wall with four towers, a gate and a keep.",
+  }, "medieval", ["castle", "large", "stone"], "castle", castle, {
+    size: 21, stone: "stone_bricks", wood: "spruce", roofMat: "deepslate_tiles", banner: "red",
+  }),
+  entry("chapel", { ru: "Часовня", en: "Chapel" }, {
+    ru: "Каменная часовня с витражами и колокольней.",
+    en: "A stone chapel with stained glass and a bell tower.",
+  }, "medieval", ["church", "stone", "bell"], "chapel", chapel, { stone: "stone_bricks", wood: "dark_oak", roofMat: "deepslate_tiles" }),
+  entry("gazebo", { ru: "Беседка", en: "Garden Gazebo" }, {
+    ru: "Восьмиугольная беседка со столиком.",
+    en: "An octagonal gazebo with a little table.",
+  }, "rustic", ["garden", "small", "round"], "gazebo", gazebo, { wood: "oak", roofMat: "spruce", radius: 3 }),
+  entry("fountain", { ru: "Фонтан", en: "Town Fountain" }, {
+    ru: "Круглый фонтан для деревенской площади.",
+    en: "A round fountain for the village square.",
+  }, "medieval", ["water", "small", "village"], "fountain", fountain, { stone: "stone_bricks", radius: 4 }),
+  entry("treehouse", { ru: "Домик на дереве", en: "Treehouse" }, {
+    ru: "Домик на платформе вокруг толстого ствола, с лестницей и кроной.",
+    en: "A cabin on a platform around a thick trunk, with a ladder and canopy.",
+  }, "fantasy", ["tree", "jungle", "ladder"], "treehouse", treehouse, { wood: "jungle", roofMat: "spruce" }),
+  entry("modern-villa", { ru: "Современная вилла", en: "Modern Villa" }, {
+    ru: "Бетонная вилла с панорамным остеклением, консолью и бассейном.",
+    en: "A concrete villa with panoramic glazing, a cantilever and a pool.",
+  }, "modern", ["modern", "pool", "glass"], "modernVilla", modernVilla, {
+    wall: "white_concrete", accent: "gray_concrete", glass: "glass",
+  }),
+];
+
+export function buildEntry(e: CatalogEntry): { model: VoxelModel; meta: BuildMeta } {
+  const model = e.make().finish();
+  model.meta.name = e.title.en;
+  model.meta.author = CONTENT_AUTHOR;
+  model.meta.createdAt = Date.parse(CONTENT_DATE);
+  const meta: BuildMeta = {
+    id: e.id,
+    title: e.title,
+    description: e.description,
+    author: CONTENT_AUTHOR,
+    license: CONTENT_LICENSE,
+    createdAt: CONTENT_DATE,
+    style: e.style,
+    tags: e.tags,
+    generator: { name: e.generator, params: e.params },
+  };
+  return { model, meta };
+}

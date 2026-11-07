@@ -1,0 +1,1733 @@
+{
+  "format": "kladka-pack",
+  "version": 1,
+  "id": "core",
+  "name": {
+    "ru": "Базовый набор",
+    "en": "Core pack"
+  },
+  "description": {
+    "ru": "Оригинальные постройки, созданные генераторами проекта. Лицензия CC0.",
+    "en": "Original builds produced by the project's generators. Licensed CC0."
+  },
+  "author": "Kladka built-in generators",
+  "license": "CC0-1.0",
+  "createdAt": "2026-11-07",
+  "game": "minecraft-java",
+  "builds": [
+    {
+      "id": "starter-hut",
+      "file": "builds/starter-hut.kbuild",
+      "meta": {
+        "id": "starter-hut",
+        "title": {
+          "ru": "Домик новичка",
+          "en": "Starter Hut"
+        },
+        "description": {
+          "ru": "Маленький дубовый домик на первую ночь: кровать, верстак, печь и сундук.",
+          "en": "A tiny oak hut for your first night: bed, crafting table, furnace and chest."
+        },
+        "author": "Kladka built-in generators",
+        "license": "CC0-1.0",
+        "createdAt": "2026-11-07",
+        "style": "rustic",
+        "tags": [
+          "small",
+          "starter",
+          "oak"
+        ],
+        "generator": {
+          "name": "house",
+          "params": {
+            "width": 5,
+            "depth": 5,
+            "floors": 1,
+            "wood": "oak",
+            "roof": "gable-x",
+            "roofMat": "spruce",
+            "base": "cobblestone",
+            "lanterns": true
+          }
+        }
+      },
+      "stats": {
+        "size": [
+          7,
+          8,
+          7
+        ],
+        "blocks": 177,
+        "materials": 14,
+        "steps": 30,
+        "difficulty": 2,
+        "minutes": 15
+      }
+    },
+    {
+      "id": "oak-cottage",
+      "file": "builds/oak-cottage.kbuild",
+      "meta": {
+        "id": "oak-cottage",
+        "title": {
+          "ru": "Дубовый коттедж",
+          "en": "Oak Cottage"
+        },
+        "description": {
+          "ru": "Уютный коттедж с ставнями, цветочными ящиками и садом.",
+          "en": "A cosy cottage with shutters, flower boxes and a little garden."
+        },
+        "author": "Kladka built-in generators",
+        "license": "CC0-1.0",
+        "createdAt": "2026-11-07",
+        "style": "rustic",
+        "tags": [
+          "cottage",
+          "oak",
+          "garden"
+        ],
+        "generator": {
+          "name": "house",
+          "params": {
+            "width": 9,
+            "depth": 7,
+            "floors": 1,
+            "wood": "oak",
+            "roof": "gable-x",
+            "roofMat": "dark_oak",
+            "base": "cobblestone",
+            "shutters": true,
+            "flowerBoxes": true,
+            "garden": true,
+            "chimney": "bricks",
+            "carpetColor": "red"
+          }
+        }
+      },
+      "stats": {
+        "size": [
+          15,
+          10,
+          10
+        ],
+        "blocks": 410,
+        "materials": 28,
+        "steps": 40,
+        "difficulty": 3,
+        "minutes": 25
+      }
+    },
+    {
+      "id": "spruce-cottage",
+      "file": "builds/spruce-cottage.kbuild",
+      "meta": {
+        "id": "spruce-cottage",
+        "title": {
+          "ru": "Еловый коттедж",
+          "en": "Spruce Cottage"
+        },
+        "description": {
+          "ru": "Тёмный еловый дом с каменным цоколем, крыльцом и трубой.",
+          "en": "A dark spruce house on a stone base with a porch and chimney."
+        },
+        "author": "Kladka built-in generators",
+        "license": "CC0-1.0",
+        "createdAt": "2026-11-07",
+        "style": "nordic",
+        "tags": [
+          "cottage",
+          "spruce",
+          "porch"
+        ],
+        "generator": {
+          "name": "house",
+          "params": {
+            "width": 9,
+            "depth": 7,
+            "floors": 1,
+            "wood": "spruce",
+            "roof": "gable-x",
+            "roofMat": "deepslate_tiles",
+            "base": "stone_bricks",
+            "porch": true,
+            "chimney": "cobblestone",
+            "carpetColor": "brown",
+            "bedColor": "green"
+          }
+        }
+      },
+      "stats": {
+        "size": [
+          11,
+          10,
+          12
+        ],
+        "blocks": 435,
+        "materials": 19,
+        "steps": 36,
+        "difficulty": 3,
+        "minutes": 25
+      }
+    },
+    {
+      "id": "birch-cottage",
+      "file": "builds/birch-cottage.kbuild",
+      "meta": {
+        "id": "birch-cottage",
+        "title": {
+          "ru": "Берёзовый домик",
+          "en": "Birch Cottage"
+        },
+        "description": {
+          "ru": "Светлый домик из берёзы и камня с вальмовой крышей.",
+          "en": "A bright birch-and-stone cottage with a hipped roof."
+        },
+        "author": "Kladka built-in generators",
+        "license": "CC0-1.0",
+        "createdAt": "2026-11-07",
+        "style": "rustic",
+        "tags": [
+          "cottage",
+          "birch",
+          "hip roof"
+        ],
+        "generator": {
+          "name": "house",
+          "params": {
+            "width": 7,
+            "depth": 7,
+            "floors": 1,
+            "wood": "birch",
+            "wall": "birch_planks",
+            "frame": "stripped_birch_log",
+            "roof": "hip",
+            "roofMat": "spruce",
+            "base": "stone_bricks",
+            "shutters": true,
+            "garden": true,
+            "bedColor": "light_blue",
+            "carpetColor": "light_gray"
+          }
+        }
+      },
+      "stats": {
+        "size": [
+          13,
+          9,
+          10
+        ],
+        "blocks": 323,
+        "materials": 26,
+        "steps": 39,
+        "difficulty": 3,
+        "minutes": 25
+      }
+    },
+    {
+      "id": "family-house",
+      "file": "builds/family-house.kbuild",
+      "meta": {
+        "id": "family-house",
+        "title": {
+          "ru": "Семейный дом",
+          "en": "Family House"
+        },
+        "description": {
+          "ru": "Двухэтажный дом с лестницей, спальнями на втором этаже и крыльцом.",
+          "en": "A two-storey house with a ladder, upstairs bedrooms and a porch."
+        },
+        "author": "Kladka built-in generators",
+        "license": "CC0-1.0",
+        "createdAt": "2026-11-07",
+        "style": "rustic",
+        "tags": [
+          "two floors",
+          "oak",
+          "porch"
+        ],
+        "generator": {
+          "name": "house",
+          "params": {
+            "width": 11,
+            "depth": 9,
+            "floors": 2,
+            "wood": "oak",
+            "roof": "gable-x",
+            "roofMat": "spruce",
+            "base": "stone_bricks",
+            "porch": true,
+            "shutters": true,
+            "chimney": "bricks",
+            "carpetColor": "orange"
+          }
+        }
+      },
+      "stats": {
+        "size": [
+          13,
+          15,
+          14
+        ],
+        "blocks": 880,
+        "materials": 23,
+        "steps": 75,
+        "difficulty": 4,
+        "minutes": 55
+      }
+    },
+    {
+      "id": "medieval-house",
+      "file": "builds/medieval-house.kbuild",
+      "meta": {
+        "id": "medieval-house",
+        "title": {
+          "ru": "Средневековый дом",
+          "en": "Medieval House"
+        },
+        "description": {
+          "ru": "Фахверковый дом: тёмный каркас, светлая штукатурка и выступающий второй этаж.",
+          "en": "Timber-framed house: dark frame, light plaster and a jettied upper floor."
+        },
+        "author": "Kladka built-in generators",
+        "license": "CC0-1.0",
+        "createdAt": "2026-11-07",
+        "style": "medieval",
+        "tags": [
+          "timber frame",
+          "two floors",
+          "dark oak"
+        ],
+        "generator": {
+          "name": "house",
+          "params": {
+            "width": 9,
+            "depth": 7,
+            "floors": 2,
+            "wood": "dark_oak",
+            "wall": "white_terracotta",
+            "frame": "stripped_dark_oak_log",
+            "posts": 2,
+            "roof": "gable-x",
+            "roofMat": "deepslate_tiles",
+            "gableFill": "white_terracotta",
+            "base": "cobblestone",
+            "jetty": true,
+            "chimney": "stone_bricks"
+          }
+        }
+      },
+      "stats": {
+        "size": [
+          11,
+          14,
+          9
+        ],
+        "blocks": 544,
+        "materials": 23,
+        "steps": 60,
+        "difficulty": 4,
+        "minutes": 35
+      }
+    },
+    {
+      "id": "merchant-house",
+      "file": "builds/merchant-house.kbuild",
+      "meta": {
+        "id": "merchant-house",
+        "title": {
+          "ru": "Дом купца",
+          "en": "Merchant's House"
+        },
+        "description": {
+          "ru": "Высокий фахверковый дом на три этажа с кирпичной трубой.",
+          "en": "A tall three-storey timber-framed house with a brick chimney."
+        },
+        "author": "Kladka built-in generators",
+        "license": "CC0-1.0",
+        "createdAt": "2026-11-07",
+        "style": "medieval",
+        "tags": [
+          "timber frame",
+          "three floors",
+          "spruce"
+        ],
+        "generator": {
+          "name": "house",
+          "params": {
+            "width": 9,
+            "depth": 9,
+            "floors": 3,
+            "wood": "spruce",
+            "wall": "white_terracotta",
+            "frame": "stripped_spruce_log",
+            "posts": 2,
+            "roof": "gable-z",
+            "roofMat": "dark_oak",
+            "gableFill": "spruce_planks",
+            "base": "stone_bricks",
+            "jetty": true,
+            "chimney": "bricks"
+          }
+        }
+      },
+      "stats": {
+        "size": [
+          11,
+          19,
+          11
+        ],
+        "blocks": 911,
+        "materials": 23,
+        "steps": 109,
+        "difficulty": 4,
+        "minutes": 65
+      }
+    },
+    {
+      "id": "nordic-longhouse",
+      "file": "builds/nordic-longhouse.kbuild",
+      "meta": {
+        "id": "nordic-longhouse",
+        "title": {
+          "ru": "Северный длинный дом",
+          "en": "Nordic Longhouse"
+        },
+        "description": {
+          "ru": "Вытянутый дом из ели с крутой крышей и тёплым очагом.",
+          "en": "A long spruce hall with a steep roof and a warm hearth."
+        },
+        "author": "Kladka built-in generators",
+        "license": "CC0-1.0",
+        "createdAt": "2026-11-07",
+        "style": "nordic",
+        "tags": [
+          "long",
+          "spruce",
+          "hall"
+        ],
+        "generator": {
+          "name": "house",
+          "params": {
+            "width": 15,
+            "depth": 7,
+            "floors": 1,
+            "floorHeight": 5,
+            "wood": "spruce",
+            "roof": "gable-x",
+            "roofMat": "dark_oak",
+            "base": "cobbled_deepslate",
+            "shutters": true,
+            "chimney": "cobblestone",
+            "carpetColor": "red"
+          }
+        }
+      },
+      "stats": {
+        "size": [
+          17,
+          11,
+          9
+        ],
+        "blocks": 640,
+        "materials": 21,
+        "steps": 48,
+        "difficulty": 3,
+        "minutes": 40
+      }
+    },
+    {
+      "id": "desert-house",
+      "file": "builds/desert-house.kbuild",
+      "meta": {
+        "id": "desert-house",
+        "title": {
+          "ru": "Дом в пустыне",
+          "en": "Desert House"
+        },
+        "description": {
+          "ru": "Песчаниковый дом с плоской крышей-террасой.",
+          "en": "A sandstone house with a flat roof terrace."
+        },
+        "author": "Kladka built-in generators",
+        "license": "CC0-1.0",
+        "createdAt": "2026-11-07",
+        "style": "desert",
+        "tags": [
+          "sandstone",
+          "flat roof"
+        ],
+        "generator": {
+          "name": "house",
+          "params": {
+            "width": 9,
+            "depth": 9,
+            "floors": 1,
+            "floorHeight": 5,
+            "wood": "acacia",
+            "wall": "smooth_sandstone",
+            "frame": "cut_sandstone",
+            "roof": "flat",
+            "roofMat": "sandstone",
+            "base": "sandstone",
+            "carpetColor": "orange",
+            "bedColor": "yellow"
+          }
+        }
+      },
+      "stats": {
+        "size": [
+          9,
+          7,
+          10
+        ],
+        "blocks": 354,
+        "materials": 19,
+        "steps": 38,
+        "difficulty": 3,
+        "minutes": 25
+      }
+    },
+    {
+      "id": "beach-house",
+      "file": "builds/beach-house.kbuild",
+      "meta": {
+        "id": "beach-house",
+        "title": {
+          "ru": "Пляжный домик",
+          "en": "Beach House"
+        },
+        "description": {
+          "ru": "Домик на сваях из берёзы с верандой и голубыми акцентами.",
+          "en": "A birch house on stilts with a veranda and light-blue accents."
+        },
+        "author": "Kladka built-in generators",
+        "license": "CC0-1.0",
+        "createdAt": "2026-11-07",
+        "style": "coastal",
+        "tags": [
+          "stilts",
+          "birch",
+          "beach"
+        ],
+        "generator": {
+          "name": "house",
+          "params": {
+            "width": 9,
+            "depth": 7,
+            "floors": 1,
+            "wood": "birch",
+            "wall": "birch_planks",
+            "frame": "stripped_birch_log",
+            "roof": "gable-z",
+            "roofMat": "prismarine_bricks",
+            "base": "sand",
+            "stilts": 3,
+            "porch": true,
+            "carpetColor": "light_blue",
+            "bedColor": "cyan"
+          }
+        }
+      },
+      "stats": {
+        "size": [
+          11,
+          13,
+          11
+        ],
+        "blocks": 470,
+        "materials": 18,
+        "steps": 54,
+        "difficulty": 3,
+        "minutes": 35
+      }
+    },
+    {
+      "id": "cherry-cottage",
+      "file": "builds/cherry-cottage.kbuild",
+      "meta": {
+        "id": "cherry-cottage",
+        "title": {
+          "ru": "Вишнёвый домик",
+          "en": "Cherry Cottage"
+        },
+        "description": {
+          "ru": "Нежно-розовый домик из вишнёвого дерева с садом.",
+          "en": "A soft pink cherry-wood cottage with a garden."
+        },
+        "author": "Kladka built-in generators",
+        "license": "CC0-1.0",
+        "createdAt": "2026-11-07",
+        "style": "fantasy",
+        "tags": [
+          "cherry",
+          "garden",
+          "small"
+        ],
+        "generator": {
+          "name": "house",
+          "params": {
+            "width": 7,
+            "depth": 7,
+            "floors": 1,
+            "wood": "cherry",
+            "roof": "gable-z",
+            "roofMat": "dark_oak",
+            "base": "mossy_stone_bricks",
+            "shutters": true,
+            "garden": true,
+            "flowerBoxes": true,
+            "bedColor": "pink",
+            "carpetColor": "pink"
+          }
+        }
+      },
+      "stats": {
+        "size": [
+          13,
+          9,
+          10
+        ],
+        "blocks": 334,
+        "materials": 25,
+        "steps": 41,
+        "difficulty": 3,
+        "minutes": 25
+      }
+    },
+    {
+      "id": "library",
+      "file": "builds/library.kbuild",
+      "meta": {
+        "id": "library",
+        "title": {
+          "ru": "Библиотека",
+          "en": "Library"
+        },
+        "description": {
+          "ru": "Кирпичная библиотека на два этажа с вальмовой крышей.",
+          "en": "A two-storey brick library with a hipped roof."
+        },
+        "author": "Kladka built-in generators",
+        "license": "CC0-1.0",
+        "createdAt": "2026-11-07",
+        "style": "medieval",
+        "tags": [
+          "bricks",
+          "two floors",
+          "books"
+        ],
+        "generator": {
+          "name": "house",
+          "params": {
+            "width": 11,
+            "depth": 11,
+            "floors": 2,
+            "floorHeight": 5,
+            "wood": "dark_oak",
+            "wall": "bricks",
+            "frame": "stone_bricks",
+            "roof": "hip",
+            "roofMat": "deepslate_tiles",
+            "base": "stone_bricks",
+            "carpetColor": "green"
+          }
+        }
+      },
+      "stats": {
+        "size": [
+          13,
+          17,
+          13
+        ],
+        "blocks": 996,
+        "materials": 23,
+        "steps": 83,
+        "difficulty": 4,
+        "minutes": 60
+      }
+    },
+    {
+      "id": "watchtower",
+      "file": "builds/watchtower.kbuild",
+      "meta": {
+        "id": "watchtower",
+        "title": {
+          "ru": "Сторожевая башня",
+          "en": "Watchtower"
+        },
+        "description": {
+          "ru": "Каменная башня с бойницами и деревянной смотровой площадкой.",
+          "en": "A stone tower with arrow slits and a wooden lookout."
+        },
+        "author": "Kladka built-in generators",
+        "license": "CC0-1.0",
+        "createdAt": "2026-11-07",
+        "style": "medieval",
+        "tags": [
+          "tower",
+          "stone",
+          "tall"
+        ],
+        "generator": {
+          "name": "watchtower",
+          "params": {
+            "size": 5,
+            "height": 14,
+            "stone": "stone_bricks",
+            "wood": "spruce",
+            "roofMat": "spruce"
+          }
+        }
+      },
+      "stats": {
+        "size": [
+          9,
+          24,
+          9
+        ],
+        "blocks": 548,
+        "materials": 13,
+        "steps": 101,
+        "difficulty": 3,
+        "minutes": 50
+      }
+    },
+    {
+      "id": "mossy-watchtower",
+      "file": "builds/mossy-watchtower.kbuild",
+      "meta": {
+        "id": "mossy-watchtower",
+        "title": {
+          "ru": "Старая башня",
+          "en": "Old Mossy Tower"
+        },
+        "description": {
+          "ru": "Невысокая замшелая башня из булыжника.",
+          "en": "A short mossy cobblestone tower."
+        },
+        "author": "Kladka built-in generators",
+        "license": "CC0-1.0",
+        "createdAt": "2026-11-07",
+        "style": "medieval",
+        "tags": [
+          "tower",
+          "cobblestone",
+          "ruin"
+        ],
+        "generator": {
+          "name": "watchtower",
+          "params": {
+            "size": 5,
+            "height": 10,
+            "stone": "mossy_cobblestone",
+            "wood": "dark_oak",
+            "roofMat": "dark_oak"
+          }
+        }
+      },
+      "stats": {
+        "size": [
+          9,
+          20,
+          9
+        ],
+        "blocks": 481,
+        "materials": 13,
+        "steps": 76,
+        "difficulty": 3,
+        "minutes": 40
+      }
+    },
+    {
+      "id": "wizard-tower",
+      "file": "builds/wizard-tower.kbuild",
+      "meta": {
+        "id": "wizard-tower",
+        "title": {
+          "ru": "Башня мага",
+          "en": "Wizard Tower"
+        },
+        "description": {
+          "ru": "Круглая башня с остроконечной крышей, библиотекой и столом зачарования.",
+          "en": "A round tower with a pointed roof, books and an enchanting table."
+        },
+        "author": "Kladka built-in generators",
+        "license": "CC0-1.0",
+        "createdAt": "2026-11-07",
+        "style": "fantasy",
+        "tags": [
+          "tower",
+          "round",
+          "magic"
+        ],
+        "generator": {
+          "name": "wizardTower",
+          "params": {
+            "radius": 4,
+            "height": 18,
+            "stone": "stone_bricks",
+            "roofMat": "deepslate_tiles",
+            "accent": "purpur_block",
+            "wood": "dark_oak"
+          }
+        }
+      },
+      "stats": {
+        "size": [
+          11,
+          29,
+          11
+        ],
+        "blocks": 1048,
+        "materials": 14,
+        "steps": 77,
+        "difficulty": 4,
+        "minutes": 55
+      }
+    },
+    {
+      "id": "lighthouse",
+      "file": "builds/lighthouse.kbuild",
+      "meta": {
+        "id": "lighthouse",
+        "title": {
+          "ru": "Маяк",
+          "en": "Lighthouse"
+        },
+        "description": {
+          "ru": "Полосатый маяк с галереей и светящейся лампой.",
+          "en": "A striped lighthouse with a gallery and a glowing lamp."
+        },
+        "author": "Kladka built-in generators",
+        "license": "CC0-1.0",
+        "createdAt": "2026-11-07",
+        "style": "coastal",
+        "tags": [
+          "tower",
+          "round",
+          "sea"
+        ],
+        "generator": {
+          "name": "lighthouse",
+          "params": {
+            "radius": 4,
+            "height": 22,
+            "stripeA": "white_concrete",
+            "stripeB": "red_concrete",
+            "base": "stone_bricks"
+          }
+        }
+      },
+      "stats": {
+        "size": [
+          15,
+          35,
+          15
+        ],
+        "blocks": 1147,
+        "materials": 14,
+        "steps": 68,
+        "difficulty": 4,
+        "minutes": 55
+      }
+    },
+    {
+      "id": "windmill",
+      "file": "builds/windmill.kbuild",
+      "meta": {
+        "id": "windmill",
+        "title": {
+          "ru": "Ветряная мельница",
+          "en": "Windmill"
+        },
+        "description": {
+          "ru": "Каменно-деревянная мельница с крыльями из шерсти.",
+          "en": "A stone-and-timber windmill with wool sails."
+        },
+        "author": "Kladka built-in generators",
+        "license": "CC0-1.0",
+        "createdAt": "2026-11-07",
+        "style": "farm",
+        "tags": [
+          "mill",
+          "round",
+          "farm"
+        ],
+        "generator": {
+          "name": "windmill",
+          "params": {
+            "radius": 4,
+            "height": 12,
+            "wall": "white_terracotta",
+            "wood": "spruce",
+            "roofMat": "dark_oak",
+            "sail": "white_wool"
+          }
+        }
+      },
+      "stats": {
+        "size": [
+          21,
+          22,
+          11
+        ],
+        "blocks": 582,
+        "materials": 14,
+        "steps": 35,
+        "difficulty": 3,
+        "minutes": 30
+      }
+    },
+    {
+      "id": "watermill",
+      "file": "builds/watermill.kbuild",
+      "meta": {
+        "id": "watermill",
+        "title": {
+          "ru": "Водяная мельница",
+          "en": "Watermill"
+        },
+        "description": {
+          "ru": "Мельница у ручья с большим колесом.",
+          "en": "A streamside mill with a big water wheel."
+        },
+        "author": "Kladka built-in generators",
+        "license": "CC0-1.0",
+        "createdAt": "2026-11-07",
+        "style": "farm",
+        "tags": [
+          "mill",
+          "water",
+          "spruce"
+        ],
+        "generator": {
+          "name": "watermill",
+          "params": {
+            "wood": "spruce",
+            "stone": "cobblestone",
+            "roofMat": "dark_oak"
+          }
+        }
+      },
+      "stats": {
+        "size": [
+          16,
+          13,
+          18
+        ],
+        "blocks": 675,
+        "materials": 15,
+        "steps": 50,
+        "difficulty": 3,
+        "minutes": 40
+      }
+    },
+    {
+      "id": "red-barn",
+      "file": "builds/red-barn.kbuild",
+      "meta": {
+        "id": "red-barn",
+        "title": {
+          "ru": "Красный амбар",
+          "en": "Red Barn"
+        },
+        "description": {
+          "ru": "Амбар с ломаной крышей, сеновалом и большими воротами.",
+          "en": "A barn with a gambrel roof, hay loft and big doors."
+        },
+        "author": "Kladka built-in generators",
+        "license": "CC0-1.0",
+        "createdAt": "2026-11-07",
+        "style": "farm",
+        "tags": [
+          "barn",
+          "large",
+          "farm"
+        ],
+        "generator": {
+          "name": "barn",
+          "params": {
+            "width": 11,
+            "depth": 13,
+            "wall": "red_terracotta",
+            "trim": "white_terracotta",
+            "wood": "dark_oak",
+            "roofMat": "dark_oak"
+          }
+        }
+      },
+      "stats": {
+        "size": [
+          14,
+          13,
+          16
+        ],
+        "blocks": 715,
+        "materials": 14,
+        "steps": 50,
+        "difficulty": 3,
+        "minutes": 40
+      }
+    },
+    {
+      "id": "well",
+      "file": "builds/well.kbuild",
+      "meta": {
+        "id": "well",
+        "title": {
+          "ru": "Колодец",
+          "en": "Village Well"
+        },
+        "description": {
+          "ru": "Каменный колодец с навесом и фонарём.",
+          "en": "A stone well with a little roof and a lantern."
+        },
+        "author": "Kladka built-in generators",
+        "license": "CC0-1.0",
+        "createdAt": "2026-11-07",
+        "style": "rustic",
+        "tags": [
+          "small",
+          "village",
+          "water"
+        ],
+        "generator": {
+          "name": "well",
+          "params": {
+            "stone": "cobblestone",
+            "wood": "oak",
+            "roofMat": "spruce"
+          }
+        }
+      },
+      "stats": {
+        "size": [
+          8,
+          8,
+          8
+        ],
+        "blocks": 142,
+        "materials": 12,
+        "steps": 10,
+        "difficulty": 2,
+        "minutes": 10
+      }
+    },
+    {
+      "id": "farm",
+      "file": "builds/farm.kbuild",
+      "meta": {
+        "id": "farm",
+        "title": {
+          "ru": "Ферма",
+          "en": "Crop Farm"
+        },
+        "description": {
+          "ru": "Огороженное поле с пшеницей, морковью и картофелем, сарай и пугало.",
+          "en": "A fenced field with wheat, carrots and potatoes, a shed and a scarecrow."
+        },
+        "author": "Kladka built-in generators",
+        "license": "CC0-1.0",
+        "createdAt": "2026-11-07",
+        "style": "farm",
+        "tags": [
+          "farm",
+          "crops",
+          "field"
+        ],
+        "generator": {
+          "name": "farm",
+          "params": {
+            "width": 17,
+            "depth": 11,
+            "wood": "oak",
+            "crops": [
+              "wheat",
+              "carrots",
+              "potatoes"
+            ]
+          }
+        }
+      },
+      "stats": {
+        "size": [
+          26,
+          7,
+          13
+        ],
+        "blocks": 625,
+        "materials": 18,
+        "steps": 40,
+        "difficulty": 4,
+        "minutes": 40
+      }
+    },
+    {
+      "id": "stable",
+      "file": "builds/stable.kbuild",
+      "meta": {
+        "id": "stable",
+        "title": {
+          "ru": "Конюшня",
+          "en": "Horse Stable"
+        },
+        "description": {
+          "ru": "Конюшня на четыре стойла с сеном и поилками.",
+          "en": "A four-stall stable with hay and water troughs."
+        },
+        "author": "Kladka built-in generators",
+        "license": "CC0-1.0",
+        "createdAt": "2026-11-07",
+        "style": "farm",
+        "tags": [
+          "stable",
+          "animals",
+          "spruce"
+        ],
+        "generator": {
+          "name": "stable",
+          "params": {
+            "stalls": 4,
+            "wood": "spruce",
+            "roofMat": "dark_oak"
+          }
+        }
+      },
+      "stats": {
+        "size": [
+          15,
+          9,
+          10
+        ],
+        "blocks": 484,
+        "materials": 10,
+        "steps": 21,
+        "difficulty": 3,
+        "minutes": 25
+      }
+    },
+    {
+      "id": "greenhouse",
+      "file": "builds/greenhouse.kbuild",
+      "meta": {
+        "id": "greenhouse",
+        "title": {
+          "ru": "Теплица",
+          "en": "Greenhouse"
+        },
+        "description": {
+          "ru": "Стеклянная теплица с грядками и цветами.",
+          "en": "A glass greenhouse with planting beds and flowers."
+        },
+        "author": "Kladka built-in generators",
+        "license": "CC0-1.0",
+        "createdAt": "2026-11-07",
+        "style": "farm",
+        "tags": [
+          "glass",
+          "garden",
+          "crops"
+        ],
+        "generator": {
+          "name": "greenhouse",
+          "params": {
+            "width": 9,
+            "depth": 11,
+            "frame": "stripped_oak_log"
+          }
+        }
+      },
+      "stats": {
+        "size": [
+          9,
+          11,
+          11
+        ],
+        "blocks": 410,
+        "materials": 13,
+        "steps": 22,
+        "difficulty": 2,
+        "minutes": 20
+      }
+    },
+    {
+      "id": "blacksmith",
+      "file": "builds/blacksmith.kbuild",
+      "meta": {
+        "id": "blacksmith",
+        "title": {
+          "ru": "Кузница",
+          "en": "Blacksmith"
+        },
+        "description": {
+          "ru": "Мастерская с горном, наковальней и точилом.",
+          "en": "A workshop with a forge, anvil and grindstone."
+        },
+        "author": "Kladka built-in generators",
+        "license": "CC0-1.0",
+        "createdAt": "2026-11-07",
+        "style": "medieval",
+        "tags": [
+          "workshop",
+          "village",
+          "stone"
+        ],
+        "generator": {
+          "name": "blacksmith",
+          "params": {
+            "wood": "spruce",
+            "stone": "cobblestone",
+            "roofMat": "dark_oak"
+          }
+        }
+      },
+      "stats": {
+        "size": [
+          11,
+          9,
+          9
+        ],
+        "blocks": 356,
+        "materials": 18,
+        "steps": 27,
+        "difficulty": 3,
+        "minutes": 20
+      }
+    },
+    {
+      "id": "market",
+      "file": "builds/market.kbuild",
+      "meta": {
+        "id": "market",
+        "title": {
+          "ru": "Рыночные прилавки",
+          "en": "Market Stalls"
+        },
+        "description": {
+          "ru": "Ряд прилавков с полосатыми навесами.",
+          "en": "A row of stalls with striped awnings."
+        },
+        "author": "Kladka built-in generators",
+        "license": "CC0-1.0",
+        "createdAt": "2026-11-07",
+        "style": "medieval",
+        "tags": [
+          "market",
+          "village",
+          "colorful"
+        ],
+        "generator": {
+          "name": "marketStalls",
+          "params": {
+            "count": 3,
+            "wood": "spruce",
+            "colors": [
+              "red",
+              "blue",
+              "lime"
+            ]
+          }
+        }
+      },
+      "stats": {
+        "size": [
+          17,
+          5,
+          5
+        ],
+        "blocks": 144,
+        "materials": 16,
+        "steps": 32,
+        "difficulty": 3,
+        "minutes": 15
+      }
+    },
+    {
+      "id": "fishing-hut",
+      "file": "builds/fishing-hut.kbuild",
+      "meta": {
+        "id": "fishing-hut",
+        "title": {
+          "ru": "Рыбацкая хижина",
+          "en": "Fishing Hut"
+        },
+        "description": {
+          "ru": "Хижина на берегу с деревянным причалом.",
+          "en": "A shoreline hut with a wooden pier."
+        },
+        "author": "Kladka built-in generators",
+        "license": "CC0-1.0",
+        "createdAt": "2026-11-07",
+        "style": "coastal",
+        "tags": [
+          "water",
+          "pier",
+          "spruce"
+        ],
+        "generator": {
+          "name": "fishingHut",
+          "params": {
+            "wood": "spruce",
+            "roofMat": "spruce"
+          }
+        }
+      },
+      "stats": {
+        "size": [
+          15,
+          9,
+          20
+        ],
+        "blocks": 632,
+        "materials": 16,
+        "steps": 40,
+        "difficulty": 3,
+        "minutes": 35
+      }
+    },
+    {
+      "id": "stone-bridge",
+      "file": "builds/stone-bridge.kbuild",
+      "meta": {
+        "id": "stone-bridge",
+        "title": {
+          "ru": "Каменный мост",
+          "en": "Stone Bridge"
+        },
+        "description": {
+          "ru": "Арочный мост через реку с фонарями.",
+          "en": "An arched river bridge with lamp posts."
+        },
+        "author": "Kladka built-in generators",
+        "license": "CC0-1.0",
+        "createdAt": "2026-11-07",
+        "style": "medieval",
+        "tags": [
+          "bridge",
+          "stone",
+          "water"
+        ],
+        "generator": {
+          "name": "bridge",
+          "params": {
+            "length": 21,
+            "width": 5,
+            "stone": "stone_bricks",
+            "wood": "spruce",
+            "arches": 3
+          }
+        }
+      },
+      "stats": {
+        "size": [
+          23,
+          9,
+          11
+        ],
+        "blocks": 452,
+        "materials": 7,
+        "steps": 41,
+        "difficulty": 3,
+        "minutes": 30
+      }
+    },
+    {
+      "id": "pagoda",
+      "file": "builds/pagoda.kbuild",
+      "meta": {
+        "id": "pagoda",
+        "title": {
+          "ru": "Пагода",
+          "en": "Pagoda"
+        },
+        "description": {
+          "ru": "Трёхъярусная пагода с изогнутыми крышами и сакурой.",
+          "en": "A three-tier pagoda with flared roofs and a cherry tree."
+        },
+        "author": "Kladka built-in generators",
+        "license": "CC0-1.0",
+        "createdAt": "2026-11-07",
+        "style": "japanese",
+        "tags": [
+          "tower",
+          "tiers",
+          "cherry"
+        ],
+        "generator": {
+          "name": "pagoda",
+          "params": {
+            "tiers": 3,
+            "base": 9,
+            "wood": "dark_oak",
+            "wall": "white_terracotta",
+            "roofMat": "deepslate_tiles",
+            "pillar": "red_terracotta"
+          }
+        }
+      },
+      "stats": {
+        "size": [
+          17,
+          19,
+          17
+        ],
+        "blocks": 1146,
+        "materials": 17,
+        "steps": 77,
+        "difficulty": 4,
+        "minutes": 60
+      }
+    },
+    {
+      "id": "shrine",
+      "file": "builds/shrine.kbuild",
+      "meta": {
+        "id": "shrine",
+        "title": {
+          "ru": "Святилище с воротами",
+          "en": "Shrine with Gate"
+        },
+        "description": {
+          "ru": "Небольшое святилище, ворота-арка и каменные фонари.",
+          "en": "A small shrine, an arch gate and stone lanterns."
+        },
+        "author": "Kladka built-in generators",
+        "license": "CC0-1.0",
+        "createdAt": "2026-11-07",
+        "style": "japanese",
+        "tags": [
+          "gate",
+          "shrine",
+          "garden"
+        ],
+        "generator": {
+          "name": "shrine",
+          "params": {
+            "wood": "spruce",
+            "gate": "red_terracotta",
+            "roofMat": "dark_oak"
+          }
+        }
+      },
+      "stats": {
+        "size": [
+          15,
+          11,
+          21
+        ],
+        "blocks": 729,
+        "materials": 15,
+        "steps": 56,
+        "difficulty": 3,
+        "minutes": 40
+      }
+    },
+    {
+      "id": "tea-house",
+      "file": "builds/tea-house.kbuild",
+      "meta": {
+        "id": "tea-house",
+        "title": {
+          "ru": "Чайный домик",
+          "en": "Tea House"
+        },
+        "description": {
+          "ru": "Домик на помосте у пруда с раздвижными панелями.",
+          "en": "A raised tea house by a pond with sliding panels."
+        },
+        "author": "Kladka built-in generators",
+        "license": "CC0-1.0",
+        "createdAt": "2026-11-07",
+        "style": "japanese",
+        "tags": [
+          "pond",
+          "garden",
+          "small"
+        ],
+        "generator": {
+          "name": "teaHouse",
+          "params": {
+            "wood": "spruce",
+            "roofMat": "deepslate_tiles"
+          }
+        }
+      },
+      "stats": {
+        "size": [
+          17,
+          11,
+          15
+        ],
+        "blocks": 644,
+        "materials": 16,
+        "steps": 37,
+        "difficulty": 3,
+        "minutes": 35
+      }
+    },
+    {
+      "id": "mini-castle",
+      "file": "builds/mini-castle.kbuild",
+      "meta": {
+        "id": "mini-castle",
+        "title": {
+          "ru": "Мини-замок",
+          "en": "Mini Castle"
+        },
+        "description": {
+          "ru": "Крепостная стена с четырьмя башнями, воротами и донжоном.",
+          "en": "A curtain wall with four towers, a gate and a keep."
+        },
+        "author": "Kladka built-in generators",
+        "license": "CC0-1.0",
+        "createdAt": "2026-11-07",
+        "style": "medieval",
+        "tags": [
+          "castle",
+          "large",
+          "stone"
+        ],
+        "generator": {
+          "name": "castle",
+          "params": {
+            "size": 21,
+            "stone": "stone_bricks",
+            "wood": "spruce",
+            "roofMat": "deepslate_tiles",
+            "banner": "red"
+          }
+        }
+      },
+      "stats": {
+        "size": [
+          25,
+          17,
+          25
+        ],
+        "blocks": 2484,
+        "materials": 21,
+        "steps": 127,
+        "difficulty": 4,
+        "minutes": 115
+      }
+    },
+    {
+      "id": "chapel",
+      "file": "builds/chapel.kbuild",
+      "meta": {
+        "id": "chapel",
+        "title": {
+          "ru": "Часовня",
+          "en": "Chapel"
+        },
+        "description": {
+          "ru": "Каменная часовня с витражами и колокольней.",
+          "en": "A stone chapel with stained glass and a bell tower."
+        },
+        "author": "Kladka built-in generators",
+        "license": "CC0-1.0",
+        "createdAt": "2026-11-07",
+        "style": "medieval",
+        "tags": [
+          "church",
+          "stone",
+          "bell"
+        ],
+        "generator": {
+          "name": "chapel",
+          "params": {
+            "stone": "stone_bricks",
+            "wood": "dark_oak",
+            "roofMat": "deepslate_tiles"
+          }
+        }
+      },
+      "stats": {
+        "size": [
+          11,
+          22,
+          17
+        ],
+        "blocks": 1005,
+        "materials": 17,
+        "steps": 72,
+        "difficulty": 4,
+        "minutes": 55
+      }
+    },
+    {
+      "id": "gazebo",
+      "file": "builds/gazebo.kbuild",
+      "meta": {
+        "id": "gazebo",
+        "title": {
+          "ru": "Беседка",
+          "en": "Garden Gazebo"
+        },
+        "description": {
+          "ru": "Восьмиугольная беседка со столиком.",
+          "en": "An octagonal gazebo with a little table."
+        },
+        "author": "Kladka built-in generators",
+        "license": "CC0-1.0",
+        "createdAt": "2026-11-07",
+        "style": "rustic",
+        "tags": [
+          "garden",
+          "small",
+          "round"
+        ],
+        "generator": {
+          "name": "gazebo",
+          "params": {
+            "wood": "oak",
+            "roofMat": "spruce",
+            "radius": 3
+          }
+        }
+      },
+      "stats": {
+        "size": [
+          9,
+          10,
+          9
+        ],
+        "blocks": 279,
+        "materials": 11,
+        "steps": 16,
+        "difficulty": 2,
+        "minutes": 15
+      }
+    },
+    {
+      "id": "fountain",
+      "file": "builds/fountain.kbuild",
+      "meta": {
+        "id": "fountain",
+        "title": {
+          "ru": "Фонтан",
+          "en": "Town Fountain"
+        },
+        "description": {
+          "ru": "Круглый фонтан для деревенской площади.",
+          "en": "A round fountain for the village square."
+        },
+        "author": "Kladka built-in generators",
+        "license": "CC0-1.0",
+        "createdAt": "2026-11-07",
+        "style": "medieval",
+        "tags": [
+          "water",
+          "small",
+          "village"
+        ],
+        "generator": {
+          "name": "fountain",
+          "params": {
+            "stone": "stone_bricks",
+            "radius": 4
+          }
+        }
+      },
+      "stats": {
+        "size": [
+          11,
+          6,
+          11
+        ],
+        "blocks": 162,
+        "materials": 5,
+        "steps": 13,
+        "difficulty": 2,
+        "minutes": 10
+      }
+    },
+    {
+      "id": "treehouse",
+      "file": "builds/treehouse.kbuild",
+      "meta": {
+        "id": "treehouse",
+        "title": {
+          "ru": "Домик на дереве",
+          "en": "Treehouse"
+        },
+        "description": {
+          "ru": "Домик на платформе вокруг толстого ствола, с лестницей и кроной.",
+          "en": "A cabin on a platform around a thick trunk, with a ladder and canopy."
+        },
+        "author": "Kladka built-in generators",
+        "license": "CC0-1.0",
+        "createdAt": "2026-11-07",
+        "style": "fantasy",
+        "tags": [
+          "tree",
+          "jungle",
+          "ladder"
+        ],
+        "generator": {
+          "name": "treehouse",
+          "params": {
+            "wood": "jungle",
+            "roofMat": "spruce"
+          }
+        }
+      },
+      "stats": {
+        "size": [
+          10,
+          20,
+          10
+        ],
+        "blocks": 715,
+        "materials": 13,
+        "steps": 45,
+        "difficulty": 3,
+        "minutes": 35
+      }
+    },
+    {
+      "id": "modern-villa",
+      "file": "builds/modern-villa.kbuild",
+      "meta": {
+        "id": "modern-villa",
+        "title": {
+          "ru": "Современная вилла",
+          "en": "Modern Villa"
+        },
+        "description": {
+          "ru": "Бетонная вилла с панорамным остеклением, консолью и бассейном.",
+          "en": "A concrete villa with panoramic glazing, a cantilever and a pool."
+        },
+        "author": "Kladka built-in generators",
+        "license": "CC0-1.0",
+        "createdAt": "2026-11-07",
+        "style": "modern",
+        "tags": [
+          "modern",
+          "pool",
+          "glass"
+        ],
+        "generator": {
+          "name": "modernVilla",
+          "params": {
+            "wall": "white_concrete",
+            "accent": "gray_concrete",
+            "glass": "glass"
+          }
+        }
+      },
+      "stats": {
+        "size": [
+          20,
+          9,
+          18
+        ],
+        "blocks": 934,
+        "materials": 14,
+        "steps": 37,
+        "difficulty": 3,
+        "minutes": 40
+      }
+    }
+  ]
+}
