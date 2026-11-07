@@ -23,3 +23,4 @@ keystore.properties
 .env.*
 tmp/
 .claude/
+apps/app/dist-artifact/

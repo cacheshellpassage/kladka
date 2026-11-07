@@ -13,3 +13,4 @@ apps/app/dist
 apps/app/src/licenses.json
 THIRD_PARTY_LICENSES.md
 .claude
+apps/app/dist-artifact
