@@ -1,0 +1,21 @@
+{
+  "name": "@kladka/renderer-cli",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "render": "tsx src/render-previews.ts"
+  },
+  "dependencies": {
+    "@kladka/content": "workspace:*",
+    "@kladka/viewer": "workspace:*",
+    "@kladka/voxel-core": "workspace:*",
+    "playwright-core": "^1.65.0",
+    "vite": "^8.3.6"
+  },
+  "devDependencies": {
+    "tsx": "^4.23.15"
+  }
+}

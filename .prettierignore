@@ -1,0 +1,11 @@
+node_modules
+dist
+coverage
+pnpm-lock.yaml
+packs
+apps/app/public/packs
+apps/app/android
+apps/app/src-tauri/gen
+apps/app/src-tauri/target
+apps/app/src-tauri/icons
+claude-code-prompt.md

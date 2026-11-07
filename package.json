@@ -1,0 +1,38 @@
+{
+  "name": "kladka-monorepo",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Offline step-by-step build guides for voxel games (Minecraft Java Edition first).",
+  "license": "MIT",
+  "type": "module",
+  "packageManager": "pnpm@10.34.9",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "pnpm --filter @kladka/app dev",
+    "build": "pnpm -r --filter ./packages/** run build && pnpm --filter @kladka/app build",
+    "build:web": "pnpm --filter @kladka/app build",
+    "content:build": "pnpm --filter @kladka/content build-pack",
+    "render:previews": "pnpm --filter @kladka/renderer-cli render",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "pnpm --filter @kladka/app test:e2e",
+    "typecheck": "pnpm -r run typecheck",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "check:offline": "node tools/check-offline.mjs"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^24.0.0",
+    "eslint": "^10.14.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^16.0.0",
+    "prettier": "^3.9.10",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.72.1",
+    "vitest": "^5.1.0"
+  }
+}
