@@ -111,6 +111,8 @@ export const en: Record<MessageKey, string> = {
   "guide.title": "Step-by-step",
   "guide.step": "Step {n} of {total}",
   "guide.layer": "Layer Y = {y}",
+  "guide.layers": "Layers Y = {y}–{to}",
+  "guide.pillar": "Pillar: place it bottom-up",
   "guide.prev": "Back",
   "guide.next": "Next",
   "guide.done": "Step done",

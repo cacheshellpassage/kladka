@@ -25,8 +25,10 @@ export const MAX_STEP_BLOCKS = 48;
 export interface PlanStep {
   index: number;
   stage: StageId;
-  /** Y of the layer group this step belongs to. */
+  /** Y of the layer group this step belongs to (the bottom layer for a pillar step). */
   layer: number;
+  /** Top layer when the step builds a pillar over several layers (bottom-up). */
+  layerTo?: number;
   /** Voxel indices in placement order. */
   blocks: number[];
   /** Blocks that became placeable only after a later group (e.g. hanging lanterns). */
@@ -347,8 +349,151 @@ export function planBuild(m: VoxelModel, opts: PlanOptions = {}): BuildPlan {
   // Companions that were never placed (partner missing) – should not happen, but keep data consistent.
   for (let i = 0; i < vol; i++) if (roles[i] && !placed[i]) placed[i] = 1;
 
-  for (const s of steps) for (const i of s.blocks) stepOf[i] = s.index;
-  return { steps, stages, stepOf, roles, totalBlocks: total, groundY: a.groundY, warnings };
+  // Quick repetitive work in one step: whole pillars bottom-up, and rows of single blocks of one kind.
+  const origStep = new Int32Array(vol).fill(-1);
+  for (const s of steps) for (const i of s.blocks) origStep[i] = s.index;
+  /** Can block `i` be placed already in the step that originally had index `base`? */
+  const canLift = (i: number, base: number): boolean => {
+    const s = supportOf[i]!;
+    if (s < 0) return true; // any neighbour (the slice below) or outside the model
+    if (s === i - layer) return true; // stands on the block below: part of the same pillar
+    if (!roles[s]) return true;
+    return origStep[s]! >= 0 && origStep[s]! < base; // e.g. a ladder on a wall built earlier
+  };
+  const finalSteps: PlanStep[] = [];
+  for (const st of stages) {
+    let part = steps.slice(st.stepStart, st.stepEnd);
+    part = mergePillars(m, part, Math.min(maxStep, PILLAR_LIMIT), canLift);
+    part = mergeSameKindRows(m, part);
+    st.stepStart = finalSteps.length;
+    for (const s of part) finalSteps.push({ ...s, index: finalSteps.length });
+    st.stepEnd = finalSteps.length;
+    st.layers = layersOf(finalSteps, st.stepStart, st.stepEnd);
+  }
+
+  for (const s of finalSteps) for (const i of s.blocks) stepOf[i] = s.index;
+  return { steps: finalSteps, stages, stepOf, roles, totalBlocks: total, groundY: a.groundY, warnings };
+}
+
+/** Upper bound of blocks in a merged pillar step. */
+const PILLAR_LIMIT = 24;
+/** Steps with at most this many blocks can be a pillar slice. */
+const PILLAR_FOOTPRINT = 4;
+
+function footprintKey(m: VoxelModel, blocks: number[]): string {
+  const layer = m.size.x * m.size.z;
+  return blocks
+    .map((i) => i % layer)
+    .sort((p, q) => p - q)
+    .join(",");
+}
+
+/**
+ * Pillars (posts, columns, chimneys…) are planned layer by layer, which gives a 1–4 block step per pillar
+ * and layer and makes the builder walk between pillars over and over. Here a chain of small steps of one
+ * stage with the same footprint on consecutive layers becomes one step "build this pillar bottom-up".
+ * It stays buildable: every block of a slice stands on the block of the slice below, which now comes
+ * earlier in the same step, and moving blocks earlier never removes support from anything else.
+ */
+function mergePillars(
+  m: VoxelModel,
+  steps: PlanStep[],
+  limit: number,
+  canLift: (i: number, base: number) => boolean,
+): PlanStep[] {
+  const layer = m.size.x * m.size.z;
+  const candidate = (s: PlanStep) =>
+    !s.deferred &&
+    !s.scaffold &&
+    s.blocks.length <= PILLAR_FOOTPRINT &&
+    s.blocks.every((i) => Math.floor(i / layer) === s.layer);
+  const keys = steps.map((s) => (candidate(s) ? footprintKey(m, s.blocks) : null));
+  const consumed = new Uint8Array(steps.length);
+  const out: PlanStep[] = [];
+  for (let k = 0; k < steps.length; k++) {
+    if (consumed[k]) continue;
+    const s = steps[k]!;
+    const key = keys[k];
+    if (!key) {
+      out.push(s);
+      continue;
+    }
+    const blocks = [...s.blocks];
+    let top = s.layer;
+    for (;;) {
+      let next = -1;
+      for (let j = k + 1; j < steps.length; j++)
+        if (!consumed[j] && keys[j] === key && steps[j]!.layer === top + 1) {
+          next = j;
+          break;
+        }
+      if (next < 0 || blocks.length + steps[next]!.blocks.length > limit) break;
+      if (!steps[next]!.blocks.every((i) => canLift(i, s.index))) break;
+      consumed[next] = 1;
+      blocks.push(...steps[next]!.blocks);
+      top++;
+    }
+    out.push(top > s.layer ? { ...s, blocks, layerTo: top } : s);
+  }
+  return out;
+}
+
+/** Single blocks of one kind on one layer (corner posts, eave slabs, lamps) within this distance become one step. */
+const ROW_GAP = 32;
+const ROW_LIMIT = 16;
+
+/**
+ * Consecutive tiny steps (≤ 2 blocks) on the same layer that use one block type and lie close together are
+ * placed in one go, e.g. the posts of a fence line or the lanterns along a path. Parts are independent
+ * regions in valid order, so the merged step stays buildable.
+ */
+function mergeSameKindRows(m: VoxelModel, steps: PlanStep[]): PlanStep[] {
+  const kind = (s: PlanStep) => {
+    if (s.deferred || s.scaffold || s.layerTo !== undefined || s.blocks.length > 2) return -1;
+    const p = m.blocks[s.blocks[0]!]!;
+    return s.blocks.every((i) => m.blocks[i] === p) ? p : -1;
+  };
+  const dist = (a: number[], b: number[]) => {
+    let best = Infinity;
+    for (const i of a)
+      for (const j of b) {
+        const p = m.coords(i),
+          q = m.coords(j);
+        best = Math.min(best, Math.max(Math.abs(p.x - q.x), Math.abs(p.z - q.z)));
+      }
+    return best;
+  };
+  const out: PlanStep[] = [];
+  for (const s of steps) {
+    const prev = out[out.length - 1];
+    const ks = kind(s);
+    if (
+      prev &&
+      ks >= 0 &&
+      prev.layer === s.layer &&
+      prev.layerTo === undefined &&
+      !prev.deferred &&
+      !prev.scaffold &&
+      prev.blocks.every((i) => m.blocks[i] === ks) &&
+      prev.blocks.length + s.blocks.length <= ROW_LIMIT &&
+      dist(prev.blocks, s.blocks) <= ROW_GAP
+    ) {
+      out[out.length - 1] = { ...prev, blocks: prev.blocks.concat(s.blocks) };
+    } else out.push(s);
+  }
+  return out;
+}
+
+/** Layer ranges of a stage after merging (consecutive steps with the same base layer). */
+function layersOf(steps: PlanStep[], from: number, to: number): PlanLayer[] {
+  const out: PlanLayer[] = [];
+  for (let k = from; k < to; k++) {
+    const y = steps[k]!.layer;
+    const last = out[out.length - 1];
+    if (last && last.y === y && last.stepEnd === k) last.stepEnd = k + 1;
+    else out.push({ y, stepStart: k, stepEnd: k + 1 });
+  }
+  return out;
 }
 
 function centroid(m: VoxelModel, blocks: number[]): [number, number, number] {

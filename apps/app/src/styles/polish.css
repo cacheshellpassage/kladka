@@ -1298,3 +1298,25 @@ h3,
     height: 22px;
   }
 }
+
+.pillar-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--accent-strong);
+  font-weight: 600;
+}
+.pillar-hint::before {
+  content: "";
+  width: 6px;
+  height: 14px;
+  border-radius: 2px;
+  background: linear-gradient(
+    0deg,
+    var(--accent) 0 30%,
+    transparent 30% 36%,
+    var(--accent) 36% 64%,
+    transparent 64% 70%,
+    var(--accent) 70%
+  );
+}

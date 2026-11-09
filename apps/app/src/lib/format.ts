@@ -36,3 +36,10 @@ export function formatBytes(n: number): string {
   if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`;
   return `${(n / 1024 / 1024).toFixed(1)} MB`;
 }
+
+/** "Layer Y = 3" or, for a pillar step built over several layers, "Layers Y = 3–7". */
+export function stepLayerLabel(t: TFunction, step: { layer: number; layerTo?: number }): string {
+  return step.layerTo !== undefined && step.layerTo > step.layer
+    ? t("guide.layers", { y: step.layer, to: step.layerTo })
+    : t("guide.layer", { y: step.layer });
+}

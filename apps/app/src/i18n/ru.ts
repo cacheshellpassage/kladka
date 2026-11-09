@@ -109,6 +109,8 @@ export const ru = {
   "guide.title": "Пошаговый режим",
   "guide.step": "Шаг {n} из {total}",
   "guide.layer": "Слой Y = {y}",
+  "guide.layers": "Слои Y = {y}–{to}",
+  "guide.pillar": "Столб: ставьте снизу вверх",
   "guide.prev": "Назад",
   "guide.next": "Далее",
   "guide.done": "Шаг выполнен",

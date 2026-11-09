@@ -7,7 +7,7 @@ import { useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointer
 import { countItems, toLines, type VoxelModel } from "@kladka/voxel-core";
 import type { ClipBox, VoxelViewer } from "@kladka/viewer";
 import { useT, type MessageKey } from "../i18n";
-import { blocksWord, formatCount, nameOf } from "../lib/format";
+import { blocksWord, formatCount, nameOf, stepLayerLabel } from "../lib/format";
 import { useSettings } from "../store/settings";
 import { Icon } from "./Icon";
 import { PlanCanvas } from "./PlanCanvas";
@@ -132,7 +132,7 @@ export function GameMode(p: GameModeProps) {
             <span className="gm-of">
               / {p.total}
               <br />
-              {cur ? t("guide.layer", { y: cur.layer }) : ""}
+              {cur ? stepLayerLabel(t, cur) : ""}
             </span>
           </>
         )}

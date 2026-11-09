@@ -18,7 +18,15 @@ export type WorkerRequest =
   | { kind: "import"; id: number; bytes: Uint8Array; filename: string; importId: string; date: string };
 
 export interface SerializedPlan {
-  steps: Array<{ stage: string; layer: number; blocks: Int32Array; deferred?: boolean; scaffold?: boolean }>;
+  steps: Array<{
+    stage: string;
+    layer: number;
+    /** Top layer of a pillar step (built bottom-up over several layers). */
+    layerTo?: number;
+    blocks: Int32Array;
+    deferred?: boolean;
+    scaffold?: boolean;
+  }>;
   stages: Array<{
     id: string;
     stepStart: number;
@@ -53,7 +61,14 @@ function serialize(plan: ReturnType<typeof planBuild>): { plan: SerializedPlan; 
   const steps = plan.steps.map((s) => {
     const blocks = Int32Array.from(s.blocks);
     transfer.push(blocks.buffer);
-    return { stage: s.stage, layer: s.layer, blocks, deferred: s.deferred, scaffold: s.scaffold };
+    return {
+      stage: s.stage,
+      layer: s.layer,
+      layerTo: s.layerTo,
+      blocks,
+      deferred: s.deferred,
+      scaffold: s.scaffold,
+    };
   });
   transfer.push(plan.stepOf.buffer, plan.roles.buffer);
   return {

@@ -11,7 +11,7 @@ import type { VoxelViewer } from "@kladka/viewer";
 import { useT, type MessageKey } from "../i18n";
 import { canvasToJpeg, buildPdf, type PdfPage } from "../lib/pdf";
 import { drawPlan, planColors } from "../lib/plan2d";
-import { blocksWord, nameOf } from "../lib/format";
+import { blocksWord, nameOf, stepLayerLabel } from "../lib/format";
 import { useBuild } from "../lib/useBuild";
 import { safeFileName, saveFile } from "../platform/platform";
 import { Link } from "../router";
@@ -468,7 +468,7 @@ export function GuidePage({ id }: { id: string }) {
               <span className="small bump" key={step} data-testid="step-label">
                 {finished ? t("guide.finished") : t("guide.step", { n: step + 1, total })}
               </span>
-              {cur ? <span className="small muted">{t("guide.layer", { y: cur.layer })}</span> : null}
+              {cur ? <span className="small muted">{stepLayerLabel(t, cur)}</span> : null}
             </div>
             <StageProgress stages={build.plan.stages} step={done} label={`${pct}%`} />
           </div>
@@ -485,7 +485,10 @@ export function GuidePage({ id }: { id: string }) {
                     blocks: blocksWord(locale, cur.blocks.length),
                   })}
                 </strong>
-                <span className="small muted">{t("guide.layer", { y: cur.layer })}</span>
+                <span className="small muted">{stepLayerLabel(t, cur)}</span>
+                {cur.layerTo !== undefined && cur.layerTo > cur.layer ? (
+                  <span className="small pillar-hint">{t("guide.pillar")}</span>
+                ) : null}
                 {nextStep ? (
                   <span className="next-hint">
                     {t("guide.next.hint", {

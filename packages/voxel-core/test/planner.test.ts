@@ -145,6 +145,78 @@ describe("planner edge cases", () => {
     expect(plan.stages.map((s) => s.id)).toEqual(["foundation", "decor"]);
   });
 
+  it("builds each pillar bottom-up in one step instead of one block per layer", () => {
+    const m = newTestModel(12, 6, 12);
+    m.roles = new Uint8Array(m.volume);
+    const posts: Array<[number, number]> = [
+      [1, 1],
+      [10, 1],
+      [1, 10],
+      [10, 10],
+    ];
+    for (const [x, z] of posts)
+      for (let y = 0; y < 5; y++) {
+        m.set(x, y, z, state("oak_log"));
+        m.roles[m.index(x, y, z)] = 2; // frame
+      }
+    const plan = planBuild(m);
+    expect(verifyPlacement(m, plan)).toEqual([]);
+    expect(plan.steps).toHaveLength(4);
+    for (const s of plan.steps) {
+      expect(s.blocks).toHaveLength(5);
+      expect([s.layer, s.layerTo]).toEqual([0, 4]);
+      // bottom-up order inside the step
+      const ys = s.blocks.map((i) => m.coords(i).y);
+      expect(ys).toEqual([...ys].sort((a, b) => a - b));
+    }
+    expect(plan.stages[0]!.layers).toEqual([{ y: 0, stepStart: 0, stepEnd: 4 }]);
+  });
+
+  it("places a ladder column on an existing wall in one step", () => {
+    const m = newTestModel(5, 7, 5);
+    m.roles = new Uint8Array(m.volume);
+    for (let y = 0; y < 6; y++) {
+      m.set(2, y, 2, state("stone_bricks"));
+      m.roles[m.index(2, y, 2)] = 3; // walls
+    }
+    for (let y = 1; y < 6; y++) {
+      m.set(2, y, 3, state("ladder", { facing: "south" }));
+      m.roles[m.index(2, y, 3)] = 6; // interior
+    }
+    const plan = planBuild(m);
+    expect(verifyPlacement(m, plan)).toEqual([]);
+    const ladders = plan.steps.filter((s) => s.stage === "interior");
+    expect(ladders).toHaveLength(1);
+    expect(ladders[0]!.blocks).toHaveLength(5);
+    expect(ladders[0]!.layerTo).toBe(5);
+  });
+
+  it("does not lift an attachment above its support", () => {
+    // torches on a wall that is built in the same stage, layer by layer: the wall comes first
+    const m = newTestModel(5, 5, 5);
+    for (let y = 0; y < 4; y++) m.set(2, y, 2, state("stone_bricks"));
+    for (let y = 1; y < 4; y++) m.set(2, y, 3, state("wall_torch", { facing: "south" }));
+    const plan = planBuild(m);
+    expect(verifyPlacement(m, plan)).toEqual([]);
+  });
+
+  it("joins single blocks of one kind on one layer into one step", () => {
+    const m = newTestModel(16, 3, 16);
+    m.roles = new Uint8Array(m.volume);
+    for (const [x, z] of [
+      [0, 0],
+      [15, 0],
+      [0, 15],
+      [15, 15],
+    ] as const) {
+      m.set(x, 0, z, state("lantern"));
+      m.roles[m.index(x, 0, z)] = 7; // decor
+    }
+    const plan = planBuild(m);
+    expect(plan.steps).toHaveLength(1);
+    expect(plan.steps[0]!.blocks).toHaveLength(4);
+  });
+
   it("handles an empty model", () => {
     const plan = planBuild(newTestModel(2, 2, 2));
     expect(plan.steps).toEqual([]);

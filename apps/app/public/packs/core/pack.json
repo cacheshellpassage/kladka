@@ -59,7 +59,7 @@
         ],
         "blocks": 177,
         "materials": 14,
-        "steps": 30,
+        "steps": 22,
         "difficulty": 2,
         "minutes": 15
       },
@@ -128,7 +128,7 @@
         ],
         "blocks": 410,
         "materials": 28,
-        "steps": 40,
+        "steps": 32,
         "difficulty": 3,
         "minutes": 25
       },
@@ -196,7 +196,7 @@
         ],
         "blocks": 435,
         "materials": 19,
-        "steps": 36,
+        "steps": 27,
         "difficulty": 3,
         "minutes": 25
       },
@@ -266,9 +266,9 @@
         ],
         "blocks": 323,
         "materials": 26,
-        "steps": 39,
+        "steps": 31,
         "difficulty": 3,
-        "minutes": 25
+        "minutes": 20
       },
       "previews": {
         "classic": [
@@ -334,9 +334,9 @@
         ],
         "blocks": 880,
         "materials": 23,
-        "steps": 75,
+        "steps": 56,
         "difficulty": 4,
-        "minutes": 55
+        "minutes": 45
       },
       "previews": {
         "classic": [
@@ -404,7 +404,7 @@
         ],
         "blocks": 544,
         "materials": 23,
-        "steps": 60,
+        "steps": 49,
         "difficulty": 4,
         "minutes": 35
       },
@@ -474,9 +474,9 @@
         ],
         "blocks": 911,
         "materials": 23,
-        "steps": 109,
+        "steps": 81,
         "difficulty": 4,
-        "minutes": 65
+        "minutes": 55
       },
       "previews": {
         "classic": [
@@ -542,9 +542,9 @@
         ],
         "blocks": 640,
         "materials": 21,
-        "steps": 48,
+        "steps": 36,
         "difficulty": 3,
-        "minutes": 40
+        "minutes": 35
       },
       "previews": {
         "classic": [
@@ -610,9 +610,9 @@
         ],
         "blocks": 354,
         "materials": 19,
-        "steps": 38,
+        "steps": 26,
         "difficulty": 3,
-        "minutes": 25
+        "minutes": 20
       },
       "previews": {
         "classic": [
@@ -680,9 +680,9 @@
         ],
         "blocks": 470,
         "materials": 18,
-        "steps": 54,
+        "steps": 35,
         "difficulty": 3,
-        "minutes": 35
+        "minutes": 25
       },
       "previews": {
         "classic": [
@@ -749,9 +749,9 @@
         ],
         "blocks": 334,
         "materials": 25,
-        "steps": 41,
+        "steps": 33,
         "difficulty": 3,
-        "minutes": 25
+        "minutes": 20
       },
       "previews": {
         "classic": [
@@ -817,9 +817,9 @@
         ],
         "blocks": 996,
         "materials": 23,
-        "steps": 83,
+        "steps": 56,
         "difficulty": 4,
-        "minutes": 60
+        "minutes": 50
       },
       "previews": {
         "classic": [
@@ -879,9 +879,9 @@
         ],
         "blocks": 548,
         "materials": 13,
-        "steps": 101,
+        "steps": 35,
         "difficulty": 3,
-        "minutes": 50
+        "minutes": 30
       },
       "previews": {
         "classic": [
@@ -941,9 +941,9 @@
         ],
         "blocks": 481,
         "materials": 13,
-        "steps": 76,
+        "steps": 30,
         "difficulty": 3,
-        "minutes": 40
+        "minutes": 25
       },
       "previews": {
         "classic": [
@@ -1004,9 +1004,9 @@
         ],
         "blocks": 1048,
         "materials": 14,
-        "steps": 77,
+        "steps": 53,
         "difficulty": 4,
-        "minutes": 55
+        "minutes": 50
       },
       "previews": {
         "classic": [
@@ -1066,9 +1066,9 @@
         ],
         "blocks": 1147,
         "materials": 14,
-        "steps": 68,
+        "steps": 45,
         "difficulty": 4,
-        "minutes": 55
+        "minutes": 50
       },
       "previews": {
         "classic": [
@@ -1129,9 +1129,9 @@
         ],
         "blocks": 582,
         "materials": 14,
-        "steps": 35,
+        "steps": 20,
         "difficulty": 3,
-        "minutes": 30
+        "minutes": 25
       },
       "previews": {
         "classic": [
@@ -1189,7 +1189,7 @@
         ],
         "blocks": 675,
         "materials": 15,
-        "steps": 50,
+        "steps": 45,
         "difficulty": 3,
         "minutes": 40
       },
@@ -1252,9 +1252,9 @@
         ],
         "blocks": 715,
         "materials": 14,
-        "steps": 50,
+        "steps": 37,
         "difficulty": 3,
-        "minutes": 40
+        "minutes": 35
       },
       "previews": {
         "classic": [
@@ -1377,9 +1377,9 @@
         ],
         "blocks": 625,
         "materials": 18,
-        "steps": 40,
+        "steps": 33,
         "difficulty": 4,
-        "minutes": 40
+        "minutes": 35
       },
       "previews": {
         "classic": [
@@ -1557,7 +1557,7 @@
         ],
         "blocks": 356,
         "materials": 18,
-        "steps": 27,
+        "steps": 22,
         "difficulty": 3,
         "minutes": 20
       },
@@ -1621,9 +1621,9 @@
         ],
         "blocks": 144,
         "materials": 16,
-        "steps": 32,
+        "steps": 18,
         "difficulty": 3,
-        "minutes": 15
+        "minutes": 10
       },
       "previews": {
         "classic": [
@@ -1680,7 +1680,7 @@
         ],
         "blocks": 632,
         "materials": 16,
-        "steps": 40,
+        "steps": 32,
         "difficulty": 3,
         "minutes": 35
       },
@@ -1742,7 +1742,7 @@
         ],
         "blocks": 452,
         "materials": 7,
-        "steps": 41,
+        "steps": 39,
         "difficulty": 3,
         "minutes": 30
       },
@@ -1805,9 +1805,9 @@
         ],
         "blocks": 1146,
         "materials": 17,
-        "steps": 77,
+        "steps": 56,
         "difficulty": 4,
-        "minutes": 60
+        "minutes": 55
       },
       "previews": {
         "classic": [
@@ -1865,9 +1865,9 @@
         ],
         "blocks": 729,
         "materials": 15,
-        "steps": 56,
+        "steps": 43,
         "difficulty": 3,
-        "minutes": 40
+        "minutes": 35
       },
       "previews": {
         "classic": [
@@ -1924,7 +1924,7 @@
         ],
         "blocks": 644,
         "materials": 16,
-        "steps": 37,
+        "steps": 34,
         "difficulty": 3,
         "minutes": 35
       },
@@ -1986,9 +1986,9 @@
         ],
         "blocks": 2484,
         "materials": 21,
-        "steps": 127,
+        "steps": 99,
         "difficulty": 4,
-        "minutes": 115
+        "minutes": 105
       },
       "previews": {
         "classic": [
@@ -2046,9 +2046,9 @@
         ],
         "blocks": 1005,
         "materials": 17,
-        "steps": 72,
+        "steps": 52,
         "difficulty": 4,
-        "minutes": 55
+        "minutes": 50
       },
       "previews": {
         "classic": [
@@ -2165,7 +2165,7 @@
         ],
         "blocks": 162,
         "materials": 5,
-        "steps": 13,
+        "steps": 8,
         "difficulty": 2,
         "minutes": 10
       },
@@ -2224,9 +2224,9 @@
         ],
         "blocks": 715,
         "materials": 13,
-        "steps": 45,
+        "steps": 31,
         "difficulty": 3,
-        "minutes": 35
+        "minutes": 30
       },
       "previews": {
         "classic": [
@@ -2284,9 +2284,9 @@
         ],
         "blocks": 934,
         "materials": 14,
-        "steps": 37,
+        "steps": 35,
         "difficulty": 3,
-        "minutes": 40
+        "minutes": 35
       },
       "previews": {
         "classic": [
