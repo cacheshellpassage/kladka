@@ -9,7 +9,7 @@ const config: CapacitorConfig = {
     // The app is fully offline: no cleartext traffic, no remote debugging in release builds.
     allowMixedContent: false,
     webContentsDebuggingEnabled: false,
-    backgroundColor: "#f4f1ec",
+    backgroundColor: "#f2f5f9",
   },
   server: {
     androidScheme: "https",

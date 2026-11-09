@@ -44,10 +44,10 @@ export function Cubes({ className, style }: { className?: string; style?: CSSPro
       [x, y + 2 * a],
     ];
     return (
-      <g key={key} stroke="#7a3218" strokeWidth={a * 0.05} strokeLinejoin="round">
-        <polygon points={pts(left)} fill="#f3cfb5" />
-        <polygon points={pts(right)} fill="#e7a983" />
-        <polygon points={pts(top)} fill="#fff5ea" />
+      <g key={key} stroke="#1e3a8a" strokeWidth={a * 0.05} strokeLinejoin="round">
+        <polygon points={pts(left)} fill="#dbe7ff" />
+        <polygon points={pts(right)} fill="#a9c4fb" />
+        <polygon points={pts(top)} fill="#ffffff" />
       </g>
     );
   };

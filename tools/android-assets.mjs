@@ -32,7 +32,7 @@ for (const d of readdirSync(join(full, "android"))) {
 }
 writeFileSync(
   join(res, "values/ic_launcher_background.xml"),
-  `<?xml version="1.0" encoding="utf-8"?>\n<resources>\n    <color name="ic_launcher_background">#C8643C</color>\n</resources>\n`,
+  `<?xml version="1.0" encoding="utf-8"?>\n<resources>\n    <color name="ic_launcher_background">#2563EB</color>\n</resources>\n`,
 );
 
 // splash: one density-independent image instead of the template's per-density images

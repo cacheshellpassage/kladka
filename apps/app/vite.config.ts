@@ -17,8 +17,8 @@ export default defineConfig({
         short_name: appConfig.name,
         description: appConfig.description.en,
         lang: "ru",
-        theme_color: "#c8643c",
-        background_color: "#f4f1ec",
+        theme_color: "#2563eb",
+        background_color: "#f2f5f9",
         display: "standalone",
         orientation: "any",
         // installed desktop PWA: open .schem/.litematic/.nbt files with the app (File Handling API)

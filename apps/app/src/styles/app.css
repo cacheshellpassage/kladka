@@ -14,37 +14,46 @@
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
 
-  --bg: #f4f1ec;
+  /* Palette (see docs/DECISIONS.md, D-017): cool blue-tinted neutrals (~60%), white surfaces (~30%),
+     one saturated blue accent (~10%) for actions and the current step. All text pairs pass WCAG AA. */
+  --bg: #f2f5f9;
   --surface: #ffffff;
-  --surface-2: #f8f6f2;
-  --border: #e3ddd3;
-  --text: #1f2328;
-  --muted: #646b76;
-  --accent: #c8643c;
-  --accent-strong: #a84d28;
+  --surface-2: #f6f8fb;
+  --border: #dbe2ec;
+  --text: #111827;
+  --muted: #556070;
+  --accent: #2563eb;
+  --accent-rgb: 37 99 235;
+  --accent-strong: #1d4ed8;
   --accent-text: #ffffff;
-  --accent-soft: #f6e3d9;
-  --ok: #2e8b57;
-  --warn: #b7791f;
-  --danger: #c0392b;
-  --shadow: 0 1px 2px rgb(0 0 0 / 0.06), 0 4px 14px rgb(0 0 0 / 0.06);
-  --focus: 0 0 0 3px rgb(200 100 60 / 0.45);
+  --accent-soft: #e1eafd;
+  --ok: #18794e;
+  --ok-rgb: 24 121 78;
+  --warn: #a8580c;
+  --danger: #c42b2b;
+  --shadow: 0 1px 2px rgb(15 23 42 / 0.06), 0 4px 14px rgb(15 23 42 / 0.07);
+  --focus: 0 0 0 3px rgb(var(--accent-rgb) / 0.45);
   color-scheme: light;
 }
 
 :root[data-theme="dark"] {
-  --bg: #121418;
-  --surface: #1b1e24;
-  --surface-2: #22262d;
-  --border: #2f343d;
-  --text: #e8eaee;
-  --muted: #a1a8b3;
-  --accent: #e07a4f;
-  --accent-strong: #f09068;
-  --accent-text: #1a0f0a;
-  --accent-soft: #3a261d;
+  --bg: #0d1218;
+  --surface: #151b24;
+  --surface-2: #1c2430;
+  --border: #283242;
+  --text: #e7ecf3;
+  --muted: #98a3b3;
+  --accent: #6b9dff;
+  --accent-rgb: 107 157 255;
+  --accent-strong: #93b8ff;
+  --accent-text: #08111f;
+  --accent-soft: #182a49;
+  --ok: #4cc38a;
+  --ok-rgb: 76 195 138;
+  --warn: #e9a23b;
+  --danger: #ff6b6b;
   --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 6px 18px rgb(0 0 0 / 0.35);
-  --focus: 0 0 0 3px rgb(240 144 104 / 0.5);
+  --focus: 0 0 0 3px rgb(var(--accent-rgb) / 0.5);
   color-scheme: dark;
 }
 

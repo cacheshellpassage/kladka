@@ -203,7 +203,7 @@ export function planColors(dark: boolean): PlanColors {
         gridStrong: "#465061",
         text: "#c9ced8",
         ghost: "#ffffff14",
-        accent: "#ffb347",
+        accent: "#6b9dff",
         future: "#6b7a99",
       }
     : {
@@ -212,7 +212,7 @@ export function planColors(dark: boolean): PlanColors {
         gridStrong: "#b7c0cf",
         text: "#3a4150",
         ghost: "#00000012",
-        accent: "#e0622b",
+        accent: "#2563eb",
         future: "#9aa7bf",
       };
 }

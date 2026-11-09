@@ -156,3 +156,19 @@ As proposed in the brief, with two small additions:
 - Locally verified: unit tests, E2E (Edge), web/PWA build, offline audit, licence audit, Tauri icon generation,
   Capacitor Android project generation. Not verified locally (no Rust / VS Build Tools / Android SDK by the owner's
   choice): `tauri build` and Gradle builds — these run in GitHub Actions.
+
+## D-017 Colour palette based on colour-preference research (2026-11-09)
+
+- Replaced the warm terracotta/beige palette with cool blue-tinted neutrals and one saturated blue accent.
+- Reasons:
+  - Palmer & Schloss (PNAS 2010, ecological valence theory): average preference peaks at saturated blue and is
+    lowest for dark yellow/olive and dark orange (brown). The old UI leaned on beige/brown tones.
+  - Schloss & Palmer (2011): pair preference and harmony grow with hue similarity and with figure-ground lightness
+    contrast. Hence one hue family (blue → indigo gradients, blue-grey neutrals) and high text contrast.
+  - 60-30-10 practice: neutral background (~60%), white surfaces (~30%), accent only on actions, the current step
+    and selection (~10%). This is a design heuristic, not a research result.
+  - The builds themselves are mostly warm (wood, stone, brick); a cool frame lets them stand out, and the blue
+    step outline is the complementary hue to wood, so it is easy to spot.
+- All text pairs pass WCAG 2.2 AA (light: text 17.7:1, muted 6.4:1, white on accent 5.2:1; dark: text 14.6:1,
+  muted 6.8:1, dark text on accent 7.1:1). The icon, splash, PWA/Android theme colours, 2D plan and 3D highlight
+  use the same palette.

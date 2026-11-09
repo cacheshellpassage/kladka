@@ -2,7 +2,7 @@
 import { useEffect, useRef } from "react";
 import { useT } from "../i18n";
 
-const COLORS = ["#e0844f", "#c8643c", "#f2c14e", "#6fb36b", "#5aa9e6", "#f3cfb5", "#ffffff"];
+const COLORS = ["#2563eb", "#6b9dff", "#3448c5", "#93c5fd", "#4cc38a", "#f5c542", "#ffffff"];
 
 export function Celebrate({
   title,

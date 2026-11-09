@@ -14,12 +14,12 @@ const require = createRequire(join(root, "packages/renderer-cli/package.json"));
 const { chromium } = require("playwright-core");
 
 const C = {
-  bg1: "#df7f52",
-  bg2: "#a3462a",
-  top: "#fff5ea",
-  left: "#f3cfb5",
-  right: "#e7a983",
-  line: "#7a3218",
+  bg1: "#3b82f6",
+  bg2: "#1e40af",
+  top: "#ffffff",
+  left: "#dbe7ff",
+  right: "#a9c4fb",
+  line: "#1e3a8a",
 };
 
 function cube(x, y, a) {
@@ -110,8 +110,8 @@ await render(iconSvg({ maskable: true }), 1024, join(assetsDir, "icon-foreground
 // splash: icon centred on the light background
 await page.setViewportSize({ width: 1366, height: 1366 });
 await page.setContent(
-  `<html><body style="margin:0;width:1366px;height:1366px;display:grid;place-items:center;background:#f4f1ec;font-family:system-ui">
-  <div style="text-align:center">${iconSvg({ size: 360 })}<div style="margin-top:28px;font-size:64px;font-weight:700;color:#1f2328">Кладка</div></div></body></html>`,
+  `<html><body style="margin:0;width:1366px;height:1366px;display:grid;place-items:center;background:#f2f5f9;font-family:system-ui">
+  <div style="text-align:center">${iconSvg({ size: 360 })}<div style="margin-top:28px;font-size:64px;font-weight:700;color:#111827">Кладка</div></div></body></html>`,
 );
 writeFileSync(
   join(assetsDir, "splash-2732.png"),

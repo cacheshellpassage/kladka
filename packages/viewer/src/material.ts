@@ -29,7 +29,7 @@ export function createUniforms(): ViewerUniforms {
     uFocusY: { value: -1e6 },
     uGhostBelow: { value: 0 },
     uSelPal: { value: -1 },
-    uHighlight: { value: new THREE.Color(0xffc23a) },
+    uHighlight: { value: new THREE.Color(0x2f7bff) },
     uGlow: { value: 1 },
     uRoleView: { value: 0 },
   };
