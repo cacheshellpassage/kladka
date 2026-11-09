@@ -653,6 +653,7 @@ export class VoxelViewer {
 
   /** Camera presets: 0 = front-right, 1 = back-right, 2 = back-left, 3 = front-left, 4 = top. */
   resetCamera(preset = 0): void {
+    if (this.fly) this.setFly(false);
     this.flight = null;
     const m = this.model;
     const sx = m?.size.x ?? 16,
@@ -864,8 +865,218 @@ export class VoxelViewer {
   }
 
   /** Renders immediately (synchronously) and returns the canvas. */
+  /* ------------------------------------------------------------------ */
+  /* measuring                                                          */
+  /* ------------------------------------------------------------------ */
+
+  private measureGroup: THREE.Group | null = null;
+
+  /**
+   * Shows the measured box between two blocks (inclusive), or just the first corner when `b` is null.
+   * Pass `a = null` to clear.
+   */
+  setMeasure(a: [number, number, number] | null, b: [number, number, number] | null): void {
+    if (this.measureGroup) {
+      this.scene.remove(this.measureGroup);
+      this.measureGroup.traverse((o) => {
+        const m = o as THREE.Mesh;
+        m.geometry?.dispose();
+        (m.material as THREE.Material | undefined)?.dispose();
+      });
+      this.measureGroup = null;
+    }
+    if (a) {
+      const lo = b ? a.map((v, i) => Math.min(v, b[i]!)) : a;
+      const hi = b ? a.map((v, i) => Math.max(v, b[i]!) + 1) : a.map((v) => v + 1);
+      const pad = 0.02;
+      const size = new THREE.Vector3(
+        hi[0]! - lo[0]! + pad * 2,
+        hi[1]! - lo[1]! + pad * 2,
+        hi[2]! - lo[2]! + pad * 2,
+      );
+      const center = new THREE.Vector3(
+        (lo[0]! + hi[0]!) / 2,
+        (lo[1]! + hi[1]!) / 2,
+        (lo[2]! + hi[2]!) / 2,
+      ).add(this.root.position);
+      const g = new THREE.Group();
+      const box = new THREE.BoxGeometry(size.x, size.y, size.z);
+      const fill = new THREE.Mesh(
+        box,
+        new THREE.MeshBasicMaterial({
+          color: 0x2f7bff,
+          transparent: true,
+          opacity: b ? 0.12 : 0.3,
+          depthWrite: false,
+        }),
+      );
+      const edges = new THREE.LineSegments(
+        new THREE.EdgesGeometry(box),
+        new THREE.LineBasicMaterial({ color: 0x2f7bff, depthTest: false, transparent: true }),
+      );
+      edges.renderOrder = 10;
+      g.add(fill, edges);
+      g.position.copy(center);
+      this.measureGroup = g;
+      this.scene.add(g);
+    }
+    this.dirty = true;
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* first-person fly mode                                               */
+  /* ------------------------------------------------------------------ */
+
+  private fly: {
+    yaw: number;
+    pitch: number;
+    keys: Set<string>;
+    input: { f: number; s: number; u: number };
+    last: number;
+    drag: { x: number; y: number; id: number } | null;
+    off: () => void;
+  } | null = null;
+
+  isFlyMode(): boolean {
+    return this.fly !== null;
+  }
+
+  /**
+   * First-person "noclip" camera: WASD / arrows to move, Space / Shift (or E / Q) up and down, drag to look
+   * around. Touch screens use `setFlyInput` from on-screen buttons. Turning it off returns to the orbit
+   * camera around the point the user was looking at.
+   */
+  setFly(on: boolean): void {
+    if (on === (this.fly !== null)) return;
+    const cam = this.camera;
+    if (on) {
+      this.flight = null;
+      const dir = new THREE.Vector3();
+      cam.getWorldDirection(dir);
+      const yaw = Math.atan2(-dir.x, -dir.z);
+      const pitch = Math.asin(THREE.MathUtils.clamp(dir.y, -1, 1));
+      this.controls.enabled = false;
+      const el = this.renderer.domElement;
+      const keys = new Set<string>();
+      const typing = (e: KeyboardEvent) =>
+        !!(e.target as HTMLElement | null)?.closest?.("input, textarea, select, [contenteditable]");
+      const kd = (e: KeyboardEvent) => {
+        if (typing(e)) return;
+        const k = e.code;
+        if (
+          [
+            "KeyW",
+            "KeyA",
+            "KeyS",
+            "KeyD",
+            "KeyQ",
+            "KeyE",
+            "Space",
+            "ShiftLeft",
+            "ShiftRight",
+            "ArrowUp",
+            "ArrowDown",
+            "ArrowLeft",
+            "ArrowRight",
+          ].includes(k)
+        ) {
+          keys.add(k);
+          e.preventDefault();
+        }
+      };
+      const ku = (e: KeyboardEvent) => keys.delete(e.code);
+      const pd = (e: PointerEvent) => {
+        if (this.fly) this.fly.drag = { x: e.clientX, y: e.clientY, id: e.pointerId };
+      };
+      const pm = (e: PointerEvent) => {
+        const f = this.fly;
+        if (!f?.drag || f.drag.id !== e.pointerId) return;
+        f.yaw -= (e.clientX - f.drag.x) * 0.005;
+        f.pitch = THREE.MathUtils.clamp(f.pitch - (e.clientY - f.drag.y) * 0.005, -1.5, 1.5);
+        f.drag.x = e.clientX;
+        f.drag.y = e.clientY;
+        this.dirty = true;
+      };
+      const pu = (e: PointerEvent) => {
+        if (this.fly?.drag?.id === e.pointerId) this.fly.drag = null;
+      };
+      const blur = () => keys.clear();
+      window.addEventListener("keydown", kd);
+      window.addEventListener("keyup", ku);
+      window.addEventListener("blur", blur);
+      el.addEventListener("pointerdown", pd);
+      window.addEventListener("pointermove", pm);
+      window.addEventListener("pointerup", pu);
+      window.addEventListener("pointercancel", pu);
+      this.fly = {
+        yaw,
+        pitch,
+        keys,
+        input: { f: 0, s: 0, u: 0 },
+        last: performance.now(),
+        drag: null,
+        off: () => {
+          window.removeEventListener("keydown", kd);
+          window.removeEventListener("keyup", ku);
+          window.removeEventListener("blur", blur);
+          el.removeEventListener("pointerdown", pd);
+          window.removeEventListener("pointermove", pm);
+          window.removeEventListener("pointerup", pu);
+          window.removeEventListener("pointercancel", pu);
+        },
+      };
+      cam.near = 0.05;
+      cam.updateProjectionMatrix();
+    } else {
+      this.fly!.off();
+      this.fly = null;
+      const dir = new THREE.Vector3();
+      cam.getWorldDirection(dir);
+      this.controls.target.copy(cam.position).addScaledVector(dir, Math.max(4, this.fitDistance * 0.35));
+      this.controls.enabled = true;
+      this.controls.update();
+    }
+    this.dirty = true;
+  }
+
+  /** Movement from on-screen buttons: forward/back, strafe, up/down in −1…1. */
+  setFlyInput(f: number, s: number, u: number): void {
+    if (this.fly) this.fly.input = { f, s, u };
+  }
+
+  private stepFly(): void {
+    const f = this.fly;
+    if (!f) return;
+    const now = performance.now();
+    const dt = Math.min(0.1, (now - f.last) / 1000);
+    f.last = now;
+    const k = f.keys;
+    const fwd =
+      (k.has("KeyW") || k.has("ArrowUp") ? 1 : 0) - (k.has("KeyS") || k.has("ArrowDown") ? 1 : 0) + f.input.f;
+    const side =
+      (k.has("KeyD") || k.has("ArrowRight") ? 1 : 0) -
+      (k.has("KeyA") || k.has("ArrowLeft") ? 1 : 0) +
+      f.input.s;
+    const up =
+      (k.has("Space") || k.has("KeyE") ? 1 : 0) -
+      (k.has("ShiftLeft") || k.has("ShiftRight") || k.has("KeyQ") ? 1 : 0) +
+      f.input.u;
+    const cam = this.camera;
+    cam.rotation.set(f.pitch, f.yaw, 0, "YXZ");
+    if (fwd || side || up) {
+      const speed = THREE.MathUtils.clamp(this.fitDistance * 0.18, 4, 24); // blocks per second
+      const dir = new THREE.Vector3(-Math.sin(f.yaw), 0, -Math.cos(f.yaw)); // walk on the horizontal plane
+      const right = new THREE.Vector3(Math.cos(f.yaw), 0, -Math.sin(f.yaw));
+      cam.position
+        .addScaledVector(dir, fwd * speed * dt)
+        .addScaledVector(right, side * speed * dt)
+        .addScaledVector(new THREE.Vector3(0, 1, 0), up * speed * dt);
+      this.dirty = true;
+    }
+  }
+
   renderNow(): HTMLCanvasElement {
-    this.controls.update();
+    if (!this.fly) this.controls.update();
     this.draw();
     return this.renderer.domElement;
   }
@@ -919,7 +1130,8 @@ export class VoxelViewer {
     if (this.disposed) return;
     this.raf = requestAnimationFrame(this.loop);
     this.stepFlight();
-    const moved = this.flight ? false : this.controls.update();
+    this.stepFly();
+    const moved = this.flight || this.fly ? false : this.controls.update();
     if (this.dropStart !== null) {
       const t = Math.min(1, (performance.now() - this.dropStart) / 420);
       this.uniforms.uDrop.value = t;
@@ -951,6 +1163,9 @@ export class VoxelViewer {
   }
 
   dispose(): void {
+    this.fly?.off();
+    this.fly = null;
+    this.setMeasure(null, null);
     this.disposed = true;
     cancelAnimationFrame(this.raf);
     this.resizeObs?.disconnect();

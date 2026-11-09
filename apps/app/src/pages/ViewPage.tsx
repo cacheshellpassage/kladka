@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { itemName } from "@kladka/voxel-core";
 import { ROLE_COLORS_3D, type ClipBox, type TimeOfDay, type VoxelViewer } from "@kladka/viewer";
 import { useT, type MessageKey } from "../i18n";
 import { buildGif, recordVideo, videoSupported } from "../lib/media";
@@ -11,6 +10,7 @@ import { useUi } from "../store/ui";
 import { BuildNotFound, MaterialsTable, Segmented, Switch } from "../components/Common";
 import { Icon } from "../components/Icon";
 import { Viewer3D } from "../components/Viewer3D";
+import { BlockInfoPanel, FlyPad, MeasurePanel, type Vec3i } from "../components/ViewTools";
 
 type Axis = "none" | "x" | "y" | "z";
 
@@ -29,7 +29,10 @@ export function ViewPage({ id }: { id: string }) {
   const [maxY, setMaxY] = useState<number>(Infinity);
   const [roleView, setRoleView] = useState(false);
   const [selected, setSelected] = useState<number | null>(null);
-  const [picked, setPicked] = useState<string | null>(null);
+  const [picked, setPicked] = useState<{ at: Vec3i; palette: number } | null>(null);
+  const [camMode, setCamMode] = useState<"orbit" | "fly">("orbit");
+  const [tool, setTool] = useState<"info" | "measure">("info");
+  const [measure, setMeasure] = useState<{ a: Vec3i | null; b: Vec3i | null }>({ a: null, b: null });
   const [animating, setAnimating] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [clip, setClip] = useState<ClipBox | null>(null);
@@ -64,6 +67,17 @@ export function ViewPage({ id }: { id: string }) {
     const h = setTimeout(() => setClip(wanted), 120);
     return () => clearTimeout(h);
   }, [wanted]);
+
+  // camera mode and the measured box live in the viewer
+  useEffect(() => viewer.current?.setFly(camMode === "fly"), [camMode]);
+  useEffect(
+    () =>
+      viewer.current?.setMeasure(
+        tool === "measure" ? measure.a : null,
+        tool === "measure" ? measure.b : null,
+      ),
+    [tool, measure],
+  );
 
   if (!item) return <BuildNotFound />;
   if (error)
@@ -135,28 +149,52 @@ export function ViewPage({ id }: { id: string }) {
 
   return (
     <div className="view-page" data-testid="view-page">
-      <Viewer3D
-        model={build.model}
-        stepOf={build.plan.stepOf}
-        roles={build.plan.roles}
-        step={null}
-        clip={clip}
-        roleView={roleView}
-        selectedPalette={selected}
-        mode={mode}
-        quality={quality}
-        timeOfDay={time}
-        onReady={(v) => (viewer.current = v)}
-        onPick={(p) => {
-          if (!p) return setPicked(null);
-          const st = build.model.palette[p.palette];
-          setPicked(
-            st ? t("viewer.picked", { name: itemName(st.name, locale), x: p.x, y: p.y, z: p.z }) : null,
-          );
-        }}
-        tip={picked ?? t("viewer.pick")}
-        label={item.meta.title[locale]}
-      />
+      <div className="view-stage">
+        <Viewer3D
+          model={build.model}
+          stepOf={build.plan.stepOf}
+          roles={build.plan.roles}
+          step={null}
+          clip={clip}
+          roleView={roleView}
+          selectedPalette={selected}
+          mode={mode}
+          quality={quality}
+          timeOfDay={time}
+          onReady={(v) => (viewer.current = v)}
+          onPick={(p) => {
+            if (tool === "measure") {
+              if (!p) return;
+              const at: Vec3i = [p.x, p.y, p.z];
+              setMeasure((m) => (!m.a || m.b ? { a: at, b: null } : { a: m.a, b: at }));
+              return;
+            }
+            setPicked(p ? { at: [p.x, p.y, p.z], palette: p.palette } : null);
+          }}
+          controls={camMode === "orbit"}
+          tip={
+            camMode === "fly" ? t("viewer.fly.hint") : tool === "measure" || picked ? null : t("viewer.pick")
+          }
+          label={item.meta.title[locale]}
+        />
+        {tool === "info" && picked ? (
+          <BlockInfoPanel
+            model={build.model}
+            at={picked.at}
+            palette={picked.palette}
+            onClose={() => setPicked(null)}
+          />
+        ) : null}
+        {tool === "measure" ? (
+          <MeasurePanel
+            model={build.model}
+            a={measure.a}
+            b={measure.b}
+            onReset={() => setMeasure({ a: null, b: null })}
+          />
+        ) : null}
+        {camMode === "fly" ? <FlyPad onInput={(f, s, u) => viewer.current?.setFlyInput(f, s, u)} /> : null}
+      </div>
       <aside className="view-tools">
         <div className="row">
           <Link className="btn ghost icon" to={{ name: "build", id }} aria-label={t("nav.back")}>
@@ -198,6 +236,33 @@ export function ViewPage({ id }: { id: string }) {
               />
             </>
           ) : null}
+        </fieldset>
+
+        <fieldset>
+          <legend>{t("viewer.camera")}</legend>
+          <Segmented<"orbit" | "fly">
+            label={t("viewer.camera")}
+            value={camMode}
+            onChange={setCamMode}
+            options={[
+              { value: "orbit", label: t("viewer.camera.orbit") },
+              { value: "fly", label: t("viewer.camera.fly") },
+            ]}
+          />
+          <span className="small muted">{t("viewer.tool")}</span>
+          <Segmented<"info" | "measure">
+            label={t("viewer.tool")}
+            value={tool}
+            onChange={(v) => {
+              setTool(v);
+              setPicked(null);
+              setMeasure({ a: null, b: null });
+            }}
+            options={[
+              { value: "info", label: t("viewer.tool.info") },
+              { value: "measure", label: t("viewer.tool.measure") },
+            ]}
+          />
         </fieldset>
 
         <fieldset>
