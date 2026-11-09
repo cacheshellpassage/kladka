@@ -1,10 +1,17 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type PointerEvent as ReactPointerEvent,
+} from "react";
 import { countItems, toLines, type MaterialLine } from "@kladka/voxel-core";
 import type { VoxelViewer } from "@kladka/viewer";
 import { useT, type MessageKey } from "../i18n";
 import { canvasToJpeg, buildPdf, type PdfPage } from "../lib/pdf";
 import { drawPlan, planColors } from "../lib/plan2d";
-import { nameOf } from "../lib/format";
+import { blocksWord, nameOf } from "../lib/format";
 import { useBuild } from "../lib/useBuild";
 import { safeFileName, saveFile } from "../platform/platform";
 import { Link } from "../router";
@@ -15,6 +22,8 @@ import { MaterialsTable, Segmented, Switch } from "../components/Common";
 import { Icon } from "../components/Icon";
 import { PlanCanvas } from "../components/PlanCanvas";
 import { Viewer3D } from "../components/Viewer3D";
+import { Celebrate } from "../components/Celebrate";
+import { haptic } from "../components/Visual";
 
 type Scope = "step" | "layer" | "stage" | "all";
 
@@ -32,6 +41,9 @@ export function GuidePage({ id }: { id: string }) {
   const [selected, setSelected] = useState<number | null>(null);
   const [busy, setBusy] = useState(false);
   const viewer = useRef<VoxelViewer | null>(null);
+  const [dir, setDir] = useState<"next" | "prev">("next");
+  const [party, setParty] = useState<null | { kind: "stage" | "build"; stage: string; next?: string }>(null);
+  const swipe = useRef<{ x: number; y: number } | null>(null);
 
   const total = build?.plan.steps.length ?? 0;
   const finished = total > 0 && step >= total;
@@ -54,11 +66,45 @@ export function GuidePage({ id }: { id: string }) {
     return () => clearTimeout(h);
   }, [build, id, step, done, total, saveProgress]);
 
-  const go = useCallback((n: number) => setStep(Math.max(0, Math.min(total, n))), [total]);
+  const go = useCallback(
+    (n: number) => {
+      const next = Math.max(0, Math.min(total, n));
+      setStep((cur) => {
+        if (next !== cur) {
+          setDir(next > cur ? "next" : "prev");
+          haptic(6);
+        }
+        return next;
+      });
+    },
+    [total],
+  );
   const markDone = useCallback(() => {
     setDone((d) => Math.max(d, step + 1));
+    haptic([12, 40, 18]);
+    const st = build?.plan.stages.find((s) => step >= s.stepStart && step < s.stepEnd);
+    if (st && step + 1 === st.stepEnd) {
+      const idx = build!.plan.stages.indexOf(st);
+      const nextStage = build!.plan.stages[idx + 1];
+      setParty(
+        nextStage ? { kind: "stage", stage: st.id, next: nextStage.id } : { kind: "build", stage: st.id },
+      );
+      haptic([30, 60, 30, 60, 60]);
+    }
     go(step + 1);
-  }, [step, go]);
+  }, [step, go, build]);
+  const onSwipeStart = (e: ReactPointerEvent) => {
+    if (e.pointerType === "mouse") return;
+    swipe.current = { x: e.clientX, y: e.clientY };
+  };
+  const onSwipeEnd = (e: ReactPointerEvent) => {
+    const s0 = swipe.current;
+    swipe.current = null;
+    if (!s0) return;
+    const dx = e.clientX - s0.x,
+      dy = e.clientY - s0.y;
+    if (Math.abs(dx) > 70 && Math.abs(dy) < 50) go(step + (dx < 0 ? 1 : -1));
+  };
 
   // bounding box of the current step and whether the work happens inside the building
   const stepBox = useMemo(() => {
@@ -82,11 +128,7 @@ export function GuidePage({ id }: { id: string }) {
     const centred = cx > inset && cx < sx - inset && cz > inset && cz < sz - inset;
     const inside =
       cur.stage === "interior" ||
-      (centred &&
-        cur.stage !== "roof" &&
-        cur.stage !== "foundation" &&
-        max[0] - min[0] < sx - 2 &&
-        max[2] - min[2] < sz - 2);
+      (cur.stage === "decor" && centred && max[0] - min[0] < sx - 2 && max[2] - min[2] < sz - 2);
     return { min, max, inside };
   }, [build, cur]);
 
@@ -303,10 +345,28 @@ export function GuidePage({ id }: { id: string }) {
   const pct = total ? Math.round((Math.min(done, total) / total) * 100) : 0;
   const view = settings.guideView;
   const showStep = finished ? null : step;
+  const nextStep = !finished && step + 1 < total ? build.plan.steps[step + 1] : undefined;
   const layerY = cur?.layer ?? 0;
 
   return (
     <div className="guide" data-testid="guide">
+      {party ? (
+        <Celebrate
+          big={party.kind === "build"}
+          emoji={party.kind === "build" ? "🏆" : "🎉"}
+          title={
+            party.kind === "build"
+              ? t("guide.buildDone")
+              : t("guide.stageDone", { stage: t(`stage.${party.stage}` as MessageKey) })
+          }
+          text={
+            party.kind === "build"
+              ? t("guide.buildDoneText", { n: build.plan.totalBlocks })
+              : t("guide.stageDoneText", { next: t(`stage.${party.next}` as MessageKey) })
+          }
+          onClose={() => setParty(null)}
+        />
+      ) : null}
       <div className={`guide-stage ${view === "split" ? "split" : ""}`}>
         {view !== "2d" ? (
           <Viewer3D
@@ -334,7 +394,13 @@ export function GuidePage({ id }: { id: string }) {
         ) : null}
       </div>
 
-      <aside className="guide-side" aria-label={t("guide.title")}>
+      <aside
+        className="guide-side"
+        aria-label={t("guide.title")}
+        onPointerDown={onSwipeStart}
+        onPointerUp={onSwipeEnd}
+        onPointerCancel={() => (swipe.current = null)}
+      >
         <div className="scroll">
           <div className="row">
             <Link className="btn ghost icon" to={{ name: "build", id }} aria-label={t("nav.back")}>
@@ -345,7 +411,7 @@ export function GuidePage({ id }: { id: string }) {
           <div className="stack" style={{ gap: 6 }}>
             <div className="row">
               {stage ? <span className="stage-pill">{t(`stage.${stage.id}` as MessageKey)}</span> : null}
-              <span className="small" data-testid="step-label">
+              <span className="small bump" key={step} data-testid="step-label">
                 {finished ? t("guide.finished") : t("guide.step", { n: step + 1, total })}
               </span>
               {cur ? <span className="small muted">{t("guide.layer", { y: cur.layer })}</span> : null}
@@ -360,6 +426,33 @@ export function GuidePage({ id }: { id: string }) {
               <div style={{ width: `${pct}%` }} />
             </div>
           </div>
+
+          {cur?.deferred ? <div className="banner small">{t("guide.deferred")}</div> : null}
+          {cur?.scaffold ? <div className="banner warn small">{t("guide.scaffold")}</div> : null}
+          {cur ? (
+            <div key={step} className={`step-card ${dir === "next" ? "slide-next" : "slide-prev"}`}>
+              <span className="step-num">{step + 1}</span>
+              <span className="stack" style={{ gap: 2 }}>
+                <strong>
+                  {t("guide.blocksInStep", {
+                    n: cur.blocks.length,
+                    blocks: blocksWord(locale, cur.blocks.length),
+                  })}
+                </strong>
+                <span className="small muted">{t("guide.layer", { y: cur.layer })}</span>
+                {nextStep ? (
+                  <span className="next-hint">
+                    {t("guide.next.hint", {
+                      stage: t(`stage.${nextStep.stage}` as MessageKey),
+                      n: nextStep.blocks.length,
+                      blocks: blocksWord(locale, nextStep.blocks.length),
+                    })}
+                  </span>
+                ) : null}
+              </span>
+            </div>
+          ) : null}
+          <p className="swipe-hint">{t("guide.swipe")}</p>
 
           <div className="stage-list" aria-label={t("guide.stageJump")}>
             {build.plan.stages.map((s) => (
@@ -382,12 +475,6 @@ export function GuidePage({ id }: { id: string }) {
                 <Icon name="reset" /> {t("guide.restart")}
               </button>
             </div>
-          ) : null}
-
-          {cur?.deferred ? <div className="banner small">{t("guide.deferred")}</div> : null}
-          {cur?.scaffold ? <div className="banner warn small">{t("guide.scaffold")}</div> : null}
-          {cur ? (
-            <div className="small muted">{t("guide.blocksInStep", { n: cur.blocks.length })}</div>
           ) : null}
 
           <Segmented<"3d" | "2d" | "split">

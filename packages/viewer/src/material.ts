@@ -99,7 +99,13 @@ vec4 kTexel = textureGrad(uAtlas, vec3(fract(kUv), vTex.z), dFdx(kUv), dFdy(kUv)
 diffuseColor *= kTexel;
 if (uRoleView > 0.5) diffuseColor.rgb = mix(diffuseColor.rgb, roleColor(vData.w), 0.65);
 if (kFuture) diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.55, 0.72, 1.0), 0.55);
-if (abs(kStep - uStep) < 0.5) diffuseColor.rgb = mix(diffuseColor.rgb, uHighlight, 0.38);
+if (abs(kStep - uStep) < 0.5) {
+  // current step: keep the material readable, outline every block face with the highlight colour
+  vec2 kf = fract(kUv);
+  float kEdge = min(min(kf.x, 1.0 - kf.x), min(kf.y, 1.0 - kf.y));
+  float kLine = 1.0 - smoothstep(0.045, 0.1, kEdge);
+  diffuseColor.rgb = mix(mix(diffuseColor.rgb, vec3(1.0), 0.14), uHighlight, max(kLine, 0.08));
+}
 if (uSelPal >= 0.0 && abs(vData.y - uSelPal) > 0.5) diffuseColor.rgb *= 0.28;
 `;
 

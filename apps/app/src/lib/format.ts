@@ -17,6 +17,16 @@ export function formatCount(t: TFunction, line: MaterialLine, units: Units): str
   return t("materials.stack", { s: line.stacks, r: line.remainder });
 }
 
+/** "блок / блока / блоков" (ru) or "block / blocks" (en). */
+export function blocksWord(locale: Locale, n: number): string {
+  if (locale === "en") return n === 1 ? "block" : "blocks";
+  const m10 = n % 10,
+    m100 = n % 100;
+  if (m10 === 1 && m100 !== 11) return "блок";
+  if (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) return "блока";
+  return "блоков";
+}
+
 export function nameOf(locale: Locale): (block: string) => string {
   return (b) => itemName(b, locale);
 }

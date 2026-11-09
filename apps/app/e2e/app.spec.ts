@@ -98,13 +98,11 @@ test("imports a user .schem file and exports it again", async ({ page }) => {
   const bytes = exportModel(m, "schem").bytes;
 
   await page.goto("/#/import");
-  await page
-    .getByTestId("import-input")
-    .setInputFiles({
-      name: "test-tower.schem",
-      mimeType: "application/octet-stream",
-      buffer: Buffer.from(bytes),
-    });
+  await page.getByTestId("import-input").setInputFiles({
+    name: "test-tower.schem",
+    mimeType: "application/octet-stream",
+    buffer: Buffer.from(bytes),
+  });
   await expect(page).toHaveURL(/#\/b\/imp-/, { timeout: 60_000 });
   await expect(page.getByRole("heading", { level: 1 })).toContainText("test-tower");
   await expect(page.getByText("Блоков")).toBeVisible();

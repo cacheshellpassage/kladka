@@ -3,6 +3,7 @@ import { useRoute } from "./router";
 import { useLibrary } from "./store/library";
 import { effectiveTheme, useSettings } from "./store/settings";
 import { Shell } from "./components/Shell";
+import { Onboarding } from "./components/Onboarding";
 import { CatalogPage } from "./pages/CatalogPage";
 import { BuildPage } from "./pages/BuildPage";
 import { GuidePage } from "./pages/GuidePage";
@@ -10,6 +11,10 @@ import { ViewPage } from "./pages/ViewPage";
 import { ImportPage } from "./pages/ImportPage";
 import { SettingsPage, restoreResourcePack } from "./pages/SettingsPage";
 import { AboutPage, HelpPage, LicensesPage, PrivacyPage } from "./pages/InfoPages";
+
+function routeKey(r: ReturnType<typeof useRoute>): string {
+  return "id" in r ? r.name + ":" + r.id : r.name;
+}
 
 export function App() {
   const route = useRoute();
@@ -75,7 +80,10 @@ export function App() {
   }
   return (
     <Shell route={route} wide={wide}>
-      {page}
+      <div key={routeKey(route)} className="page-anim" style={wide ? { height: "100%" } : undefined}>
+        {page}
+      </div>
+      <Onboarding />
     </Shell>
   );
 }

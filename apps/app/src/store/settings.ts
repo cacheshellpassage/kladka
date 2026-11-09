@@ -22,6 +22,7 @@ export interface Settings {
   ghostBelow: boolean;
   autoCamera: boolean;
   autoCutaway: boolean;
+  onboarded: boolean;
   guideView: "3d" | "2d" | "split";
   rememberResourcePack: boolean;
 }
@@ -65,6 +66,7 @@ export const DEFAULT_SETTINGS: Settings = {
   ghostBelow: false,
   autoCamera: true,
   autoCutaway: true,
+  onboarded: false,
   guideView: "split",
   rememberResourcePack: false,
 };

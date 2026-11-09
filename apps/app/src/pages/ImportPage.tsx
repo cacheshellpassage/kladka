@@ -1,17 +1,17 @@
-import { useRef, useState, type DragEvent } from "react";
+import { useState, type DragEvent } from "react";
 import { useT } from "../i18n";
 import { importFile } from "../lib/importer";
 import { Link, navigate } from "../router";
 import { useLibrary } from "../store/library";
 import { useSettings } from "../store/settings";
 import { Icon } from "../components/Icon";
+import { FilePicker } from "../components/FilePicker";
 
 export function ImportPage() {
   const t = useT();
   const locale = useSettings((s) => s.locale);
   const imports = useLibrary((s) => s.imports);
   const reloadImports = useLibrary((s) => s.reloadImports);
-  const input = useRef<HTMLInputElement>(null);
   const [state, setState] = useState<{ kind: "idle" | "working" | "done" | "error"; msg?: string }>({
     kind: "idle",
   });
@@ -55,26 +55,15 @@ export function ImportPage() {
         onDrop={onDrop}
       >
         <Icon name="import" size={40} />
-        <button
-          className="btn primary big"
-          type="button"
-          onClick={() => input.current?.click()}
-          disabled={state.kind === "working"}
-        >
-          {t("import.choose")}
-        </button>
-        <span className="small muted">{t("import.drop")}</span>
-        <input
-          ref={input}
-          type="file"
+        <FilePicker
           accept=".schem,.schematic,.litematic,.nbt,.kbuild,.zip"
-          hidden
-          data-testid="import-input"
-          onChange={(e) => {
-            void handle(e.target.files?.[0]);
-            e.target.value = "";
-          }}
-        />
+          onFile={(file) => void handle(file)}
+          disabled={state.kind === "working"}
+          testId="import-input"
+        >
+          <Icon name="import" /> {t("import.choose")}
+        </FilePicker>
+        <span className="small muted">{t("import.drop")}</span>
       </div>
       <p className="small muted">{t("import.packLead")}</p>
       {state.kind === "working" ? (

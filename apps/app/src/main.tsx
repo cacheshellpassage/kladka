@@ -3,6 +3,20 @@ import { createRoot } from "react-dom/client";
 import { App } from "./App";
 import { platform } from "./platform/platform";
 import "./styles/app.css";
+import "./styles/polish.css";
+
+// press ripple starts where the finger/cursor touched the button
+document.addEventListener(
+  "pointerdown",
+  (e) => {
+    const el = (e.target as HTMLElement | null)?.closest?.<HTMLElement>(".btn, .chip");
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    el.style.setProperty("--rx", String(e.clientX - r.left) + "px");
+    el.style.setProperty("--ry", String(e.clientY - r.top) + "px");
+  },
+  { passive: true },
+);
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

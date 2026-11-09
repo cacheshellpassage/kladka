@@ -27,6 +27,10 @@ export const ru = {
   "catalog.count": "{n} построек",
   "catalog.reset": "Сбросить фильтры",
   "catalog.filters": "Фильтры",
+  "catalog.heroTitle": "Что построим сегодня?",
+  "catalog.heroLead": "{n} построек с пошаговыми инструкциями, 3D и списками материалов",
+  "catalog.continue": "Продолжить строить",
+  "catalog.continueStep": "Шаг {n} из {total}",
   "catalog.progress": "Пройдено {p}%",
 
   "style.rustic": "Деревенский",
@@ -106,7 +110,7 @@ export const ru = {
   "guide.done": "Шаг выполнен",
   "guide.finished": "Постройка завершена! 🎉",
   "guide.restart": "Начать заново",
-  "guide.blocksInStep": "{n} блоков в шаге",
+  "guide.blocksInStep": "{n} {blocks} в шаге",
   "guide.view.3d": "3D",
   "guide.view.2d": "Схема",
   "guide.view.split": "3D + схема",
@@ -270,6 +274,26 @@ export const ru = {
   "common.error": "Ошибка",
   "common.loading": "Загрузка…",
   "common.retry": "Повторить",
+  "onboard.title": "Добро пожаловать",
+  "onboard.1.title": "Стройте по шагам",
+  "onboard.1.text":
+    "Каждая постройка разбита на этапы, слои и маленькие шаги в том порядке, в котором блоки реально можно поставить. Нажимайте «Шаг выполнен» — прогресс сохраняется сам.",
+  "onboard.2.title": "Камера покажет, где строить",
+  "onboard.2.text":
+    "3D сам наводится на новые блоки, а для работ внутри скрывает крышу. Листайте шаги свайпом влево и вправо или кнопками.",
+  "onboard.3.title": "Ваши постройки и офлайн",
+  "onboard.3.text":
+    "Импортируйте .schem, .litematic и .nbt, экспортируйте для Litematica и WorldEdit. Всё работает без интернета.",
+  "onboard.skip": "Пропустить",
+  "onboard.next": "Дальше",
+  "onboard.start": "Начать строить",
+  "guide.next.hint": "Дальше: {stage}, {n} {blocks}",
+  "guide.swipe": "Свайп влево — следующий шаг, вправо — предыдущий",
+  "guide.stageDone": "Этап «{stage}» готов!",
+  "guide.stageDoneText": "Отличная работа. Следующий этап: {next}.",
+  "guide.buildDone": "Постройка завершена!",
+  "guide.buildDoneText": "Все {n} блоков на месте. Самое время сделать скриншот.",
+  "common.continue": "Продолжить",
 } as const;
 
 export type MessageKey = keyof typeof ru;

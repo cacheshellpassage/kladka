@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { clearAll, estimateStorage, getOne, put, remove } from "../db/db";
 import { useT } from "../i18n";
 import { formatBytes } from "../lib/format";
@@ -13,6 +13,7 @@ import {
 } from "../store/settings";
 import { useUi } from "../store/ui";
 import { Segmented, Switch } from "../components/Common";
+import { FilePicker } from "../components/FilePicker";
 
 export function SettingsPage() {
   const t = useT();
@@ -20,7 +21,6 @@ export function SettingsPage() {
   const showToast = useUi((u) => u.showToast);
   const providerInfo = useUi((u) => u.providerInfo);
   const setProvider = useUi((u) => u.setProvider);
-  const fileInput = useRef<HTMLInputElement>(null);
   const [usage, setUsage] = useState<number | null>(null);
   const [rpBusy, setRpBusy] = useState(false);
 
@@ -167,9 +167,15 @@ export function SettingsPage() {
             : t("settings.resourcePack.none")}
         </p>
         <div className="row">
-          <button className="btn" type="button" onClick={() => fileInput.current?.click()} disabled={rpBusy}>
+          <FilePicker
+            className="btn"
+            accept=".zip,.jar"
+            disabled={rpBusy}
+            testId="resource-pack-input"
+            onFile={(file) => void loadPack(file)}
+          >
             {rpBusy ? t("common.loading") : t("settings.resourcePack.choose")}
-          </button>
+          </FilePicker>
           {providerInfo ? (
             <button
               className="btn ghost"
@@ -183,17 +189,6 @@ export function SettingsPage() {
             </button>
           ) : null}
         </div>
-        <input
-          ref={fileInput}
-          type="file"
-          accept=".zip,.jar"
-          hidden
-          data-testid="resource-pack-input"
-          onChange={(e) => {
-            void loadPack(e.target.files?.[0]);
-            e.target.value = "";
-          }}
-        />
         <Switch
           label={t("settings.resourcePack.remember")}
           checked={s.rememberResourcePack}

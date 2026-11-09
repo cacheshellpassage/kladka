@@ -48,7 +48,7 @@ export function BuildPage({ id }: { id: string }) {
         <div className="stack">
           <div className="hero card">
             {cover ? (
-              <img src={cover} alt={item.meta.title[locale]} />
+              <img key={cover} className="fade-in" src={cover} alt={item.meta.title[locale]} />
             ) : (
               <div className="viewer-msg" style={{ position: "static", aspectRatio: "16/10" }}>
                 {t("build.noPreview")}
@@ -124,7 +124,7 @@ export function BuildPage({ id }: { id: string }) {
                 <span>{t("build.steps")}</span>
               </div>
             </div>
-            <div className="row">
+            <div className="row build-cta">
               <Link className="btn primary big" to={{ name: "guide", id }} data-testid="start-guide">
                 <Icon name="layers" />
                 {progress && progress.step > 0

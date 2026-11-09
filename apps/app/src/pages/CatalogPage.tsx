@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, type CSSProperties } from "react";
 import { useT, type MessageKey } from "../i18n";
 import { previewUrl, type LibraryItem } from "../lib/content";
 import { formatMinutes } from "../lib/format";
@@ -7,6 +7,7 @@ import { useLibrary } from "../store/library";
 import { useSettings } from "../store/settings";
 import { Disclaimer, DifficultyDots } from "../components/Common";
 import { Icon } from "../components/Icon";
+import { CoverImg, Cubes, Ring, SkeletonCard } from "../components/Visual";
 
 type SizeFilter = "all" | "small" | "medium" | "large";
 type Sort = "name" | "blocks" | "difficulty";
@@ -53,6 +54,20 @@ export function CatalogPage() {
     return out;
   }, [all, q, style, size, diff, favOnly, sort, favorites, locale]);
 
+  const inProgress = useMemo(
+    () =>
+      all
+        .map((b) => {
+          const pr = progress.get(b.id);
+          if (!pr || !pr.total || pr.step <= 0 || pr.done >= pr.total) return null;
+          return { b, pct: Math.round((pr.done / pr.total) * 100), step: pr.step, at: pr.updatedAt };
+        })
+        .filter((x): x is NonNullable<typeof x> => x !== null)
+        .sort((a, b) => b.at - a.at)
+        .slice(0, 6),
+    [all, progress],
+  );
+
   const activeFilters = (style !== "all" ? 1 : 0) + (size !== "all" ? 1 : 0) + (diff ? 1 : 0);
 
   const reset = () => {
@@ -66,8 +81,42 @@ export function CatalogPage() {
   return (
     <>
       <div className="catalog-head">
+        <section className="hero-banner">
+          <Cubes className="cubes" />
+          <h1>{t("catalog.heroTitle")}</h1>
+          <p>{t("catalog.heroLead", { n: all.length })}</p>
+        </section>
+        {inProgress.length ? (
+          <section aria-label={t("catalog.continue")}>
+            <div className="section-title">
+              <Icon name="layers" size={18} /> {t("catalog.continue")}
+            </div>
+            <div className="continue-strip">
+              {inProgress.map(({ b, pct, step }, i) => (
+                <Link
+                  key={b.id}
+                  className="continue-card card"
+                  style={{ animationDelay: `${i * 60}ms` }}
+                  to={{ name: "guide", id: b.id }}
+                >
+                  <img src={previewUrl(b, coverStyle, "thumb")} alt="" />
+                  <span>
+                    <span className="t">{b.meta.title[locale]}</span>
+                    <br />
+                    <span className="s">
+                      {t("catalog.continueStep", { n: step + 1, total: b.stats.steps })}
+                    </span>
+                  </span>
+                  <Ring pct={pct} label={t("catalog.progress", { p: pct })} />
+                </Link>
+              ))}
+            </div>
+          </section>
+        ) : null}
         <div className="row">
-          <h1 style={{ margin: 0 }}>{t("catalog.title")}</h1>
+          <span className="section-title" style={{ margin: 0 }}>
+            <Icon name="grid" size={18} /> {t("catalog.title")}
+          </span>
           <span className="muted small">{t("catalog.count", { n: list.length })}</span>
         </div>
         <div className="searchbox">
@@ -150,7 +199,13 @@ export function CatalogPage() {
         </div>
       </div>
 
-      {status === "loading" ? <p className="muted">{t("common.loading")}</p> : null}
+      {status === "loading" || status === "idle" ? (
+        <div className="grid">
+          {Array.from({ length: 8 }, (_, i) => (
+            <SkeletonCard key={i} />
+          ))}
+        </div>
+      ) : null}
       {status === "error" ? <div className="banner error">{error}</div> : null}
       {status === "ready" && list.length === 0 ? (
         <div className="stack" style={{ alignItems: "flex-start" }}>
@@ -162,7 +217,7 @@ export function CatalogPage() {
       ) : null}
 
       <div className="grid" data-testid="catalog-grid">
-        {list.map((b) => {
+        {list.map((b, idx) => {
           const pr = progress.get(b.id);
           const pct = pr && pr.total ? Math.round((pr.done / pr.total) * 100) : 0;
           const img = previewUrl(b, coverStyle, "thumb");
@@ -170,10 +225,12 @@ export function CatalogPage() {
             <Link
               key={`${b.source}:${b.id}`}
               className="bcard card"
+              style={{ "--i": idx } as CSSProperties}
               to={{ name: "build", id: b.id }}
               data-testid={`build-${b.id}`}
             >
-              {img ? <img className="cover" src={img} alt="" loading="lazy" /> : <div className="cover" />}
+              <CoverImg src={img} />
+              {b.source === "import" ? <span className="badge">{t("style.imported")}</span> : null}
               {favorites.has(b.id) ? (
                 <span className="fav">
                   <Icon name="star" filled size={22} />
