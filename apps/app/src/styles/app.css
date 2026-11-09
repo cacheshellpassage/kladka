@@ -12,6 +12,7 @@
   --radius-sm: 10px;
   --tap: 44px;
   --gap: 16px;
+  --topbar-h: 61px; /* sticky top bar; 0 when the navigation rail is used */
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
 
@@ -737,7 +738,7 @@ input[type="range"] {
 .guide {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 380px;
-  height: calc(100dvh - 61px - var(--safe-top));
+  height: calc(100dvh - var(--topbar-h) - var(--safe-top));
 }
 .guide-stage {
   display: grid;
@@ -826,7 +827,7 @@ input[type="range"] {
   .guide {
     grid-template-columns: 1fr;
     grid-template-rows: minmax(260px, 46dvh) minmax(0, 1fr);
-    height: calc(100dvh - 61px - var(--safe-top));
+    height: calc(100dvh - var(--topbar-h) - var(--safe-top));
   }
   .guide-stage.split {
     grid-template-columns: 1fr 1fr;
@@ -840,7 +841,7 @@ input[type="range"] {
 .view-page {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 320px;
-  height: calc(100dvh - 61px - var(--safe-top));
+  height: calc(100dvh - var(--topbar-h) - var(--safe-top));
 }
 .view-tools {
   border-left: 1px solid var(--border);

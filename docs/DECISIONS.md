@@ -172,3 +172,19 @@ As proposed in the brief, with two small additions:
 - All text pairs pass WCAG 2.2 AA (light: text 17.7:1, muted 6.4:1, white on accent 5.2:1; dark: text 14.6:1,
   muted 6.8:1, dark text on accent 7.1:1). The icon, splash, PWA/Android theme colours, 2D plan and 3D highlight
   use the same palette.
+
+## D-018 Visual refinements (2026-11-09)
+
+- **Block icons**: material lists show isometric "inventory" icons drawn with Canvas 2D from the same procedural
+  textures and parametric shapes as the 3D view (or from the user's resource pack). Nothing is shipped as images.
+- **Covers** are rendered on a transparent background (WebP with alpha) with a soft contact shadow, so the same
+  files suit the light and the dark theme; the card behind them draws a theme-aware backdrop.
+- **3D (classic)**: the ground now counts as an occluder for vertex AO (darker bottom edge of the lowest blocks),
+  plus a blurred footprint "contact shadow" when the whole build is shown. New blocks of the next step drop into
+  place (420 ms, skipped with "reduce motion").
+- **Typography**: Inter Variable (OFL-1.1, `@fontsource-variable/inter`) is bundled; tabular numerals for counters.
+- **Stage colours**: stages are ordered, so they use one blue ordinal ramp (foundation darkest → decor lightest),
+  validated with the dataviz ordinal checks (one hue, monotone lightness, ΔL ≥ 0.06, light end ≥ 2:1). Labels
+  always stay in text colours; the 3D "colour by stage" view uses the same ramp with a legend.
+- **Wide screens** (≥ 1100 px): navigation moves to a left rail so the 3D view and the step panel get the full
+  height; the in-game plan zooms to the current step's blocks.

@@ -30,6 +30,11 @@
     "license": "ISC"
   },
   {
+    "name": "@fontsource-variable/inter",
+    "version": "5.2.5",
+    "license": "OFL-1.1"
+  },
+  {
     "name": "@tauri-apps/api",
     "version": "2.12.4",
     "license": "Apache-2.0 OR MIT"
