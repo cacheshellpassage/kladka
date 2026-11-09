@@ -188,3 +188,19 @@ As proposed in the brief, with two small additions:
   always stay in text colours; the 3D "colour by stage" view uses the same ramp with a legend.
 - **Wide screens** (≥ 1100 px): navigation moves to a left rail so the 3D view and the step panel get the full
   height; the in-game plan zooms to the current step's blocks.
+
+## D-019 Fewer steps, import covers, client.jar help, community links (2026-11-09)
+
+- **Pillars in one step.** Layer-by-layer planning made the builder walk between posts once per layer. A post-pass
+  joins same-footprint chains on consecutive layers into one bottom-up step when every lifted block stays supported
+  (re-checked by the placement simulation in the tests for all 36 builds), and joins same-kind single blocks on one
+  layer. The step card says “Pillar: place it bottom-up” and shows the layer range.
+- **Import covers.** Imports render two 800×500 covers on the device: classic (transparent, like the built-in
+  ones) and shaders (golden hour). Older imports get them the first time their page is opened.
+- **client.jar help.** Per-OS steps with the `versions` folders of the official launcher, TLauncher (Legacy),
+  Prism Launcher and CurseForge and a copy button; a web page cannot open a dialog in a given folder, so the user
+  pastes the path into the dialog. The desktop app opens the dialog right there (dialog `open` + fs `read-file`
+  limited to the launchers' folders). Not built locally — verified in CI only.
+- **Community links** open in the system browser (`@tauri-apps/plugin-opener` on desktop, Capacitor's external
+  navigation on Android, a new tab on the web). Nothing is fetched by the app (see LEGAL.md).
+- Declined by the owner: generated surroundings (terrain) around builds.

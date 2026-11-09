@@ -21,7 +21,7 @@ WITH MOJANG OR MICROSOFT.
 
 ## Shipped JavaScript dependencies (in the app bundle)
 
-Summary: MIT (14), ISC (2), MIT OR Apache-2.0 (2), OFL-1.1 (1), Apache-2.0 OR MIT (1), 0BSD (1). No copyleft licenses.
+Summary: MIT (14), MIT OR Apache-2.0 (3), ISC (2), OFL-1.1 (1), Apache-2.0 OR MIT (1), 0BSD (1). No copyleft licenses.
 
 | Package | Version | License |
 | --- | --- | --- |
@@ -35,6 +35,7 @@ Summary: MIT (14), ISC (2), MIT OR Apache-2.0 (2), OFL-1.1 (1), Apache-2.0 OR MI
 | @tauri-apps/api | 2.12.4 | Apache-2.0 OR MIT |
 | @tauri-apps/plugin-dialog | 2.8.4 | MIT OR Apache-2.0 |
 | @tauri-apps/plugin-fs | 2.7.1 | MIT OR Apache-2.0 |
+| @tauri-apps/plugin-opener | 2.7.2 | MIT OR Apache-2.0 |
 | @types/react | 19.3.0 | MIT |
 | csstype | 3.2.3 | MIT |
 | fflate | 0.8.3 | MIT |

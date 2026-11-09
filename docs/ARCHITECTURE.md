@@ -67,6 +67,11 @@ Hytale (`.prefab.json`) can be added as another adapter plus an importer in `for
 4. **Steps.** Placed blocks of a group are split into connected regions (6-connectivity), big regions are cut into
    chunks of ≤ 48 blocks (placement order preserved), chunks are ordered by a nearest-neighbour tour, and small
    neighbouring regions (≤ 24 blocks, gap ≤ 3) are merged into one step.
+   Then, per stage: **pillars** — chains of small steps (≤ 4 blocks) with the same footprint on consecutive
+   layers become one step built bottom-up (`layerTo` = top layer, ≤ 24 blocks), but only if every lifted block is
+   still supported (it stands on the block below, or its support was built in an earlier step, e.g. a ladder on a
+   finished wall); and **same-kind singles** — consecutive 1–2 block steps of one block type on one layer (corner
+   posts, eave slabs, lamps; ≤ 16 blocks, ≤ 32 apart) become one step. Built-in catalogue: 1823 → 1320 steps.
 5. **Companions.** Upper door halves, bed heads and upper halves of tall plants join their partner's step.
 
 Tests (`packages/voxel-core/test/planner.test.ts`) re-simulate every plan and assert that each block is placeable
