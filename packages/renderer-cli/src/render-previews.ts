@@ -1,5 +1,5 @@
 /**
- * `pnpm render:previews [ids...] [--angles=0,1,2,3] [--styles=classic,cinematic] [--out=dir]`
+ * `pnpm render:previews [ids...] [--angles=0,1,2,3,4] [--styles=classic,cinematic] [--out=dir]` (4 = top view)
  *
  * Renders cover images for every build of the core pack with the same composition (same sky, light
  * and framing) and writes them next to the pack, updating pack.json. Uses a locally installed
@@ -49,6 +49,19 @@ export async function launchBrowser(): Promise<Browser> {
   throw lastErr;
 }
 
+/** Windows may briefly lock a file (antivirus, the dev server's watcher): retry a few times. */
+async function writeRetry(path: string, data: string | Buffer): Promise<void> {
+  for (let attempt = 0; ; attempt++) {
+    try {
+      writeFileSync(path, data);
+      return;
+    } catch (e) {
+      if (attempt >= 8) throw e;
+      await new Promise((r) => setTimeout(r, 150 * (attempt + 1)));
+    }
+  }
+}
+
 function dataUrlToBytes(url: string): Buffer {
   return Buffer.from(url.slice(url.indexOf(",") + 1), "base64");
 }
@@ -58,7 +71,7 @@ async function main(): Promise<void> {
   if (!existsSync(manifestPath)) throw new Error("pack.json not found, run pnpm content:build first");
   const manifest = JSON.parse(readFileSync(manifestPath, "utf8")) as ContentPackManifest;
   const only = process.argv.slice(2).filter((a) => !a.startsWith("--"));
-  const angles = (arg("angles") ?? "0,1,2,3").split(",").map(Number);
+  const angles = (arg("angles") ?? "0,1,2,3,4").split(",").map(Number);
   const styles = (arg("styles") ?? "classic,cinematic").split(",") as Array<"classic" | "cinematic">;
   const outDir = arg("out");
 
@@ -87,7 +100,8 @@ async function main(): Promise<void> {
     mkdirSync(join(base, "previews", b.id), { recursive: true });
     const previews = b.previews ?? {};
     for (const style of styles) {
-      const list: string[] = [];
+      // keep angles rendered earlier: `--angles=4` adds the top view without touching the others
+      const list: string[] = [...((style === "classic" ? previews.classic : previews.cinematic) ?? [])];
       for (const angle of angles) {
         const dataUrl = await page.evaluate((job) => window.kladkaRender(job), {
           file: `/packs/core/${b.file}`,
@@ -98,8 +112,13 @@ async function main(): Promise<void> {
           quality: COVER.quality,
         });
         const rel = `previews/${b.id}/${style}-${angle}.webp`;
-        writeFileSync(join(base, rel), dataUrlToBytes(dataUrl));
-        list.push(rel);
+        await writeRetry(join(base, rel), dataUrlToBytes(dataUrl));
+        list[angle] = rel;
+      }
+      if (!angles.includes(0)) {
+        if (style === "classic") previews.classic = list;
+        else previews.cinematic = list;
+        continue;
       }
       const thumbUrl = await page.evaluate((job) => window.kladkaRender(job), {
         file: `/packs/core/${b.file}`,
@@ -110,7 +129,7 @@ async function main(): Promise<void> {
         quality: THUMB.quality,
       });
       const thumbRel = `previews/${b.id}/${style}-thumb.webp`;
-      writeFileSync(join(base, thumbRel), dataUrlToBytes(thumbUrl));
+      await writeRetry(join(base, thumbRel), dataUrlToBytes(thumbUrl));
       if (style === "classic") {
         previews.classic = list;
         previews.thumb = thumbRel;
@@ -121,7 +140,7 @@ async function main(): Promise<void> {
     }
     b.previews = previews;
     console.log(`${b.id.padEnd(20)} done (${((Date.now() - t0) / 1000).toFixed(0)} s)`);
-    if (!outDir) writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + "\n");
+    if (!outDir) await writeRetry(manifestPath, JSON.stringify(manifest, null, 2) + "\n");
   }
   await browser.close();
   await server.close();

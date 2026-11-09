@@ -660,8 +660,11 @@ export class VoxelViewer {
       sy = m?.size.y ?? 16,
       sz = m?.size.z ?? 16;
     const target = new THREE.Vector3(0, sy / 2, 0);
+    // presets 0-3: four corners at 26°; preset 4: top view aligned with the 2D plan (north up, east right)
     const az =
-      [Math.PI / 4, (3 * Math.PI) / 4, (5 * Math.PI) / 4, (7 * Math.PI) / 4][preset % 4] ?? Math.PI / 4;
+      preset === 4
+        ? 0
+        : ([Math.PI / 4, (3 * Math.PI) / 4, (5 * Math.PI) / 4, (7 * Math.PI) / 4][preset % 4] ?? Math.PI / 4);
     const el = preset === 4 ? Math.PI * 0.47 : THREE.MathUtils.degToRad(26);
     // direction from target to camera
     const back = new THREE.Vector3(

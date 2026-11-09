@@ -17,6 +17,7 @@ import {
 } from "../components/Common";
 import { ExportDialog } from "../components/ExportDialog";
 import { Icon } from "../components/Icon";
+import { Passport } from "../components/Passport";
 
 export function BuildPage({ id }: { id: string }) {
   const t = useT();
@@ -45,7 +46,11 @@ export function BuildPage({ id }: { id: string }) {
   if (!item) return status === "ready" ? <BuildNotFound /> : <p className="muted">{t("common.loading")}</p>;
   const fav = favorites.has(id);
   const cover = previewUrl(item, coverStyle, "cover", angle);
-  const angles = item.source === "core" ? [0, 1, 2, 3] : [];
+  const angleCount =
+    item.source === "core"
+      ? ((coverStyle === "shaders" ? item.previews?.cinematic : item.previews?.classic)?.length ?? 0)
+      : 0;
+  const angles = Array.from({ length: angleCount }, (_, i) => i);
   const stagesPresent = build?.plan.stages ?? [];
 
   const del = async () => {
@@ -175,6 +180,7 @@ export function BuildPage({ id }: { id: string }) {
                 </div>
               </div>
             ) : null}
+            {build ? <Passport model={build.model} /> : null}
             {item.warnings?.length ? (
               <div className="banner warn small">
                 <b>{t("build.warnings")}:</b> {item.warnings.join("; ")}

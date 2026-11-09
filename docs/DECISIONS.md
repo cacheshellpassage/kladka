@@ -204,3 +204,23 @@ As proposed in the brief, with two small additions:
 - **Community links** open in the system browser (`@tauri-apps/plugin-opener` on desktop, Capacitor's external
   navigation on Android, a new tab on the web). Nothing is fetched by the app (see LEGAL.md).
 - Declined by the owner: generated surroundings (terrain) around builds.
+
+## D-020 Gaps found in a competitor review (2026-11-09)
+
+A review of shulkr.com (browser schematic viewer/editor) listed what Kladka lacked; the owner chose:
+
+- **Block details on tap** (3D view): name, coordinates, every block-state property in plain words, and the
+  exact `id[key=value]` string for game commands, with a copy button.
+- **Measuring**: tap two corner blocks → box size W × H × D, number of blocks inside and their materials; the
+  box is drawn in 3D.
+- **Fly camera**: first-person noclip (WASD/arrows, Space/Shift, drag to look; on-screen pad on touch screens).
+- **Build passport**: distinct block types, size class (S < 1k, M < 10k, L < 100k, XL), the game version the
+  file was saved in (DataVersion table), the oldest Java release that has every vanilla block it uses (table of
+  blocks added from 1.14 to 1.21.9; newer or unknown ids cannot raise the minimum, so the wording is “and
+  newer”), and required mods (non-`minecraft` namespaces).
+- **Top view** as a fifth cover angle, aligned with the 2D plan (north up). `render:previews` now keeps existing
+  angles when rendering one, and retries writes that Windows briefly locks.
+
+Not taken (need a server, accounts or network, or out of scope): community catalogue and uploads, comments,
+duplicate detection, AI builder, test servers, URL import, Bedrock `.mcstructure`, a full editor, bundled
+game or mod textures.

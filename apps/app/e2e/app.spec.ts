@@ -105,7 +105,7 @@ test("imports a user .schem file and exports it again", async ({ page }) => {
   });
   await expect(page).toHaveURL(/#\/b\/imp-/, { timeout: 60_000 });
   await expect(page.getByRole("heading", { level: 1 })).toContainText("test-tower");
-  await expect(page.getByText("Блоков")).toBeVisible();
+  await expect(page.getByText("Блоков", { exact: true })).toBeVisible();
 
   await page.getByTestId("start-guide").click();
   await expect(page.getByTestId("step-label")).toContainText("Шаг 1 из");
@@ -164,6 +164,49 @@ test("materials checklist is saved per build", async ({ page }) => {
   await page.reload();
   await expect(page.getByText(/Собрано 2 из/)).toBeVisible();
   await expect(page.locator("input.check").nth(0)).toBeChecked();
+});
+
+test("build passport shows block types, versions and mods", async ({ page }) => {
+  await openBuild(page, "pagoda");
+  const passport = page.getByTestId("passport");
+  await expect(passport).toBeVisible();
+  await expect(passport).toContainText("Java 1.20");
+  await expect(passport).toContainText("Java 26.3");
+  await expect(passport).toContainText("не нужны");
+});
+
+test("free 3D view: block info, measuring and fly camera", async ({ page }) => {
+  await page.goto("/#/b/well/view");
+  await expect(page.getByTestId("view-page")).toBeVisible();
+  const canvas = page.locator(".viewer-host canvas");
+  await page.waitForTimeout(1500);
+  const box = (await canvas.boundingBox())!;
+  const cx = box.x + box.width / 2,
+    cy = box.y + box.height / 2;
+  // tap somewhere on the build until a block is hit
+  const hit = async () => {
+    for (const [dx, dy] of [
+      [0, 0],
+      [0, 30],
+      [0, 60],
+      [-30, 40],
+      [30, 40],
+    ] as Array<[number, number]>) {
+      await page.mouse.click(cx + dx, cy + dy);
+      await page.waitForTimeout(150);
+      if ((await page.locator(".block-panel, .measure-size").count()) > 0) return true;
+      if (await page.getByText("Теперь нажмите").isVisible()) return true;
+    }
+    return false;
+  };
+  expect(await hit()).toBe(true);
+  await expect(page.locator(".block-panel")).toContainText("ID для команд");
+  await page.getByRole("button", { name: "Измерить" }).click();
+  await expect(page.getByText("Нажмите на блок в одном углу")).toBeVisible();
+  await page.getByRole("button", { name: "Полёт" }).click();
+  await expect(page.locator(".fly-pad")).toBeVisible();
+  await page.getByRole("button", { name: "Вращение" }).click();
+  await expect(page.locator(".fly-pad")).toHaveCount(0);
 });
 
 test("free 3D view: section and layer controls", async ({ page }) => {

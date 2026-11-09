@@ -240,3 +240,31 @@ describe("Litematica import edge cases", () => {
     expect(() => importBytes(legacy, "x.schematic")).toThrow(/Legacy/);
   });
 });
+
+describe("build passport", () => {
+  it("names DataVersions and finds the oldest compatible release", async () => {
+    const { buildPassport, versionName, blockSince, VoxelModel, minecraftJava, state } =
+      await import("../src");
+    expect(versionName(4189)).toBe("1.21.4");
+    expect(versionName(4190)).toBe("1.21.4+");
+    expect(versionName(1343)).toBe("1.12.2");
+    expect(blockSince("minecraft:oak_planks")).toBe(0);
+    expect(versionName(blockSince("minecraft:cherry_planks"))).toBe("1.20");
+    expect(versionName(blockSince("minecraft:waxed_oxidized_copper_bulb"))).toBe("1.21");
+    expect(versionName(blockSince("minecraft:pale_oak_log"))).toBe("1.21.4");
+    const m = new VoxelModel(
+      { x: 3, y: 1, z: 1 },
+      { dataVersion: 3953, materialOf: minecraftJava.materialOf },
+    );
+    m.set(0, 0, 0, state("stone"));
+    m.set(1, 0, 0, state("cherry_planks"));
+    m.set(2, 0, 0, state("create:shaft"));
+    const p = buildPassport(m);
+    expect(p.blockTypes).toBe(3);
+    expect(p.savedIn).toBe("1.21");
+    expect(p.minVersion).toBe("1.20");
+    expect(p.newestBlocks).toEqual(["minecraft:cherry_planks"]);
+    expect(p.mods).toEqual([{ namespace: "create", blocks: 1 }]);
+    expect(p.sizeClass).toBe("S");
+  });
+});

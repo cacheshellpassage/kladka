@@ -30,3 +30,4 @@ export * from "./names";
 export * from "./shapes";
 export * from "./connections";
 export * from "./version";
+export * from "./compat";
