@@ -15,3 +15,4 @@ export {
 } from "./palette-render";
 export { generateTexture, averageColor, TEX } from "./textures";
 export { PRESETS, type TimeOfDay } from "./environment";
+export { drawBlockIcon, blockIconUrl } from "./icon";

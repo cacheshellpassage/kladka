@@ -157,6 +157,7 @@ export function meshChunk(input: MeshInput, cx: number, cy: number, cz: number, 
     return r.greedy && r.info.render === "opaque";
   };
   const aoOcc = (x: number, y: number, z: number) => {
+    if (y < 0) return 1; // the ground darkens the bottom edge of the lowest blocks
     const p = pal(x, y, z);
     return p !== 0 && opaqueCube(p) ? 1 : 0;
   };

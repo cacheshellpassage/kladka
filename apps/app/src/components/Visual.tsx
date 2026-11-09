@@ -1,5 +1,7 @@
 /** Small visual building blocks: fading cover images, decorative cubes, progress ring, skeletons. */
-import { useState, type CSSProperties } from "react";
+import { useMemo, useState, type CSSProperties } from "react";
+import { blockIconUrl } from "@kladka/viewer";
+import { useUi } from "../store/ui";
 
 export function CoverImg({ src, alt = "" }: { src?: string; alt?: string }) {
   const [ready, setReady] = useState(false);
@@ -93,4 +95,21 @@ export function haptic(pattern: number | number[] = 12): void {
   } catch {
     /* unsupported */
   }
+}
+
+/** Isometric inventory-style icon of a block (procedural or resource-pack textures). */
+export function BlockIcon({ block, color, size = 22 }: { block: string; color?: number; size?: number }) {
+  const provider = useUi((s) => s.provider);
+  const url = useMemo(() => blockIconUrl(block, size, provider), [block, size, provider]);
+  if (!url)
+    return (
+      <span
+        className="sw"
+        style={{ background: `#${(color ?? 0x999999).toString(16).padStart(6, "0")}` }}
+        aria-hidden
+      />
+    );
+  return (
+    <img className="block-icon" src={url} width={size} height={size} alt="" aria-hidden draggable={false} />
+  );
 }

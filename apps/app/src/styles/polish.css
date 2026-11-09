@@ -997,3 +997,33 @@
 .mats tr td {
   transition: opacity var(--dur) var(--ease-out);
 }
+
+/* ---------- block icons ---------- */
+.block-icon {
+  display: inline-block;
+  vertical-align: middle;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 1px 1px rgb(15 23 42 / 0.18));
+}
+.gm-mat {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ---------- cover backdrop (covers are rendered on a transparent background) ---------- */
+:root {
+  --cover-bg:
+    radial-gradient(
+      120% 90% at 50% 35%,
+      color-mix(in srgb, var(--surface) 70%, var(--accent-soft)) 0%,
+      transparent 70%
+    ),
+    linear-gradient(180deg, var(--surface-2), color-mix(in srgb, var(--surface-2) 85%, var(--border)));
+}
+.bcard .cover-wrap.ready,
+.hero img,
+.thumbs img,
+.continue-card img {
+  background: var(--cover-bg);
+}

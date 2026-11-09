@@ -23,6 +23,7 @@ const viewer = new VoxelViewer(stage, {
   preserveDrawingBuffer: true,
   antialias: true,
   ground: true,
+  transparent: true, // classic covers on a transparent background suit both themes
 });
 let loaded = "";
 

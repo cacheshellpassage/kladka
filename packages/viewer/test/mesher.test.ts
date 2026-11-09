@@ -51,10 +51,18 @@ describe("greedy mesher", () => {
 
   it("treats clipped blocks as air so cut faces are closed", () => {
     const m = model();
+    m.set(0, 1, 0, state("stone"));
+    m.set(0, 2, 0, state("stone"));
+    expect(quads(m).opaque).toBe(6);
+    expect(quads(m, null, { min: [0, 0, 0], max: [4, 2, 4] }).opaque).toBe(6);
+  });
+
+  it("darkens the bottom edge of blocks standing on the ground", () => {
+    const m = model();
     m.set(0, 0, 0, state("stone"));
     m.set(0, 1, 0, state("stone"));
-    expect(quads(m).opaque).toBe(6);
-    expect(quads(m, null, { min: [0, 0, 0], max: [4, 1, 4] }).opaque).toBe(6);
+    // the ground occludes the lowest corners, so the two side faces no longer merge
+    expect(quads(m).opaque).toBe(10);
   });
 
   it("routes glass to the translucent pass and culls glass-glass faces", () => {

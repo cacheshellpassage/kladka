@@ -12,6 +12,7 @@ import { useSettings } from "../store/settings";
 import { Icon } from "./Icon";
 import { PlanCanvas } from "./PlanCanvas";
 import { Viewer3D } from "./Viewer3D";
+import { BlockIcon } from "./Visual";
 import type { SerializedPlan } from "../lib/worker-client";
 
 type WakeLockSentinelLike = { release: () => Promise<void>; released?: boolean };
@@ -168,7 +169,10 @@ export function GameMode(p: GameModeProps) {
         <ul className="gm-mats" aria-label={t("build.materials")}>
           {lines.slice(0, 4).map((l) => (
             <li key={l.item}>
-              <span>{nameOf(locale)(l.item)}</span>
+              <span className="gm-mat">
+                <BlockIcon block={l.item} size={26} />
+                {nameOf(locale)(l.item)}
+              </span>
               <b>{formatCount(t, l, units)}</b>
             </li>
           ))}

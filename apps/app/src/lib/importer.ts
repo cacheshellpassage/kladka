@@ -24,6 +24,7 @@ export async function renderThumb(kbuild: Uint8Array): Promise<string | undefine
       quality: "medium",
       preserveDrawingBuffer: true,
       ground: true,
+      transparent: true,
     });
     const { model } = decodeKBuild(kbuild);
     await v.setModel(model, null);

@@ -7,6 +7,7 @@ import { safeFileName, saveFile } from "../platform/platform";
 import { useSettings, type Units } from "../store/settings";
 import { useUi } from "../store/ui";
 import { Icon } from "./Icon";
+import { BlockIcon } from "./Visual";
 
 export function Modal({
   title,
@@ -292,7 +293,7 @@ export function MaterialsTable({
                   </td>
                 ) : null}
                 <td style={{ width: 26 }}>
-                  <span className="sw" style={{ background: `#${color.toString(16).padStart(6, "0")}` }} />
+                  <BlockIcon block={pal ? model.palette[pal]!.name : l.item} color={color} />
                 </td>
                 <td>
                   {onSelect && pal !== undefined ? (

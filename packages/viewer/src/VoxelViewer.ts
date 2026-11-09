@@ -39,6 +39,8 @@ export interface ViewerOptions {
   /** Show ground plane/grid. Default true. */
   ground?: boolean;
   antialias?: boolean;
+  /** Transparent canvas: in classic mode no background colour and no grid (used for cover images). */
+  transparent?: boolean;
 }
 
 export interface PickResult {
@@ -81,6 +83,9 @@ export class VoxelViewer {
   private hemi = new THREE.HemisphereLight(0xffffff, 0x444444, 1);
   private ground: THREE.Mesh;
   private grid: THREE.GridHelper | null = null;
+  /** Soft contact shadow under the build (classic mode). */
+  private contact: THREE.Mesh | null = null;
+  private transparent: boolean;
   private composer: EffectComposer | null = null;
   private bloomPass: UnrealBloomPass | null = null;
   private gtaoPass: GTAOPass | null = null;
@@ -123,13 +128,16 @@ export class VoxelViewer {
     this.timeOfDay = opts.timeOfDay ?? "day";
     this.showGround = opts.ground ?? true;
     this.maxPixelRatio = opts.maxPixelRatio ?? 2;
+    this.transparent = opts.transparent ?? false;
 
     this.renderer = new THREE.WebGLRenderer({
       antialias: opts.antialias ?? this.quality !== "low",
       preserveDrawingBuffer: opts.preserveDrawingBuffer ?? false,
       powerPreference: "high-performance",
-      alpha: false,
+      alpha: this.transparent,
+      premultipliedAlpha: false,
     });
+    if (this.transparent) this.renderer.setClearColor(0x000000, 0);
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     this.renderer.domElement.style.display = "block";
@@ -197,6 +205,7 @@ export class VoxelViewer {
     this.roles = plan?.roles ?? null;
     this.rebuildAtlas();
     this.root.position.set(-model.size.x / 2, 0, -model.size.z / 2);
+    this.buildContactShadow(model);
     this.layoutEnvironment();
     this.updateClipUniforms();
     this.resetCamera();
@@ -213,6 +222,79 @@ export class VoxelViewer {
       this.dirty = true;
       if (i < list.length) await nextFrame();
     }
+  }
+
+  /**
+   * Soft "contact" shadow on the ground under the build's footprint (classic mode has no real
+   * shadows). The footprint is rasterised at 6 px per block and blurred with three box-blur passes.
+   */
+  private buildContactShadow(model: VoxelModel): void {
+    if (this.contact) {
+      this.scene.remove(this.contact);
+      this.contact.geometry.dispose();
+      const mat = this.contact.material as THREE.MeshBasicMaterial;
+      mat.map?.dispose();
+      mat.dispose();
+      this.contact = null;
+    }
+    const { x: sx, y: sy, z: sz } = model.size;
+    const RES = 6,
+      PAD = 3;
+    const w = (sx + PAD * 2) * RES,
+      h = (sz + PAD * 2) * RES;
+    if (w * h > 2_000_000) return; // huge imports: skip
+    const a = new Float32Array(w * h);
+    const layer = sx * sz;
+    for (let z = 0; z < sz; z++)
+      for (let x = 0; x < sx; x++) {
+        let filled = false;
+        for (let y = 0; y < Math.min(sy, 6) && !filled; y++)
+          filled = model.blocks[x + z * sx + y * layer] !== 0;
+        if (!filled) continue;
+        for (let j = 0; j < RES; j++)
+          for (let i = 0; i < RES; i++) a[(x + PAD) * RES + i + ((z + PAD) * RES + j) * w] = 1;
+      }
+    const blur = (src: Float32Array, r: number) => {
+      const tmp = new Float32Array(w * h);
+      const n = 2 * r + 1;
+      for (let y = 0; y < h; y++) {
+        let s = 0;
+        for (let x = -r; x <= r; x++) s += src[Math.min(w - 1, Math.max(0, x)) + y * w]!;
+        for (let x = 0; x < w; x++) {
+          tmp[x + y * w] = s / n;
+          s += src[Math.min(w - 1, x + r + 1) + y * w]! - src[Math.max(0, x - r) + y * w]!;
+        }
+      }
+      for (let x = 0; x < w; x++) {
+        let s = 0;
+        for (let y = -r; y <= r; y++) s += tmp[x + Math.min(h - 1, Math.max(0, y)) * w]!;
+        for (let y = 0; y < h; y++) {
+          src[x + y * w] = s / n;
+          s += tmp[x + Math.min(h - 1, y + r + 1) * w]! - tmp[x + Math.max(0, y - r) * w]!;
+        }
+      }
+    };
+    for (let k = 0; k < 3; k++) blur(a, Math.round(RES * 0.9));
+    const px = new Uint8Array(w * h * 4);
+    for (let j = 0; j < h; j++)
+      for (let i = 0; i < w; i++) {
+        // texture row 0 is the far (+z) edge after the plane is laid flat
+        const v = a[i + (h - 1 - j) * w]!;
+        px[(i + j * w) * 4 + 3] = Math.round(Math.min(1, v) * 0.42 * 255);
+      }
+    const tex = new THREE.DataTexture(px, w, h, THREE.RGBAFormat);
+    tex.magFilter = THREE.LinearFilter;
+    tex.minFilter = THREE.LinearFilter;
+    tex.needsUpdate = true;
+    const mesh = new THREE.Mesh(
+      new THREE.PlaneGeometry(sx + PAD * 2, sz + PAD * 2).rotateX(-Math.PI / 2),
+      new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false, color: 0x0b1220 }),
+    );
+    mesh.position.set(0, 0.004, 0);
+    mesh.renderOrder = -1;
+    mesh.visible = this.mode === "classic";
+    this.contact = mesh;
+    this.scene.add(mesh);
   }
 
   getModel(): VoxelModel | null {
@@ -428,6 +510,7 @@ export class VoxelViewer {
     this.sun.visible = shaders;
     this.hemi.visible = shaders;
     this.ground.visible = shaders && this.showGround;
+    if (this.contact) this.contact.visible = !shaders;
     if (this.grid) this.grid.visible = !shaders && this.showGround;
     if (shaders) {
       this.sky.apply(p, this.timeOfDay);
@@ -455,7 +538,10 @@ export class VoxelViewer {
       this.sun.shadow.map?.dispose();
       this.sun.shadow.map = null;
     } else {
-      this.scene.background = new THREE.Color(this.theme === "dark" ? 0x1a1e26 : 0xdfe7ef);
+      this.scene.background = this.transparent
+        ? null
+        : new THREE.Color(this.theme === "dark" ? 0x161c26 : 0xe4eaf2);
+      if (this.grid && this.transparent) this.grid.visible = false;
       this.scene.fog = null;
       this.renderer.toneMapping = THREE.NoToneMapping;
       this.renderer.toneMappingExposure = 1;
@@ -500,8 +586,9 @@ export class VoxelViewer {
     const dark = this.theme === "dark";
     this.grid = new THREE.GridHelper(gsize, gsize, dark ? 0x3a4250 : 0xb5c2cf, dark ? 0x2a303a : 0xcbd5df);
     this.grid.position.set(sx % 2 ? 0.5 : 0, -0.01, sz % 2 ? 0.5 : 0);
-    this.grid.visible = this.mode === "classic" && this.showGround;
+    this.grid.visible = this.mode === "classic" && this.showGround && !this.transparent;
     this.scene.add(this.grid);
+    if (this.contact) this.contact.visible = this.mode === "classic";
     this.camera.far = r * 30;
     this.camera.updateProjectionMatrix();
   }
@@ -852,6 +939,11 @@ export class VoxelViewer {
     for (const k of ["opaque", "cutout", "translucent", "depth"] as const) this.materials[k].dispose();
     this.sky.dispose();
     this.ground.geometry.dispose();
+    if (this.contact) {
+      this.contact.geometry.dispose();
+      (this.contact.material as THREE.MeshBasicMaterial).map?.dispose();
+      (this.contact.material as THREE.Material).dispose();
+    }
     (this.ground.material as THREE.Material).dispose();
     this.composer?.dispose();
     this.renderer.dispose();
