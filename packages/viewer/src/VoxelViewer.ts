@@ -101,6 +101,8 @@ export class VoxelViewer {
     onDone?: () => void;
   } | null = null;
   private stepValue: number | null = null;
+  /** Start time of the current step's "drop in" animation. */
+  private dropStart: number | null = null;
   /** Camera distance that frames the whole model (set by resetCamera). */
   private fitDistance = 30;
   private flight: {
@@ -388,6 +390,17 @@ export class VoxelViewer {
 
   /** Shows the build up to `step` (highlighting it). `null` shows everything. */
   setStep(step: number | null): void {
+    const prev = this.stepValue;
+    // moving one step forward: the new blocks drop into place (skipped for "reduce motion")
+    const reduce =
+      typeof matchMedia !== "undefined" && matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (prev !== null && step === prev + 1 && !reduce) {
+      this.dropStart = performance.now();
+      this.uniforms.uDrop.value = 0;
+    } else {
+      this.dropStart = null;
+      this.uniforms.uDrop.value = 1;
+    }
     this.stepValue = step;
     this.uniforms.uStep.value = step === null ? 1e9 : step;
     this.updateComposerPasses();
@@ -907,6 +920,12 @@ export class VoxelViewer {
     this.raf = requestAnimationFrame(this.loop);
     this.stepFlight();
     const moved = this.flight ? false : this.controls.update();
+    if (this.dropStart !== null) {
+      const t = Math.min(1, (performance.now() - this.dropStart) / 420);
+      this.uniforms.uDrop.value = t;
+      if (t >= 1) this.dropStart = null;
+      this.dirty = true;
+    }
     if (this.animation) {
       const a = this.animation;
       const t = Math.min(1, (performance.now() - a.start) / a.duration);

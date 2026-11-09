@@ -18,7 +18,14 @@ import { Link } from "../router";
 import { useLibrary } from "../store/library";
 import { useSettings } from "../store/settings";
 import { useUi } from "../store/ui";
-import { MaterialsTable, Segmented, StageDot, StageProgress, Switch } from "../components/Common";
+import {
+  BuildNotFound,
+  MaterialsTable,
+  Segmented,
+  StageDot,
+  StageProgress,
+  Switch,
+} from "../components/Common";
 import { Icon } from "../components/Icon";
 import { PlanCanvas } from "../components/PlanCanvas";
 import { Viewer3D } from "../components/Viewer3D";
@@ -330,12 +337,7 @@ export function GuidePage({ id }: { id: string }) {
     }
   };
 
-  if (!item)
-    return (
-      <p className="muted" style={{ padding: 16 }}>
-        {t("build.notFound")}
-      </p>
-    );
+  if (!item) return <BuildNotFound />;
   if (error)
     return (
       <div className="banner error" style={{ margin: 16 }}>

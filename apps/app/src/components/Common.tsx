@@ -7,7 +7,8 @@ import { safeFileName, saveFile } from "../platform/platform";
 import { useSettings, type Units } from "../store/settings";
 import { useUi } from "../store/ui";
 import { Icon } from "./Icon";
-import { BlockIcon } from "./Visual";
+import { BlockIcon, EmptyState } from "./Visual";
+import { Link } from "../router";
 
 export function Modal({
   title,
@@ -361,5 +362,17 @@ export function StageProgress({
         );
       })}
     </div>
+  );
+}
+
+/** "Build not found" page body with a way back to the catalog. */
+export function BuildNotFound() {
+  const t = useT();
+  return (
+    <EmptyState kind="notFound" title={t("build.notFound")} hint={t("build.notFound.hint")}>
+      <Link className="btn primary" to={{ name: "catalog" }}>
+        {t("nav.catalog")}
+      </Link>
+    </EmptyState>
   );
 }

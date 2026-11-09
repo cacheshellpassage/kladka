@@ -1147,3 +1147,76 @@ h3,
   display: inline-flex;
   align-items: center;
 }
+
+/* empty-state illustrations */
+.empty-title {
+  color: var(--text);
+  font-size: var(--fs-md);
+}
+.empty .empty-art {
+  opacity: 1;
+  overflow: visible;
+}
+.empty-art .iso polygon {
+  stroke: color-mix(in srgb, var(--accent) 55%, var(--text));
+  stroke-width: 1.2;
+  stroke-linejoin: round;
+}
+.empty-art .tone-0 .t {
+  fill: color-mix(in srgb, var(--accent-soft) 40%, var(--surface));
+}
+.empty-art .tone-0 .l {
+  fill: var(--accent-soft);
+}
+.empty-art .tone-0 .r {
+  fill: color-mix(in srgb, var(--accent) 30%, var(--accent-soft));
+}
+.empty-art .tone-1 .t {
+  fill: var(--surface);
+}
+.empty-art .tone-1 .l {
+  fill: color-mix(in srgb, var(--surface-2) 70%, var(--border));
+}
+.empty-art .tone-1 .r {
+  fill: var(--border);
+}
+.empty-art .tone-2 .t {
+  fill: color-mix(in srgb, var(--accent) 45%, var(--surface));
+}
+.empty-art .tone-2 .l {
+  fill: color-mix(in srgb, var(--accent) 65%, var(--surface));
+}
+.empty-art .tone-2 .r {
+  fill: var(--accent);
+}
+.empty-art .ghost {
+  opacity: 0.35;
+}
+.empty-art .ghost polygon {
+  stroke-dasharray: 3 3;
+}
+.empty-art .shadow {
+  fill: var(--text);
+  opacity: 0.07;
+}
+.empty-art .accent-stroke,
+.empty-art .warn-stroke {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.empty-art .warn-stroke {
+  stroke: var(--danger);
+}
+.empty-art .accent-fill {
+  fill: #f5c542;
+  stroke: color-mix(in srgb, #f5c542 60%, var(--text));
+  stroke-width: 1.2;
+  stroke-linejoin: round;
+}
+.empty-art .accent-text {
+  fill: var(--accent);
+  font: 800 26px var(--font);
+}

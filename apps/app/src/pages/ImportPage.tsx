@@ -5,6 +5,7 @@ import { Link, navigate } from "../router";
 import { useLibrary } from "../store/library";
 import { useSettings } from "../store/settings";
 import { Icon } from "../components/Icon";
+import { EmptyState } from "../components/Visual";
 import { FilePicker } from "../components/FilePicker";
 
 export function ImportPage() {
@@ -77,13 +78,13 @@ export function ImportPage() {
         </div>
       ) : null}
       {state.kind === "error" ? (
-        <div className="banner error" role="alert">
-          {state.msg}
-        </div>
+        <EmptyState kind="error" title={t("import.errorTitle")} hint={state.msg} />
       ) : null}
 
       <h2>{t("import.recent")}</h2>
-      {imports.length === 0 ? <p className="muted">{t("import.none")}</p> : null}
+      {imports.length === 0 ? (
+        <EmptyState kind="import" title={t("import.none")} hint={t("import.none.hint")} />
+      ) : null}
       <div className="grid">
         {imports.map((b) => (
           <Link key={b.id} className="bcard card" to={{ name: "build", id: b.id }}>

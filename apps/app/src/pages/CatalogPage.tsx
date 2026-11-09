@@ -7,7 +7,7 @@ import { useLibrary } from "../store/library";
 import { useSettings } from "../store/settings";
 import { Disclaimer, DifficultyDots } from "../components/Common";
 import { Icon } from "../components/Icon";
-import { CoverImg, Cubes, Ring, SkeletonCard } from "../components/Visual";
+import { CoverImg, Cubes, EmptyState, Ring, SkeletonCard } from "../components/Visual";
 
 type SizeFilter = "all" | "small" | "medium" | "large";
 type Sort = "name" | "blocks" | "difficulty";
@@ -208,12 +208,19 @@ export function CatalogPage() {
       ) : null}
       {status === "error" ? <div className="banner error">{error}</div> : null}
       {status === "ready" && list.length === 0 ? (
-        <div className="stack" style={{ alignItems: "flex-start" }}>
-          <p className="muted">{t("catalog.empty")}</p>
-          <button className="btn" type="button" onClick={reset}>
-            {t("catalog.reset")}
-          </button>
-        </div>
+        favOnly && favorites.size === 0 ? (
+          <EmptyState kind="favorites" title={t("catalog.favEmpty.title")} hint={t("catalog.favEmpty.hint")}>
+            <button className="btn" type="button" onClick={() => setFavOnly(false)}>
+              {t("catalog.reset")}
+            </button>
+          </EmptyState>
+        ) : (
+          <EmptyState kind="search" title={t("catalog.empty.title")} hint={t("catalog.empty.hint")}>
+            <button className="btn" type="button" onClick={reset}>
+              {t("catalog.reset")}
+            </button>
+          </EmptyState>
+        )
       ) : null}
 
       <div className="grid" data-testid="catalog-grid">

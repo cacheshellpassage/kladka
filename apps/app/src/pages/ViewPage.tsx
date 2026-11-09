@@ -8,7 +8,7 @@ import { safeFileName, saveBlob, saveDataUrl, saveFile } from "../platform/platf
 import { Link } from "../router";
 import { useSettings, type ModePref, type QualityPref } from "../store/settings";
 import { useUi } from "../store/ui";
-import { MaterialsTable, Segmented, Switch } from "../components/Common";
+import { BuildNotFound, MaterialsTable, Segmented, Switch } from "../components/Common";
 import { Icon } from "../components/Icon";
 import { Viewer3D } from "../components/Viewer3D";
 
@@ -65,12 +65,7 @@ export function ViewPage({ id }: { id: string }) {
     return () => clearTimeout(h);
   }, [wanted]);
 
-  if (!item)
-    return (
-      <p className="muted" style={{ padding: 16 }}>
-        {t("build.notFound")}
-      </p>
-    );
+  if (!item) return <BuildNotFound />;
   if (error)
     return (
       <div className="banner error" style={{ margin: 16 }}>

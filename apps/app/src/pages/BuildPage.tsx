@@ -6,7 +6,14 @@ import { forgetBuild, useBuild } from "../lib/useBuild";
 import { Link, navigate } from "../router";
 import { useLibrary } from "../store/library";
 import { useSettings, type ModePref } from "../store/settings";
-import { DifficultyDots, MaterialsTable, Segmented, Disclaimer, StageDot } from "../components/Common";
+import {
+  BuildNotFound,
+  DifficultyDots,
+  MaterialsTable,
+  Segmented,
+  Disclaimer,
+  StageDot,
+} from "../components/Common";
 import { ExportDialog } from "../components/ExportDialog";
 import { Icon } from "../components/Icon";
 
@@ -24,7 +31,7 @@ export function BuildPage({ id }: { id: string }) {
   const [angle, setAngle] = useState(0);
   const [exporting, setExporting] = useState(false);
 
-  if (!item) return <p className="muted">{status === "ready" ? t("build.notFound") : t("common.loading")}</p>;
+  if (!item) return status === "ready" ? <BuildNotFound /> : <p className="muted">{t("common.loading")}</p>;
   const fav = favorites.has(id);
   const cover = previewUrl(item, coverStyle, "cover", angle);
   const angles = item.source === "core" ? [0, 1, 2, 3] : [];

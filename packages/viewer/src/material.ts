@@ -17,6 +17,8 @@ export interface ViewerUniforms {
   uHighlight: { value: THREE.Color };
   uGlow: { value: number };
   uRoleView: { value: number };
+  /** 0..1 progress of the "drop in" animation of the current step (1 = landed). */
+  uDrop: { value: number };
 }
 
 export function createUniforms(): ViewerUniforms {
@@ -32,6 +34,7 @@ export function createUniforms(): ViewerUniforms {
     uHighlight: { value: new THREE.Color(0x2f7bff) },
     uGlow: { value: 1 },
     uRoleView: { value: 0 },
+    uDrop: { value: 1 },
   };
 }
 
@@ -60,6 +63,8 @@ function glslColor(hex: string): string {
 const VERT_HEAD = /* glsl */ `
 attribute vec3 aTex;
 attribute vec4 aData;
+uniform float uStep;
+uniform float uDrop;
 varying vec3 vTex;
 varying vec4 vData;
 varying vec3 vWPos;
@@ -71,6 +76,11 @@ vTex = aTex;
 vData = aData;
 vWPos = (modelMatrix * vec4(transformed, 1.0)).xyz;
 vNrmW = normal;
+// blocks of the current step drop into place (clipping above uses the final position)
+if (uDrop < 1.0 && abs(aData.x - uStep) < 0.5) {
+  float kFall = 1.0 - uDrop;
+  transformed.y += kFall * kFall * 1.6;
+}
 `;
 
 const FRAG_HEAD = /* glsl */ `
