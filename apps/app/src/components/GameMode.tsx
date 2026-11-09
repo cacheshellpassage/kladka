@@ -5,6 +5,7 @@
  */
 import { useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
 import { countItems, toLines, type VoxelModel } from "@kladka/voxel-core";
+import type { ClipBox, VoxelViewer } from "@kladka/viewer";
 import { useT, type MessageKey } from "../i18n";
 import { blocksWord, formatCount, nameOf } from "../lib/format";
 import { useSettings } from "../store/settings";
@@ -60,6 +61,11 @@ export interface GameModeProps {
   onNext: () => void;
   onDone: () => void;
   onExit: () => void;
+  /** Cutaway box for indoor steps (same as in the regular guide). */
+  clip?: ClipBox | null;
+  tip?: string | null;
+  onViewerReady?: (v: VoxelViewer) => void;
+  onViewerDispose?: () => void;
 }
 
 export function GameMode(p: GameModeProps) {
@@ -139,6 +145,10 @@ export function GameMode(p: GameModeProps) {
             roles={p.plan.roles}
             step={p.step}
             controls={false}
+            clip={p.clip}
+            tip={p.tip}
+            onReady={p.onViewerReady}
+            onDispose={p.onViewerDispose}
             label={p.title}
           />
         ) : cur ? (

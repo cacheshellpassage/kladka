@@ -42,6 +42,15 @@ export function GuidePage({ id }: { id: string }) {
   const [selected, setSelected] = useState<number | null>(null);
   const [busy, setBusy] = useState(false);
   const viewer = useRef<VoxelViewer | null>(null);
+  // bumped when a 3D view appears, so the automatic camera also aims a viewer opened later
+  const [viewerGen, setViewerGen] = useState(0);
+  const onViewerReady = useCallback((v: VoxelViewer) => {
+    viewer.current = v;
+    setViewerGen((g) => g + 1);
+  }, []);
+  const onViewerDispose = useCallback(() => {
+    viewer.current = null;
+  }, []);
   const [dir, setDir] = useState<"next" | "prev">("next");
   const [party, setParty] = useState<null | { kind: "stage" | "build"; stage: string; next?: string }>(null);
   const swipe = useRef<{ x: number; y: number } | null>(null);
@@ -150,7 +159,7 @@ export function GuidePage({ id }: { id: string }) {
       interior: lookDown ? true : undefined,
       closeness: stepBox.inside ? 0.7 : 1,
     });
-  }, [cur, stepBox, settings.autoCamera]);
+  }, [cur, stepBox, settings.autoCamera, viewerGen]);
 
   // keyboard
   useEffect(() => {
@@ -369,6 +378,10 @@ export function GuidePage({ id }: { id: string }) {
           onNext={() => go(step + 1)}
           onDone={markDone}
           onExit={() => settings.set({ gameMode: false })}
+          clip={cutaway}
+          tip={cutaway ? t("guide.cutaway", { y: cutaway.max[1] - 1 }) : null}
+          onViewerReady={onViewerReady}
+          onViewerDispose={onViewerDispose}
         />
       </>
     );
@@ -404,7 +417,8 @@ export function GuidePage({ id }: { id: string }) {
             selectedPalette={selected}
             clip={cutaway}
             tip={cutaway ? t("guide.cutaway", { y: cutaway.max[1] - 1 }) : null}
-            onReady={(v) => (viewer.current = v)}
+            onReady={onViewerReady}
+            onDispose={onViewerDispose}
             label={item.meta.title[locale]}
           />
         ) : null}

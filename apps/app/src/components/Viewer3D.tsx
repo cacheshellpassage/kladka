@@ -21,6 +21,8 @@ export interface Viewer3DProps {
   timeOfDay?: TimeOfDay;
   quality?: Quality;
   onReady?: (v: VoxelViewer) => void;
+  /** Called when the viewer is destroyed (e.g. the 3D view was switched off). */
+  onDispose?: () => void;
   onPick?: (p: { x: number; y: number; z: number; palette: number } | null) => void;
   tip?: string | null;
   controls?: boolean;
@@ -72,6 +74,7 @@ export function Viewer3D(p: Viewer3DProps) {
     return () => {
       v.dispose();
       viewerRef.current = null;
+      p.onDispose?.();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
