@@ -1320,3 +1320,114 @@ h3,
     var(--accent) 70%
   );
 }
+
+/* ---------- client.jar help ---------- */
+.jar-help {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.jar-help[open] {
+  gap: 10px;
+}
+.jar-help > summary {
+  cursor: pointer;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 32px;
+  list-style: none;
+}
+.jar-help > summary::-webkit-details-marker {
+  display: none;
+}
+.jar-help > * + * {
+  margin-top: 10px;
+}
+.jar-steps {
+  margin: 0;
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.jar-paths {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.jar-path {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    "label copy"
+    "path copy";
+  align-items: center;
+  gap: 2px 8px;
+  padding: 8px 4px 8px 10px;
+  border-radius: 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+.jar-path > span {
+  grid-area: label;
+  font-weight: 600;
+}
+.jar-path > code {
+  grid-area: path;
+  font-size: var(--fs-xs);
+  color: var(--muted);
+  overflow-wrap: anywhere;
+  user-select: all;
+}
+.jar-path > button {
+  grid-area: copy;
+}
+.jar-help .segmented {
+  max-width: 100%;
+  overflow-x: auto;
+  align-self: flex-start;
+}
+
+/* ---------- schematic sites ---------- */
+.sites-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
+  gap: 10px;
+}
+.site {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 14px;
+  height: 100%;
+  text-decoration: none;
+  color: var(--text);
+  transition:
+    border-color var(--dur) var(--ease-out),
+    transform var(--dur) var(--ease-out);
+}
+.site:hover {
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+  transform: translateY(-2px);
+}
+.site-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--accent-strong);
+}
+.site-head strong {
+  color: var(--text);
+}
+.site-formats {
+  margin-top: auto;
+}

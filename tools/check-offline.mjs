@@ -21,6 +21,8 @@ const ALLOW = [
   /^https?:\/\/(creativecommons\.org|opensource\.org|spdx\.org)\//,
   /^https?:\/\/(localhost|127\.0\.0\.1|ipc\.localhost|asset\.localhost|tauri\.localhost)/, // native shells
   /^https:\/\/threejs\.org\//, // three.js warnings
+  // "Where to get builds": opened in the system browser on tap, never fetched by the app
+  /^https:\/\/(www\.)?(planetminecraft\.com|abfielder\.com|minecraftmaps\.com|minecraft-schematics\.com)\//,
   /^https?:\/\/fb\.me\//,
 ];
 

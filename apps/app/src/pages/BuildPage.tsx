@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useT, type MessageKey } from "../i18n";
 import { previewUrl } from "../lib/content";
 import { formatMinutes } from "../lib/format";
+import { ensureImportCovers } from "../lib/importer";
 import { forgetBuild, useBuild } from "../lib/useBuild";
 import { Link, navigate } from "../router";
 import { useLibrary } from "../store/library";
@@ -30,6 +31,16 @@ export function BuildPage({ id }: { id: string }) {
   const removeImport = useLibrary((s) => s.removeImport);
   const [angle, setAngle] = useState(0);
   const [exporting, setExporting] = useState(false);
+  const reloadImports = useLibrary((s) => s.reloadImports);
+  const needsCovers = item?.source === "import" && !item.covers;
+
+  // builds imported by older versions: render the classic + shaders covers once, on this device
+  useEffect(() => {
+    if (!needsCovers) return;
+    void ensureImportCovers(id).then((updated) => {
+      if (updated) void reloadImports();
+    });
+  }, [id, needsCovers, reloadImports]);
 
   if (!item) return status === "ready" ? <BuildNotFound /> : <p className="muted">{t("common.loading")}</p>;
   const fav = favorites.has(id);

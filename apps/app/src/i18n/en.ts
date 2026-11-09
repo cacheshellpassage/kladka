@@ -183,6 +183,17 @@ export const en: Record<MessageKey, string> = {
   "import.choose": "Choose file",
   "import.drop": "or drop a file here",
   "import.pack": "Content pack (.zip)",
+  "sites.title": "Where to get builds",
+  "sites.lead":
+    "Community sites share ready-made schematics. Download a file and pick it above, or open it with the app.",
+  "sites.planetminecraft":
+    "The largest community: projects tagged “schematic”, many with a downloadable file.",
+  "sites.abfielder": "Houses, farms and villages as Litematica files, some of them free.",
+  "sites.minecraftmaps": "A schematic catalogue with a 3D preview and material list on the site.",
+  "sites.minecraftschematics":
+    "A large, older catalogue. .schematic files (before 1.13) are not supported: pick .schem.",
+  "sites.note":
+    "Links open in your browser; the app never downloads anything by itself. Respect the author's licence: builds are usually for personal use only.",
   "import.packLead": "You can also add a content pack: a .zip with pack.json and build files.",
   "import.working": "Processing file…",
   "import.success": "Done! The build was added to the catalog.",
@@ -251,6 +262,35 @@ export const en: Record<MessageKey, string> = {
   "settings.resourcePack.none": "Built-in procedural textures are used.",
   "settings.resourcePack.remove": "Remove",
   "settings.resourcePack.error": "No block textures found in the archive (assets/minecraft/textures/block).",
+  "jar.title": "How to use the textures of your game (client.jar)",
+  "jar.intro":
+    "The textures are inside the game version file (.jar) on your computer. The app reads it on this device only and never sends it anywhere.",
+  "jar.os.windows": "Windows",
+  "jar.os.mac": "macOS",
+  "jar.os.linux": "Linux",
+  "jar.os.phone": "Phone",
+  "jar.step.desktop":
+    "Easiest: press “Open game folder” above, the dialog opens right in the versions folder. Or step by step:",
+  "jar.step.copy": "Copy the folder of your launcher from the list below (button next to the path).",
+  "jar.step.choose": "Press “Choose .zip / .jar”.",
+  "jar.step.paste.windows":
+    "In the dialog click the “File name” field, paste the path (Ctrl+V) and press Enter: the dialog jumps to that folder.",
+  "jar.step.paste.mac": "In the dialog press ⌘ ⇧ G, paste the path and press Return.",
+  "jar.step.paste.linux": "In the dialog press Ctrl+L, paste the path and press Enter.",
+  "jar.step.pick":
+    "Open the folder of the version you play (for example 1.21.11) and pick the .jar file with the same name.",
+  "jar.paths": "Where the game versions are:",
+  "jar.copy": "Copy path",
+  "jar.copied": "Path copied",
+  "jar.openFolder": "Open game folder…",
+  "jar.phone":
+    "Java Edition does not run on phones, so there is no client.jar there. Send the file to yourself from your computer (e.g. Telegram “Saved Messages”), save it and pick it here. Any .zip resource pack works too.",
+  "jar.launcher.official": "Official launcher",
+  "jar.launcher.tlauncherLegacy": "TLauncher (Legacy)",
+  "jar.launcher.prism": "Prism Launcher",
+  "jar.launcher.curseforge": "CurseForge",
+  "jar.prismNote":
+    "In Prism Launcher open the version folder and pick minecraft-<version>-client.jar. Regular TLauncher keeps versions where the official launcher does.",
   "settings.data": "Data",
   "settings.clear": "Clear all data",
   "settings.clear.confirm": "Delete progress, favorites, imports and settings? This cannot be undone.",

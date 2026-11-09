@@ -2,7 +2,7 @@
 import { unzipSync, strFromU8 } from "fflate";
 import { decodeKBuild, type ContentPackManifest } from "@kladka/voxel-core";
 import { VoxelViewer } from "@kladka/viewer";
-import { put, type ImportRecord } from "../db/db";
+import { getOne, put, type ImportRecord } from "../db/db";
 import { importInWorker } from "./worker-client";
 
 export const MAX_IMPORT_BYTES = 64 * 1024 * 1024;
@@ -12,29 +12,71 @@ function newId(prefix: string): string {
   return `${prefix}-${Date.now().toString(36)}-${rnd}`;
 }
 
-/** Renders a small cover image for an imported build (local, offscreen). */
-export async function renderThumb(kbuild: Uint8Array): Promise<string | undefined> {
+const COVER_W = 800,
+  COVER_H = 500;
+
+/**
+ * Renders a cover image for an imported build on the device (offscreen, nothing leaves the device):
+ * - "classic": the normal view on a transparent background with a soft contact shadow, so it suits both
+ *   themes (same look as the built-in covers);
+ * - "shaders": the "Shaders" mode at golden hour with sky, sun shadows and bloom.
+ */
+export async function renderCover(
+  kbuild: Uint8Array,
+  style: "classic" | "shaders",
+): Promise<string | undefined> {
   const host = document.createElement("div");
-  host.style.cssText = "position:fixed;left:-10000px;top:0;width:384px;height:240px;pointer-events:none;";
+  host.style.cssText = `position:fixed;left:-10000px;top:0;width:${COVER_W}px;height:${COVER_H}px;pointer-events:none;`;
   document.body.appendChild(host);
   let v: VoxelViewer | null = null;
   try {
     v = new VoxelViewer(host, {
-      mode: "classic",
+      mode: style === "shaders" ? "shaders" : "classic",
       quality: "medium",
+      timeOfDay: "sunset",
       preserveDrawingBuffer: true,
       ground: true,
-      transparent: true,
+      transparent: style === "classic",
+      maxPixelRatio: 1,
     });
     const { model } = decodeKBuild(kbuild);
     await v.setModel(model, null);
     v.resetCamera(0);
-    return v.capture(384, 240, "image/webp", 0.8);
+    v.renderNow();
+    await new Promise((r) => requestAnimationFrame(() => r(null)));
+    return v.capture(COVER_W, COVER_H, "image/webp", 0.82);
   } catch {
     return undefined;
   } finally {
     v?.dispose();
     host.remove();
+  }
+}
+
+async function renderCovers(kbuild: Uint8Array): Promise<{ classic?: string; shaders?: string }> {
+  const classic = await renderCover(kbuild, "classic");
+  const shaders = await renderCover(kbuild, "shaders");
+  return { classic, shaders };
+}
+
+const coverJobs = new Set<string>();
+
+/**
+ * Builds imported before covers existed get their covers rendered the
+ * first time their page is opened. Returns true when the record was updated.
+ */
+export async function ensureImportCovers(id: string): Promise<boolean> {
+  if (coverJobs.has(id)) return false;
+  coverJobs.add(id);
+  try {
+    const rec = await getOne("imports", id);
+    if (!rec || rec.covers) return false; // already rendered (or tried) once
+    const covers = await renderCovers(rec.bytes);
+    if (!covers.classic && !covers.shaders) return false;
+    await put("imports", { ...rec, covers, thumb: covers.classic ?? rec.thumb });
+    return true;
+  } finally {
+    coverJobs.delete(id);
   }
 }
 
@@ -47,13 +89,14 @@ export async function importFile(file: File): Promise<ImportRecord[]> {
 
 async function importOne(bytes: Uint8Array, filename: string, id: string): Promise<ImportRecord> {
   const res = await importInWorker(bytes, filename, id);
-  const thumb = await renderThumb(res.bytes);
+  const covers = await renderCovers(res.bytes);
   const rec: ImportRecord = {
     id,
     meta: res.meta,
     stats: res.stats,
     bytes: res.bytes,
-    thumb,
+    thumb: covers.classic,
+    covers,
     sourceFile: filename,
     sourceFormat: res.format,
     warnings: res.warnings,

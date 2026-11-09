@@ -9,6 +9,8 @@ export interface ImportRecord {
   /** .kbuild bytes (our compact format) */
   bytes: Uint8Array;
   thumb?: string;
+  /** Cover images rendered on the device at import (800×500 WebP data URLs). */
+  covers?: { classic?: string; shaders?: string };
   sourceFile: string;
   sourceFormat: string;
   warnings: string[];

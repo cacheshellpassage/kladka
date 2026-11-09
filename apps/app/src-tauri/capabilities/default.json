@@ -1,19 +1,28 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
-  "description": "Main window: save exported files chosen by the user. No network, no shell.",
+  "description": "Main window: save exports, open a file the user picks (client.jar / resource pack), open web links in the default browser. No network access from the app itself, no shell.",
   "windows": ["main"],
   "permissions": [
     "core:default",
     "dialog:allow-save",
+    "dialog:allow-open",
     "fs:allow-write-file",
+    "fs:allow-read-file",
+    "opener:default",
     {
       "identifier": "fs:scope",
       "allow": [
         { "path": "$HOME/**" },
         { "path": "$DOCUMENT/**" },
         { "path": "$DOWNLOAD/**" },
-        { "path": "$DESKTOP/**" }
+        { "path": "$DESKTOP/**" },
+        { "path": "$DATA/.minecraft/**" },
+        { "path": "$DATA/minecraft/**" },
+        { "path": "$DATA/.tlauncher/**" },
+        { "path": "$DATA/PrismLauncher/**" },
+        { "path": "$HOME/.minecraft/**" },
+        { "path": "$HOME/curseforge/**" }
       ]
     }
   ]

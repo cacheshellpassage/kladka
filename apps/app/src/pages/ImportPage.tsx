@@ -6,6 +6,7 @@ import { useLibrary } from "../store/library";
 import { useSettings } from "../store/settings";
 import { Icon } from "../components/Icon";
 import { EmptyState } from "../components/Visual";
+import { SchematicSites } from "../components/SchematicSites";
 import { FilePicker } from "../components/FilePicker";
 
 export function ImportPage() {
@@ -80,6 +81,8 @@ export function ImportPage() {
       {state.kind === "error" ? (
         <EmptyState kind="error" title={t("import.errorTitle")} hint={state.msg} />
       ) : null}
+
+      <SchematicSites />
 
       <h2>{t("import.recent")}</h2>
       {imports.length === 0 ? (

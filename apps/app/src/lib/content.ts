@@ -13,6 +13,8 @@ export interface LibraryItem {
   /** URL relative to the app root for core builds. */
   file?: string;
   thumb?: string;
+  /** Imported builds: covers rendered on the device (classic and shaders). */
+  covers?: { classic?: string; shaders?: string };
   warnings?: string[];
 }
 
@@ -33,7 +35,15 @@ export async function loadCorePack(): Promise<LibraryItem[]> {
 }
 
 export function importToItem(r: ImportRecord): LibraryItem {
-  return { id: r.id, source: "import", meta: r.meta, stats: r.stats, thumb: r.thumb, warnings: r.warnings };
+  return {
+    id: r.id,
+    source: "import",
+    meta: r.meta,
+    stats: r.stats,
+    thumb: r.thumb,
+    covers: r.covers,
+    warnings: r.warnings,
+  };
 }
 
 export async function loadImports(): Promise<LibraryItem[]> {
@@ -59,7 +69,10 @@ export function previewUrl(
   kind: "thumb" | "cover",
   angle = 0,
 ): string | undefined {
-  if (item.source === "import") return item.thumb;
+  if (item.source === "import") {
+    const c = item.covers;
+    return (style === "shaders" ? (c?.shaders ?? c?.classic) : c?.classic) ?? item.thumb;
+  }
   const p = item.previews;
   if (!p) return undefined;
   if (kind === "thumb") {

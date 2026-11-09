@@ -88,3 +88,67 @@ export function safeFileName(s: string): string {
       .slice(0, 60) || "build"
   );
 }
+
+/**
+ * Opens a web page in the system browser (schematic sites, docs). The app itself never loads remote
+ * content; the page opens outside the app.
+ */
+export async function openExternal(url: string): Promise<void> {
+  const kind = platform();
+  if (kind === "tauri") {
+    const { openUrl } = await import("@tauri-apps/plugin-opener");
+    await openUrl(url);
+    return;
+  }
+  if (kind === "android") {
+    // Capacitor hands navigation to a non-app URL over to the system browser
+    window.location.assign(url);
+    return;
+  }
+  window.open(url, "_blank", "noopener,noreferrer");
+}
+
+export type DesktopOs = "windows" | "mac" | "linux" | "phone";
+
+/** Best guess of the user's OS for showing the right game folder. */
+export function detectOs(): DesktopOs {
+  const ua = typeof navigator !== "undefined" ? navigator.userAgent : "";
+  if (/Android|iPhone|iPad|iPod/i.test(ua)) return "phone";
+  if (/Mac OS X|Macintosh/i.test(ua)) return "mac";
+  if (/Windows/i.test(ua)) return "windows";
+  return "linux";
+}
+
+/**
+ * Desktop app only: opens the native "Open" dialog directly in the game's `versions` folder and reads the
+ * chosen .jar/.zip. Returns undefined when cancelled. Not available in the browser (a web page cannot
+ * open a dialog in a given folder), where the user pastes the folder path into the dialog instead.
+ */
+export async function pickGameJar(): Promise<File | undefined> {
+  if (platform() !== "tauri") return undefined;
+  const { open } = await import("@tauri-apps/plugin-dialog");
+  const { readFile } = await import("@tauri-apps/plugin-fs");
+  const { dataDir, homeDir, join } = await import("@tauri-apps/api/path");
+  const os = detectOs();
+  let defaultPath: string | undefined;
+  try {
+    defaultPath =
+      os === "windows"
+        ? await join(await dataDir(), ".minecraft", "versions")
+        : os === "mac"
+          ? await join(await dataDir(), "minecraft", "versions")
+          : await join(await homeDir(), ".minecraft", "versions");
+  } catch {
+    defaultPath = undefined;
+  }
+  const path = await open({
+    defaultPath,
+    multiple: false,
+    directory: false,
+    filters: [{ name: "client.jar / resource pack", extensions: ["jar", "zip"] }],
+  });
+  if (!path || Array.isArray(path)) return undefined;
+  const bytes = await readFile(path);
+  const name = path.split(/[\\/]/).pop() ?? "client.jar";
+  return new File([bytes as BlobPart], name);
+}

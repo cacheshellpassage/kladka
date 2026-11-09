@@ -14,6 +14,7 @@ import {
 import { useUi } from "../store/ui";
 import { Segmented, Switch } from "../components/Common";
 import { FilePicker } from "../components/FilePicker";
+import { JarHelp } from "../components/JarHelp";
 
 export function SettingsPage() {
   const t = useT();
@@ -189,6 +190,7 @@ export function SettingsPage() {
             </button>
           ) : null}
         </div>
+        <JarHelp onFile={(f) => void loadPack(f)} busy={rpBusy} />
         <Switch
           label={t("settings.resourcePack.remember")}
           checked={s.rememberResourcePack}
