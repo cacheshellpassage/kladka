@@ -23,6 +23,7 @@ import { Icon } from "../components/Icon";
 import { PlanCanvas } from "../components/PlanCanvas";
 import { Viewer3D } from "../components/Viewer3D";
 import { Celebrate } from "../components/Celebrate";
+import { GameMode } from "../components/GameMode";
 import { haptic } from "../components/Visual";
 
 type Scope = "step" | "layer" | "stage" | "all";
@@ -82,13 +83,10 @@ export function GuidePage({ id }: { id: string }) {
   const markDone = useCallback(() => {
     setDone((d) => Math.max(d, step + 1));
     haptic([12, 40, 18]);
-    const st = build?.plan.stages.find((s) => step >= s.stepStart && step < s.stepEnd);
-    if (st && step + 1 === st.stepEnd) {
-      const idx = build!.plan.stages.indexOf(st);
-      const nextStage = build!.plan.stages[idx + 1];
-      setParty(
-        nextStage ? { kind: "stage", stage: st.id, next: nextStage.id } : { kind: "build", stage: st.id },
-      );
+    // celebrate only the completed build (no pop-ups between stages)
+    if (build && step + 1 === build.plan.steps.length) {
+      const last = build.plan.stages[build.plan.stages.length - 1];
+      setParty({ kind: "build", stage: last?.id ?? "decor" });
       haptic([30, 60, 30, 60, 60]);
     }
     go(step + 1);
@@ -348,6 +346,33 @@ export function GuidePage({ id }: { id: string }) {
   const nextStep = !finished && step + 1 < total ? build.plan.steps[step + 1] : undefined;
   const layerY = cur?.layer ?? 0;
 
+  if (settings.gameMode)
+    return (
+      <>
+        {party ? (
+          <Celebrate
+            big
+            emoji="🏆"
+            title={t("guide.buildDone")}
+            text={t("guide.buildDoneText", { n: build.plan.totalBlocks })}
+            onClose={() => setParty(null)}
+          />
+        ) : null}
+        <GameMode
+          title={item.meta.title[locale]}
+          model={build.model}
+          plan={build.plan}
+          step={step}
+          total={total}
+          finished={finished}
+          onPrev={() => go(step - 1)}
+          onNext={() => go(step + 1)}
+          onDone={markDone}
+          onExit={() => settings.set({ gameMode: false })}
+        />
+      </>
+    );
+
   return (
     <div className="guide" data-testid="guide">
       {party ? (
@@ -406,7 +431,15 @@ export function GuidePage({ id }: { id: string }) {
             <Link className="btn ghost icon" to={{ name: "build", id }} aria-label={t("nav.back")}>
               <Icon name="back" />
             </Link>
-            <strong style={{ fontSize: "var(--fs-md)" }}>{item.meta.title[locale]}</strong>
+            <strong style={{ fontSize: "var(--fs-md)", flex: 1 }}>{item.meta.title[locale]}</strong>
+            <button
+              className="btn"
+              type="button"
+              onClick={() => settings.set({ gameMode: true })}
+              data-testid="enter-game"
+            >
+              <Icon name="play" /> {t("game.enter")}
+            </button>
           </div>
           <div className="stack" style={{ gap: 6 }}>
             <div className="row">

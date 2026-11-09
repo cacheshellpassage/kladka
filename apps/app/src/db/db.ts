@@ -36,11 +36,19 @@ export interface ResourcePackRecord {
   textures: Record<string, Uint8Array>;
 }
 
+export interface ChecklistRecord {
+  id: string;
+  /** Items (ids) the player has already collected. */
+  checked: string[];
+  updatedAt: number;
+}
+
 interface Stores {
   imports: ImportRecord;
   progress: ProgressRecord;
   favorites: FavoriteRecord;
   resourcePack: ResourcePackRecord;
+  checklists: ChecklistRecord;
 }
 type StoreName = keyof Stores;
 
@@ -49,9 +57,10 @@ interface KladkaDB extends DBSchema {
   progress: { key: string; value: ProgressRecord };
   favorites: { key: string; value: FavoriteRecord };
   resourcePack: { key: string; value: ResourcePackRecord };
+  checklists: { key: string; value: ChecklistRecord };
 }
 
-const STORES: StoreName[] = ["imports", "progress", "favorites", "resourcePack"];
+const STORES: StoreName[] = ["imports", "progress", "favorites", "resourcePack", "checklists"];
 let dbp: Promise<IDBPDatabase<KladkaDB>> | null = null;
 let memoryFallback = false;
 const mem: { [K in StoreName]: Map<string, Stores[K]> } = {
@@ -59,13 +68,15 @@ const mem: { [K in StoreName]: Map<string, Stores[K]> } = {
   progress: new Map(),
   favorites: new Map(),
   resourcePack: new Map(),
+  checklists: new Map(),
 };
 
 function db(): Promise<IDBPDatabase<KladkaDB>> {
   if (!dbp) {
-    dbp = openDB<KladkaDB>("kladka", 1, {
+    dbp = openDB<KladkaDB>("kladka", 2, {
       upgrade(d) {
-        for (const s of STORES) d.createObjectStore(s, { keyPath: "id" });
+        for (const s of STORES)
+          if (!d.objectStoreNames.contains(s)) d.createObjectStore(s, { keyPath: "id" });
       },
     });
   }

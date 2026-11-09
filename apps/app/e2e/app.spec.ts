@@ -139,6 +139,33 @@ test("loads a user resource pack locally", async ({ page }) => {
   await expect(page.getByTestId("view-page")).toBeVisible();
 });
 
+test("in-game mode: big buttons advance the step and the mode is remembered", async ({ page }) => {
+  await page.goto("/#/b/well/guide");
+  await page.getByTestId("enter-game").click();
+  await expect(page.getByTestId("game-mode")).toBeVisible();
+  const num = page.locator(".gm-num");
+  await expect(num).toHaveText("1");
+  await page.getByTestId("game-done").click();
+  await expect(num).toHaveText("2");
+  await page.reload();
+  await expect(page.getByTestId("game-mode")).toBeVisible();
+  await page.getByRole("button", { name: /Выйти из режима/ }).click();
+  await expect(page.getByTestId("guide")).toBeVisible();
+});
+
+test("materials checklist is saved per build", async ({ page }) => {
+  await openBuild(page, "fountain");
+  const boxes = page.locator("input.check");
+  await expect(boxes.first()).toBeVisible();
+  await boxes.nth(0).check();
+  await boxes.nth(1).check();
+  await expect(page.getByText(/Собрано 2 из/)).toBeVisible();
+  await page.waitForTimeout(300);
+  await page.reload();
+  await expect(page.getByText(/Собрано 2 из/)).toBeVisible();
+  await expect(page.locator("input.check").nth(0)).toBeChecked();
+});
+
 test("free 3D view: section and layer controls", async ({ page }) => {
   await page.goto("/#/b/watchtower/view");
   await expect(page.getByTestId("view-page")).toBeVisible();

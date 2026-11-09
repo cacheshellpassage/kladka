@@ -1,7 +1,9 @@
-import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { blockInfo, itemName, type MaterialLine, type VoxelModel } from "@kladka/voxel-core";
 import { useT } from "../i18n";
 import { formatCount } from "../lib/format";
+import { getOne, put } from "../db/db";
+import { safeFileName, saveFile } from "../platform/platform";
 import { useSettings, type Units } from "../store/settings";
 import { useUi } from "../store/ui";
 import { Icon } from "./Icon";
@@ -120,12 +122,36 @@ export function MaterialsTable({
   model,
   selected,
   onSelect,
+  checklistId,
+  title,
 }: {
   lines: MaterialLine[];
   model: VoxelModel;
   selected?: number | null;
   onSelect?: (palette: number | null) => void;
+  /** When set, rows get checkboxes saved per build (gathering checklist). */
+  checklistId?: string;
+  /** Build title used for exported checklists. */
+  title?: string;
 }) {
+  const [checked, setChecked] = useState<Set<string>>(new Set());
+  useEffect(() => {
+    if (!checklistId) return;
+    let alive = true;
+    void getOne("checklists", checklistId).then((r) => alive && setChecked(new Set(r?.checked ?? [])));
+    return () => {
+      alive = false;
+    };
+  }, [checklistId]);
+  const toggle = (item: string) => {
+    if (!checklistId) return;
+    const next = new Set(checked);
+    if (next.has(item)) next.delete(item);
+    else next.add(item);
+    setChecked(next);
+    void put("checklists", { id: checklistId, checked: [...next], updatedAt: Date.now() });
+  };
+  const collected = lines.filter((l) => checked.has(l.item)).length;
   const t = useT();
   const locale = useSettings((s) => s.locale);
   const units = useSettings((s) => s.units);
@@ -141,8 +167,47 @@ export function MaterialsTable({
     if (!paletteOf.has(p.material)) paletteOf.set(p.material, i);
   });
   const total = lines.reduce((n, l) => n + l.count, 0);
+  const listText = () =>
+    (title ? title + "\n\n" : "") +
+    lines
+      .map(
+        (l) =>
+          (checklistId ? (checked.has(l.item) ? "☑ " : "☐ ") : "") +
+          itemName(l.item, locale) +
+          " — " +
+          l.count +
+          (units !== "pieces" && l.count >= l.stackSize && l.stackSize > 1
+            ? " (" + formatCount(t, l, units) + ")"
+            : ""),
+      )
+      .join("\n");
+  const share = async () => {
+    const text = listText();
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: title ?? t("build.materials"), text });
+        return;
+      }
+    } catch (e) {
+      if ((e as Error).name === "AbortError") return;
+    }
+    try {
+      await saveFile(
+        safeFileName(title ?? "materials") + "-checklist.txt",
+        new TextEncoder().encode(text),
+        "text/plain",
+      );
+    } catch {
+      await copy();
+    }
+  };
+  const reset = () => {
+    if (!checklistId) return;
+    setChecked(new Set());
+    void put("checklists", { id: checklistId, checked: [], updatedAt: Date.now() });
+  };
   const copy = async () => {
-    const text = lines.map((l) => `${itemName(l.item, locale)}: ${l.count}`).join("\n");
+    const text = listText();
     try {
       await navigator.clipboard.writeText(text);
       showToast(t("materials.copied"));
@@ -164,16 +229,46 @@ export function MaterialsTable({
           ]}
         />
         <span className="spacer" />
-        <button
-          className="btn icon ghost"
-          type="button"
-          onClick={copy}
-          title={t("materials.copy")}
-          aria-label={t("materials.copy")}
-        >
-          <Icon name="copy" />
-        </button>
+        <span className="row" style={{ gap: 4, flexWrap: "nowrap" }}>
+          <button
+            className="btn icon ghost"
+            type="button"
+            onClick={copy}
+            title={t("materials.copy")}
+            aria-label={t("materials.copy")}
+          >
+            <Icon name="copy" />
+          </button>
+          {checklistId ? (
+            <button
+              className="btn icon ghost"
+              type="button"
+              onClick={share}
+              title={t("materials.share")}
+              aria-label={t("materials.share")}
+            >
+              <Icon name="download" />
+            </button>
+          ) : null}
+        </span>
       </div>
+      {checklistId ? (
+        <div className="checklist-head">
+          <div className="row" style={{ justifyContent: "space-between" }}>
+            <span className="small">
+              <b>{t("materials.collected", { n: collected, total: lines.length })}</b>
+            </span>
+            {collected ? (
+              <button className="btn ghost" type="button" onClick={reset} style={{ minHeight: 32 }}>
+                {t("materials.reset")}
+              </button>
+            ) : null}
+          </div>
+          <div className="progressbar">
+            <div style={{ width: (lines.length ? Math.round((collected / lines.length) * 100) : 0) + "%" }} />
+          </div>
+        </div>
+      ) : null}
       <table className="mats">
         <tbody>
           {lines.map((l) => {
@@ -181,7 +276,21 @@ export function MaterialsTable({
             const color = pal ? blockInfo(model.palette[pal]!.name).color : 0x999999;
             const sel = pal !== undefined && pal === selected;
             return (
-              <tr key={l.item} className={sel ? "sel" : ""}>
+              <tr
+                key={l.item}
+                className={(sel ? "sel " : "") + (checklistId && checked.has(l.item) ? "got" : "")}
+              >
+                {checklistId ? (
+                  <td style={{ width: 34 }}>
+                    <input
+                      type="checkbox"
+                      className="check"
+                      checked={checked.has(l.item)}
+                      onChange={() => toggle(l.item)}
+                      aria-label={itemName(l.item, locale)}
+                    />
+                  </td>
+                ) : null}
                 <td style={{ width: 26 }}>
                   <span className="sw" style={{ background: `#${color.toString(16).padStart(6, "0")}` }} />
                 </td>

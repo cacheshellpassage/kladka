@@ -23,6 +23,7 @@ export interface Settings {
   autoCamera: boolean;
   autoCutaway: boolean;
   onboarded: boolean;
+  gameMode: boolean;
   guideView: "3d" | "2d" | "split";
   rememberResourcePack: boolean;
 }
@@ -67,6 +68,7 @@ export const DEFAULT_SETTINGS: Settings = {
   autoCamera: true,
   autoCutaway: true,
   onboarded: false,
+  gameMode: false,
   guideView: "split",
   rememberResourcePack: false,
 };

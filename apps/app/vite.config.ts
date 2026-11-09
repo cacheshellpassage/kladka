@@ -21,6 +21,13 @@ export default defineConfig({
         background_color: "#f4f1ec",
         display: "standalone",
         orientation: "any",
+        // installed desktop PWA: open .schem/.litematic/.nbt files with the app (File Handling API)
+        file_handlers: [
+          {
+            action: "./",
+            accept: { "application/octet-stream": [".schem", ".litematic", ".nbt", ".kbuild"] },
+          },
+        ],
         start_url: "./",
         scope: "./",
         icons: [

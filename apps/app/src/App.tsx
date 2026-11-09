@@ -1,5 +1,8 @@
 import { useEffect } from "react";
-import { useRoute } from "./router";
+import { navigate, useRoute } from "./router";
+import { listenForIncomingFiles } from "./lib/incoming";
+import { translate } from "./i18n";
+import { useUi } from "./store/ui";
 import { useLibrary } from "./store/library";
 import { effectiveTheme, useSettings } from "./store/settings";
 import { Shell } from "./components/Shell";
@@ -27,6 +30,27 @@ export function App() {
     void load();
     void restoreResourcePack();
   }, [load]);
+
+  // files opened with the app (Android "Open with"/"Share", desktop PWA file handlers)
+  useEffect(
+    () =>
+      listenForIncomingFiles({
+        onStart: () => useUi.getState().showToast(translate(useSettings.getState().locale, "import.working")),
+        onImported: (id, count) => {
+          void useLibrary.getState().reloadImports();
+          const loc = useSettings.getState().locale;
+          useUi
+            .getState()
+            .showToast(
+              count > 1 ? translate(loc, "import.packAdded", { n: count }) : translate(loc, "import.success"),
+            );
+          navigate({ name: "build", id });
+        },
+        onError: (msg) =>
+          useUi.getState().showToast(translate(useSettings.getState().locale, "import.error", { msg })),
+      }),
+    [],
+  );
 
   useEffect(() => {
     const apply = () => (document.documentElement.dataset.theme = effectiveTheme(theme));

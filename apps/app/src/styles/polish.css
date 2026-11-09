@@ -827,3 +827,172 @@
     display: none;
   }
 }
+
+/* ---------- in-game mode ---------- */
+.game-mode {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr) auto auto;
+  gap: 10px;
+  padding: calc(8px + var(--safe-top)) 14px calc(14px + var(--safe-bottom));
+  background: var(--bg);
+  animation: fade-in var(--dur) var(--ease-out);
+  touch-action: pan-y;
+}
+.gm-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.gm-title {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.gm-title strong {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.gm-title span {
+  font-size: var(--fs-xs);
+  color: var(--accent-strong);
+  font-weight: 700;
+}
+.gm-step {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 10px;
+  animation: bump var(--dur) var(--ease-spring);
+}
+.gm-num {
+  font-size: calc(4.2rem * var(--text-scale));
+  font-weight: 900;
+  line-height: 1;
+  background: var(--grad-accent);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.gm-of {
+  color: var(--muted);
+  font-weight: 700;
+  font-size: var(--fs-sm);
+}
+.gm-visual {
+  min-height: 0;
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  display: grid;
+}
+.gm-visual .plan-host {
+  display: grid;
+  place-items: center;
+}
+.gm-finished {
+  place-self: center;
+  font-size: var(--fs-lg);
+  font-weight: 800;
+}
+.gm-mats {
+  list-style: none;
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: 16px;
+  background: var(--surface-2);
+  display: grid;
+  gap: 6px;
+  font-size: var(--fs-md);
+}
+.gm-mats li {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+.gm-mats li b {
+  font-variant-numeric: tabular-nums;
+}
+.gm-mats li.more,
+.gm-mats li.sum {
+  color: var(--muted);
+  font-size: var(--fs-sm);
+}
+.gm-controls {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 10px;
+  align-items: stretch;
+}
+.game-mode.left .gm-controls {
+  grid-template-columns: 1fr auto;
+}
+.game-mode.left .gm-nav {
+  order: 2;
+}
+.gm-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.gm-nav .btn {
+  width: 72px;
+  min-height: 60px;
+  border-radius: 18px;
+}
+.gm-done {
+  min-height: 130px;
+  border-radius: 24px;
+  font-size: calc(1.35rem * var(--text-scale));
+  flex-direction: column;
+}
+
+/* ---------- materials checklist ---------- */
+.checklist-head {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.check {
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 8px;
+  border: 2px solid var(--border);
+  background: var(--surface);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition:
+    background var(--dur) var(--ease-out),
+    border-color var(--dur) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out);
+}
+.check:active {
+  transform: scale(0.88);
+}
+.check:checked {
+  background: var(--ok);
+  border-color: var(--ok);
+}
+.check:checked::after {
+  content: "";
+  width: 6px;
+  height: 11px;
+  border: solid #fff;
+  border-width: 0 2.5px 2.5px 0;
+  transform: translateY(-1px) rotate(45deg);
+}
+.mats tr.got td:not(:first-child) {
+  opacity: 0.5;
+  text-decoration: line-through;
+  text-decoration-color: var(--muted);
+}
+.mats tr td {
+  transition: opacity var(--dur) var(--ease-out);
+}

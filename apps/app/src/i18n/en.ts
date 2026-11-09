@@ -276,6 +276,12 @@ export const en: Record<MessageKey, string> = {
   "common.error": "Error",
   "common.loading": "Loading…",
   "common.retry": "Retry",
+  "materials.collected": "Collected {n} of {total}",
+  "materials.reset": "Reset",
+  "materials.share": "Share checklist",
+  "game.enter": "I'm in game",
+  "game.exit": "Leave in-game mode",
+  "game.awake": "screen stays on",
   "onboard.title": "Welcome",
   "onboard.1.title": "Build step by step",
   "onboard.1.text":

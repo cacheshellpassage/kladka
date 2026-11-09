@@ -176,7 +176,12 @@ export function BuildPage({ id }: { id: string }) {
             <h2>{t("build.materials")}</h2>
             {error ? <div className="banner error">{error}</div> : null}
             {build ? (
-              <MaterialsTable lines={build.materials} model={build.model} />
+              <MaterialsTable
+                lines={build.materials}
+                model={build.model}
+                checklistId={id}
+                title={item.meta.title[locale]}
+              />
             ) : (
               <p className="muted">{t("build.loading")}</p>
             )}

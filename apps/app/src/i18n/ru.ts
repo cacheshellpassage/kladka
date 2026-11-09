@@ -274,6 +274,12 @@ export const ru = {
   "common.error": "Ошибка",
   "common.loading": "Загрузка…",
   "common.retry": "Повторить",
+  "materials.collected": "Собрано {n} из {total}",
+  "materials.reset": "Сбросить",
+  "materials.share": "Поделиться чек-листом",
+  "game.enter": "Я в игре",
+  "game.exit": "Выйти из режима «Я в игре»",
+  "game.awake": "экран не гаснет",
   "onboard.title": "Добро пожаловать",
   "onboard.1.title": "Стройте по шагам",
   "onboard.1.text":
