@@ -280,7 +280,7 @@ export class VoxelViewer {
       for (let i = 0; i < w; i++) {
         // texture row 0 is the far (+z) edge after the plane is laid flat
         const v = a[i + (h - 1 - j) * w]!;
-        px[(i + j * w) * 4 + 3] = Math.round(Math.min(1, v) * 0.42 * 255);
+        px[(i + j * w) * 4 + 3] = Math.round(Math.min(1, v) * 0.3 * 255);
       }
     const tex = new THREE.DataTexture(px, w, h, THREE.RGBAFormat);
     tex.magFilter = THREE.LinearFilter;
@@ -292,7 +292,7 @@ export class VoxelViewer {
     );
     mesh.position.set(0, 0.004, 0);
     mesh.renderOrder = -1;
-    mesh.visible = this.mode === "classic";
+    mesh.visible = this.mode === "classic" && this.stepValue === null;
     this.contact = mesh;
     this.scene.add(mesh);
   }
@@ -391,6 +391,8 @@ export class VoxelViewer {
     this.stepValue = step;
     this.uniforms.uStep.value = step === null ? 1e9 : step;
     this.updateComposerPasses();
+    // the contact shadow matches the finished build only
+    if (this.contact) this.contact.visible = this.mode === "classic" && step === null;
     this.dirty = true;
   }
 
@@ -510,7 +512,7 @@ export class VoxelViewer {
     this.sun.visible = shaders;
     this.hemi.visible = shaders;
     this.ground.visible = shaders && this.showGround;
-    if (this.contact) this.contact.visible = !shaders;
+    if (this.contact) this.contact.visible = !shaders && this.stepValue === null;
     if (this.grid) this.grid.visible = !shaders && this.showGround;
     if (shaders) {
       this.sky.apply(p, this.timeOfDay);
@@ -588,7 +590,7 @@ export class VoxelViewer {
     this.grid.position.set(sx % 2 ? 0.5 : 0, -0.01, sz % 2 ? 0.5 : 0);
     this.grid.visible = this.mode === "classic" && this.showGround && !this.transparent;
     this.scene.add(this.grid);
-    if (this.contact) this.contact.visible = this.mode === "classic";
+    if (this.contact) this.contact.visible = this.mode === "classic" && this.stepValue === null;
     this.camera.far = r * 30;
     this.camera.updateProjectionMatrix();
   }

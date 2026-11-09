@@ -238,16 +238,19 @@ export function CatalogPage() {
               ) : null}
               <div className="body">
                 <span className="title">{b.meta.title[locale]}</span>
-                <span className="meta">
-                  <span>{t(`style.${b.meta.style}` as MessageKey)}</span>
-                  <span>·</span>
-                  <span>{b.stats.size.join("×")}</span>
-                  <span>·</span>
-                  <span>{formatMinutes(t, b.stats.minutes)}</span>
-                </span>
-                <span className="meta">
+                <span className="meta meta-top">
+                  <span className="style-name">{t(`style.${b.meta.style}` as MessageKey)}</span>
                   <DifficultyDots value={b.stats.difficulty} />
-                  <span>{b.stats.blocks}</span>
+                </span>
+                <span className="meta meta-stats">
+                  <span title={t("build.time")}>
+                    <Icon name="clock" size={14} />
+                    {formatMinutes(t, b.stats.minutes)}
+                  </span>
+                  <span title={t("build.blocks")}>
+                    <Icon name="cube" size={14} />
+                    {b.stats.blocks}
+                  </span>
                 </span>
                 {pct > 0 ? (
                   <div

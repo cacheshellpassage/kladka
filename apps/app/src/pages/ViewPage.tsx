@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { itemName } from "@kladka/voxel-core";
-import type { ClipBox, TimeOfDay, VoxelViewer } from "@kladka/viewer";
-import { useT } from "../i18n";
+import { ROLE_COLORS_3D, type ClipBox, type TimeOfDay, type VoxelViewer } from "@kladka/viewer";
+import { useT, type MessageKey } from "../i18n";
 import { buildGif, recordVideo, videoSupported } from "../lib/media";
 import { useBuild } from "../lib/useBuild";
 import { safeFileName, saveBlob, saveDataUrl, saveFile } from "../platform/platform";
@@ -254,6 +254,16 @@ export function ViewPage({ id }: { id: string }) {
             />
           </label>
           <Switch label={t("viewer.roles")} checked={roleView} onChange={setRoleView} />
+          {roleView ? (
+            <ul className="role-legend">
+              {Object.entries(ROLE_COLORS_3D).map(([id, c]) => (
+                <li key={id}>
+                  <i className="stage-dot" style={{ background: c }} aria-hidden />
+                  {t(`stage.${id}` as MessageKey)}
+                </li>
+              ))}
+            </ul>
+          ) : null}
         </fieldset>
 
         <fieldset>

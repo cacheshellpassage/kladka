@@ -43,6 +43,60 @@ export interface DrawPlanOptions {
   /** Margin for axis labels (px). */
   margin?: number;
   title?: string;
+  /** Draw only this window of the layer (x0/z0 inclusive, x1/z1 exclusive); labels keep real coordinates. */
+  region?: PlanRegion;
+}
+
+export interface PlanRegion {
+  x0: number;
+  z0: number;
+  x1: number;
+  z1: number;
+}
+
+/**
+ * Window around the blocks of `step` on layer `y`, padded by `pad` cells and at least `minSize` cells wide,
+ * clamped to the model. Returns null when the window would cover (almost) the whole layer anyway.
+ */
+export function stepRegion(
+  model: VoxelModel,
+  stepOf: Int32Array | null,
+  y: number,
+  step: number,
+  pad = 3,
+  minSize = 9,
+): PlanRegion | null {
+  if (!stepOf) return null;
+  const { x: sx, z: sz } = model.size;
+  let x0 = Infinity,
+    z0 = Infinity,
+    x1 = -Infinity,
+    z1 = -Infinity;
+  for (let z = 0; z < sz; z++)
+    for (let x = 0; x < sx; x++)
+      if (stepOf[model.index(x, y, z)] === step) {
+        x0 = Math.min(x0, x);
+        z0 = Math.min(z0, z);
+        x1 = Math.max(x1, x + 1);
+        z1 = Math.max(z1, z + 1);
+      }
+  if (!Number.isFinite(x0)) return null;
+  const grow = (lo: number, hi: number, size: number): [number, number] => {
+    lo -= pad;
+    hi += pad;
+    const need = minSize - (hi - lo);
+    if (need > 0) {
+      lo -= Math.floor(need / 2);
+      hi += Math.ceil(need / 2);
+    }
+    if (lo < 0) [lo, hi] = [0, Math.min(size, hi - lo)];
+    if (hi > size) [lo, hi] = [Math.max(0, lo - (hi - size)), size];
+    return [lo, hi];
+  };
+  [x0, x1] = grow(x0, x1, sx);
+  [z0, z1] = grow(z0, z1, sz);
+  if ((x1 - x0) * (z1 - z0) > sx * sz * 0.7) return null;
+  return { x0, z0, x1, z1 };
 }
 
 export function legendFor(model: VoxelModel, y: number, nameOf: (n: string) => string): LegendEntry[] {
@@ -71,8 +125,12 @@ export function drawPlan(
   const { model, y, cell, colors } = o;
   const margin = o.margin ?? Math.max(18, Math.round(cell * 1.2));
   const top = o.title ? margin + 22 : margin;
-  const W = model.size.x,
-    D = model.size.z;
+  const rg = o.region ?? { x0: 0, z0: 0, x1: model.size.x, z1: model.size.z };
+  const OX = rg.x0,
+    OZ = rg.z0;
+  const SW = model.size.x;
+  const W = rg.x1 - rg.x0,
+    D = rg.z1 - rg.z0;
   const width = margin + W * cell + 8;
   const height = top + D * cell + 8;
   const grid = layerGrid(model, null, y);
@@ -83,7 +141,7 @@ export function drawPlan(
   ctx.fillRect(0, 0, width, height);
   if (o.title) {
     ctx.fillStyle = colors.text;
-    ctx.font = `600 15px system-ui, sans-serif`;
+    ctx.font = `600 15px 'Inter Variable', system-ui, sans-serif`;
     ctx.textBaseline = "top";
     ctx.fillText(o.title, margin, 6);
   }
@@ -91,7 +149,7 @@ export function drawPlan(
   // ghost of the layer below
   for (let z = 0; z < D; z++)
     for (let x = 0; x < W; x++) {
-      const c = x + z * W;
+      const c = OX + x + (OZ + z) * SW;
       if (!grid.cells[c] && grid.below[c]) {
         ctx.fillStyle = colors.ghost;
         ctx.fillRect(x * cell, z * cell, cell, cell);
@@ -99,17 +157,17 @@ export function drawPlan(
     }
   // blocks
   const fontSize = Math.max(8, Math.floor(cell * 0.55));
-  ctx.font = `600 ${fontSize}px system-ui, sans-serif`;
+  ctx.font = `600 ${fontSize}px 'Inter Variable', system-ui, sans-serif`;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   for (let z = 0; z < D; z++)
     for (let x = 0; x < W; x++) {
-      const c = x + z * W;
+      const c = OX + x + (OZ + z) * SW;
       const p = grid.cells[c]!;
       if (!p) continue;
       const st = model.palette[p]!;
       const info = blockInfo(st.name);
-      const idx = model.index(x, y, z);
+      const idx = model.index(OX + x, y, OZ + z);
       const step = o.stepOf ? o.stepOf[idx]! : -1;
       const future = o.currentStep !== null && step > o.currentStep;
       const current = o.currentStep !== null && step === o.currentStep;
@@ -171,14 +229,14 @@ export function drawPlan(
   // grid
   ctx.lineWidth = 1;
   for (let x = 0; x <= W; x++) {
-    ctx.strokeStyle = x % 5 === 0 ? colors.gridStrong : colors.grid;
+    ctx.strokeStyle = (OX + x) % 5 === 0 ? colors.gridStrong : colors.grid;
     ctx.beginPath();
     ctx.moveTo(x * cell + 0.5, 0);
     ctx.lineTo(x * cell + 0.5, D * cell);
     ctx.stroke();
   }
   for (let z = 0; z <= D; z++) {
-    ctx.strokeStyle = z % 5 === 0 ? colors.gridStrong : colors.grid;
+    ctx.strokeStyle = (OZ + z) % 5 === 0 ? colors.gridStrong : colors.grid;
     ctx.beginPath();
     ctx.moveTo(0, z * cell + 0.5);
     ctx.lineTo(W * cell, z * cell + 0.5);
@@ -186,11 +244,13 @@ export function drawPlan(
   }
   // axis labels
   ctx.fillStyle = colors.text;
-  ctx.font = `${Math.max(9, Math.min(12, cell * 0.6))}px system-ui, sans-serif`;
+  ctx.font = `${Math.max(9, Math.min(12, cell * 0.6))}px 'Inter Variable', system-ui, sans-serif`;
   const every = cell >= 18 ? 1 : cell >= 10 ? 5 : 10;
-  for (let x = 0; x < W; x++) if (x % every === 0) ctx.fillText(String(x), x * cell + cell / 2, -margin / 2);
+  for (let x = 0; x < W; x++)
+    if ((OX + x) % every === 0) ctx.fillText(String(OX + x), x * cell + cell / 2, -margin / 2);
   ctx.textAlign = "right";
-  for (let z = 0; z < D; z++) if (z % every === 0) ctx.fillText(String(z), -4, z * cell + cell / 2);
+  for (let z = 0; z < D; z++)
+    if ((OZ + z) % every === 0) ctx.fillText(String(OZ + z), -4, z * cell + cell / 2);
   ctx.restore();
   return { width, height, legend };
 }

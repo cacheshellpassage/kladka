@@ -1,6 +1,7 @@
 /* Kladka design tokens + base styles. Light/dark via [data-theme] on <html>. */
 :root {
-  --font: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", "Helvetica Neue", Arial, sans-serif;
+  /* Inter (OFL-1.1) is bundled with the app, so text looks the same on every device and offline */
+  --font: "Inter Variable", system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", Arial, sans-serif;
   --text-scale: 1;
   --fs-xs: calc(0.75rem * var(--text-scale));
   --fs-sm: calc(0.875rem * var(--text-scale));

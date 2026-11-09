@@ -158,6 +158,7 @@ export function GameMode(p: GameModeProps) {
             stepOf={p.plan.stepOf}
             y={cur.layer}
             currentStep={p.step}
+            focus
             label={t("guide.layer", { y: cur.layer })}
           />
         ) : (

@@ -28,6 +28,8 @@ const PATHS: Record<string, string> = {
   reset: "M4 4v6h6M20 20v-6h-6M5 15a7 7 0 0 0 12.5 2.5M19 9A7 7 0 0 0 6.5 6.5",
   plan: "M4 4h16v16H4zM4 9h16M4 14h16M9 4v16M14 4v16",
   copy: "M8 8h11v12H8zM5 16V4h11",
+  clock: "M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zm0 4.5V12l3 2",
+  ruler: "M3 15L15 3l6 6L9 21zm4-4l2 2m1-5l2 2m1-5l2 2",
 };
 
 export function Icon({

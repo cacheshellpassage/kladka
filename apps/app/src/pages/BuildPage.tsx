@@ -6,7 +6,7 @@ import { forgetBuild, useBuild } from "../lib/useBuild";
 import { Link, navigate } from "../router";
 import { useLibrary } from "../store/library";
 import { useSettings, type ModePref } from "../store/settings";
-import { DifficultyDots, MaterialsTable, Segmented, Disclaimer } from "../components/Common";
+import { DifficultyDots, MaterialsTable, Segmented, Disclaimer, StageDot } from "../components/Common";
 import { ExportDialog } from "../components/ExportDialog";
 import { Icon } from "../components/Icon";
 
@@ -150,6 +150,7 @@ export function BuildPage({ id }: { id: string }) {
                 <div className="stage-list">
                   {stagesPresent.map((s) => (
                     <span key={s.id} className="chip" style={{ cursor: "default" }}>
+                      <StageDot id={s.id} />
                       {t(`stage.${s.id}` as MessageKey)} · {s.blockCount}
                     </span>
                   ))}

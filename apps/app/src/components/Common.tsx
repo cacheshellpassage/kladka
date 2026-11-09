@@ -324,3 +324,42 @@ export function Disclaimer() {
   const t = useT();
   return <p className="disclaimer">{t("about.disclaimer")}</p>;
 }
+
+/** Small colour mark of a build stage (stage colours are an ordinal blue ramp, see polish.css). */
+export function StageDot({ id }: { id: string }) {
+  return <i className="stage-dot" style={{ background: `var(--st-${id})` }} aria-hidden />;
+}
+
+/** Progress bar split into stage segments, each as wide as its share of steps. */
+export function StageProgress({
+  stages,
+  step,
+  label,
+}: {
+  stages: Array<{ id: string; stepStart: number; stepEnd: number }>;
+  step: number;
+  label: string;
+}) {
+  const total = stages.length ? stages[stages.length - 1]!.stepEnd : 0;
+  const pct = total ? Math.round((Math.min(step, total) / total) * 100) : 0;
+  return (
+    <div
+      className="stage-progress"
+      role="progressbar"
+      aria-label={label}
+      aria-valuenow={pct}
+      aria-valuemin={0}
+      aria-valuemax={100}
+    >
+      {stages.map((s) => {
+        const n = Math.max(1, s.stepEnd - s.stepStart);
+        const f = Math.min(1, Math.max(0, (step - s.stepStart) / n));
+        return (
+          <span key={s.id} style={{ flexGrow: n }}>
+            <i style={{ width: `${f * 100}%`, background: `var(--st-${s.id})` }} />
+          </span>
+        );
+      })}
+    </div>
+  );
+}

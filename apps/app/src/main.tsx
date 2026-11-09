@@ -2,6 +2,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { App } from "./App";
 import { platform } from "./platform/platform";
+import "@fontsource-variable/inter/wght.css";
 import "./styles/app.css";
 import "./styles/polish.css";
 

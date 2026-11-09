@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import type { VoxelModel } from "@kladka/voxel-core";
-import { drawPlan, planColors, type LegendEntry } from "../lib/plan2d";
+import { drawPlan, planColors, stepRegion, type LegendEntry } from "../lib/plan2d";
 import { nameOf } from "../lib/format";
 import { effectiveTheme, useSettings } from "../store/settings";
 
@@ -11,6 +11,7 @@ export function PlanCanvas({
   currentStep,
   onLegend,
   label,
+  focus = false,
 }: {
   model: VoxelModel;
   stepOf: Int32Array | null;
@@ -18,6 +19,8 @@ export function PlanCanvas({
   currentStep: number | null;
   onLegend?: (l: LegendEntry[]) => void;
   label: string;
+  /** Zoom to the blocks of the current step (with a few cells of context) instead of the whole layer. */
+  focus?: boolean;
 }) {
   const host = useRef<HTMLDivElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
@@ -25,6 +28,10 @@ export function PlanCanvas({
   const dark = useSettings((s) => effectiveTheme(s.theme) === "dark");
 
   useEffect(() => {
+    const region =
+      focus && currentStep !== null ? (stepRegion(model, stepOf, y, currentStep) ?? undefined) : undefined;
+    const cols = region ? region.x1 - region.x0 : model.size.x;
+    const rows = region ? region.z1 - region.z0 : model.size.z;
     const draw = () => {
       const c = canvas.current,
         h = host.current;
@@ -33,12 +40,12 @@ export function PlanCanvas({
       const availH = Math.max(160, h.clientHeight - 16);
       const cell = Math.max(
         10,
-        Math.min(30, Math.floor(Math.min((avail - 30) / model.size.x, (availH - 30) / model.size.z))),
+        Math.min(focus ? 56 : 30, Math.floor(Math.min((avail - 30) / cols, (availH - 30) / rows))),
       );
       const dpr = Math.min(2, window.devicePixelRatio || 1);
-      const margin = Math.max(18, Math.round(cell * 1.2));
-      const w = margin + model.size.x * cell + 8,
-        hh = margin + model.size.z * cell + 8;
+      const margin = Math.max(18, Math.min(30, Math.round(cell * 1.2)));
+      const w = margin + cols * cell + 8,
+        hh = margin + rows * cell + 8;
       c.width = Math.ceil(w * dpr);
       c.height = Math.ceil(hh * dpr);
       c.style.width = `${w}px`;
@@ -55,6 +62,7 @@ export function PlanCanvas({
         colors: planColors(dark),
         nameOf: nameOf(locale),
         margin,
+        region,
       });
       onLegend?.(r.legend);
     };
@@ -62,7 +70,7 @@ export function PlanCanvas({
     const ro = new ResizeObserver(draw);
     if (host.current) ro.observe(host.current);
     return () => ro.disconnect();
-  }, [model, stepOf, y, currentStep, dark, locale, onLegend]);
+  }, [model, stepOf, y, currentStep, dark, locale, onLegend, focus]);
 
   return (
     <div className="plan-host" ref={host}>

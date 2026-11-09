@@ -1027,3 +1027,123 @@
 .continue-card img {
   background: var(--cover-bg);
 }
+
+/* ---------- catalog card meta ---------- */
+.bcard .meta-top {
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: nowrap;
+}
+.bcard .meta-top .style-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+.bcard .meta-top .dots {
+  flex: none;
+}
+.bcard .meta-stats {
+  gap: 4px 12px;
+}
+.bcard .meta-stats > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.bcard .meta-stats svg {
+  opacity: 0.75;
+}
+
+/* ---------- typography ---------- */
+body {
+  font-feature-settings: "cv11", "ss03"; /* Inter: single-storey a, rounded quotes */
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+h1,
+h2,
+h3,
+.title {
+  letter-spacing: -0.015em;
+}
+/* numbers that change or line up in columns keep a fixed width */
+.mats .n,
+.stat b,
+.gm-num,
+.gm-of,
+.gm-mats b,
+.step-num,
+[data-testid="step-label"],
+.checklist-head b,
+.progress-text {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- stage colours ----------
+   Stages are ordered, so they use one blue ramp (ordinal encoding): the foundation is the heaviest step,
+   decor the lightest. Both ramps pass the dataviz ordinal checks (one hue, monotone lightness, adjacent
+   ΔL ≥ 0.06, light end ≥ 2:1 against the surface). Labels always stay in text colours. */
+:root {
+  --st-foundation: #013271;
+  --st-frame: #034393;
+  --st-walls: #1a57ad;
+  --st-openings: #306dc4;
+  --st-roof: #4582db;
+  --st-interior: #5a98f3;
+  --st-decor: #7baffc;
+}
+:root[data-theme="dark"] {
+  --st-foundation: #b7d3fc;
+  --st-frame: #94bffd;
+  --st-walls: #72aafd;
+  --st-openings: #5795f0;
+  --st-roof: #4481da;
+  --st-interior: #316ec5;
+  --st-decor: #1d5ab0;
+}
+.stage-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  flex: none;
+  vertical-align: middle;
+  margin-right: 6px;
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.08);
+}
+.stage-progress {
+  display: flex;
+  gap: 2px;
+  height: 8px;
+}
+.stage-progress > span {
+  position: relative;
+  min-width: 4px;
+  border-radius: 4px;
+  background: var(--surface-2);
+  box-shadow: inset 0 0 0 1px var(--border);
+  overflow: hidden;
+}
+.stage-progress > span > i {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: 4px;
+  transition: width var(--dur-slow) var(--ease-out);
+}
+.role-legend {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  font-size: var(--fs-sm);
+  color: var(--muted);
+}
+.role-legend li {
+  display: inline-flex;
+  align-items: center;
+}

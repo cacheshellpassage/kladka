@@ -18,7 +18,7 @@ import { Link } from "../router";
 import { useLibrary } from "../store/library";
 import { useSettings } from "../store/settings";
 import { useUi } from "../store/ui";
-import { MaterialsTable, Segmented, Switch } from "../components/Common";
+import { MaterialsTable, Segmented, StageDot, StageProgress, Switch } from "../components/Common";
 import { Icon } from "../components/Icon";
 import { PlanCanvas } from "../components/PlanCanvas";
 import { Viewer3D } from "../components/Viewer3D";
@@ -457,21 +457,18 @@ export function GuidePage({ id }: { id: string }) {
           </div>
           <div className="stack" style={{ gap: 6 }}>
             <div className="row">
-              {stage ? <span className="stage-pill">{t(`stage.${stage.id}` as MessageKey)}</span> : null}
+              {stage ? (
+                <span className="stage-pill">
+                  <StageDot id={stage.id} />
+                  {t(`stage.${stage.id}` as MessageKey)}
+                </span>
+              ) : null}
               <span className="small bump" key={step} data-testid="step-label">
                 {finished ? t("guide.finished") : t("guide.step", { n: step + 1, total })}
               </span>
               {cur ? <span className="small muted">{t("guide.layer", { y: cur.layer })}</span> : null}
             </div>
-            <div
-              className="progressbar"
-              role="progressbar"
-              aria-valuenow={pct}
-              aria-valuemin={0}
-              aria-valuemax={100}
-            >
-              <div style={{ width: `${pct}%` }} />
-            </div>
+            <StageProgress stages={build.plan.stages} step={done} label={`${pct}%`} />
           </div>
 
           {cur?.deferred ? <div className="banner small">{t("guide.deferred")}</div> : null}
@@ -509,7 +506,7 @@ export function GuidePage({ id }: { id: string }) {
                 className={step >= s.stepStart && step < s.stepEnd ? "cur" : done >= s.stepEnd ? "done" : ""}
                 onClick={() => go(s.stepStart)}
               >
-                {done >= s.stepEnd ? "✓ " : ""}
+                {done >= s.stepEnd ? "✓ " : <StageDot id={s.id} />}
                 {t(`stage.${s.id}` as MessageKey)}
               </button>
             ))}

@@ -35,6 +35,28 @@ export function createUniforms(): ViewerUniforms {
   };
 }
 
+/**
+ * "Colour by stage" in 3D: one blue ramp from foundation (darkest) to decor (lightest), in build order;
+ * lights stay amber. Validated as an ordinal ramp (monotone lightness, ΔL ≥ 0.06 between neighbours).
+ */
+export const ROLE_COLORS_3D: Record<string, string> = {
+  foundation: "#013271",
+  frame: "#034393",
+  walls: "#1a57ad",
+  openings: "#306dc4",
+  roof: "#4582db",
+  interior: "#5a98f3",
+  decor: "#7baffc",
+};
+
+function glslColor(hex: string): string {
+  const n = parseInt(hex.slice(1), 16);
+  // shader colours are linear: convert from sRGB so the 3D view shows the same colours as the legend
+  const lin = (v: number) => (v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4);
+  const c = [(n >> 16) & 255, (n >> 8) & 255, n & 255].map((v) => lin(v / 255).toFixed(4));
+  return `vec3(${c.join(", ")})`;
+}
+
 const VERT_HEAD = /* glsl */ `
 attribute vec3 aTex;
 attribute vec4 aData;
@@ -70,13 +92,9 @@ varying vec3 vNrmW;
 
 vec3 roleColor(float r) {
   if (r < 0.5) return vec3(0.7);
-  if (r < 1.5) return vec3(0.55, 0.45, 0.38);
-  if (r < 2.5) return vec3(0.62, 0.42, 0.22);
-  if (r < 3.5) return vec3(0.85, 0.78, 0.6);
-  if (r < 4.5) return vec3(0.45, 0.7, 0.9);
-  if (r < 5.5) return vec3(0.75, 0.3, 0.25);
-  if (r < 6.5) return vec3(0.6, 0.5, 0.8);
-  if (r < 7.5) return vec3(0.45, 0.75, 0.4);
+${Object.values(ROLE_COLORS_3D)
+  .map((c, i) => `  if (r < ${i + 1}.5) return ${glslColor(c)};`)
+  .join("\n")}
   return vec3(1.0, 0.85, 0.3);
 }
 
@@ -97,7 +115,7 @@ if (uGhostBelow > 0.5 && vWPos.y < uFocusY - 0.01 && kladkaDither(2.0)) discard;
 vec2 kUv = vTex.xy;
 vec4 kTexel = textureGrad(uAtlas, vec3(fract(kUv), vTex.z), dFdx(kUv), dFdy(kUv));
 diffuseColor *= kTexel;
-if (uRoleView > 0.5) diffuseColor.rgb = mix(diffuseColor.rgb, roleColor(vData.w), 0.65);
+if (uRoleView > 0.5) diffuseColor.rgb = mix(diffuseColor.rgb * 0.35 + 0.65 * dot(diffuseColor.rgb, vec3(0.3, 0.59, 0.11)), roleColor(vData.w), 0.82);
 if (kFuture) diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.55, 0.72, 1.0), 0.55);
 if (abs(kStep - uStep) < 0.5) {
   // current step: keep the material readable, outline every block face with the highlight colour
