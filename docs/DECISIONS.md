@@ -259,3 +259,28 @@ text, horizontal overflow, small tap targets and console errors. What changed:
 
 Not verifiable here: real phone hardware (touch, notches, performance) and the Android/Tauri builds, which
 run in CI only.
+
+## D-022 Identical parts in one step; the plan moves like a map (2026-11-10)
+
+Two follow-ups of the walkthrough in D-021.
+
+- **Identical parts share a step** (`mergeCopies` in the planner). Symmetric builds repeat the same work: four
+  corner towers, two wings, a row of bays. Steps of one stage that start on the same layer and have the same
+  shape (shifted, mirrored or turned by 90°; stairs and logs are compared with their facing turned the same
+  way) become one step that says "N identical parts", with a note when the other parts are mirrored or turned.
+  A part joins the first one only if every block of it is supported by what is already built at that point of
+  the plan, at most 96 blocks per step and 64 blocks apart. Items of one or two blocks (lamps, doors) are
+  joined silently, pillars keep their own "N identical pillars" wording. The mini-castle went from 92 steps to
+  80, the whole catalogue from 1235 to 1153. A test builds 40 random mirrored models and checks that nothing is
+  placed ahead of what holds it; turning the support check off makes it fail.
+- **The 2D plan takes gestures**: pinch or the mouse wheel zooms around the fingers or the cursor, a drag moves
+  the plan, a double tap zooms in and back, a round button returns to the starting view. The plan draws only
+  the window that is on screen (whole cells at rest), so the rulers with real coordinates stay at the edge at
+  any zoom instead of scrolling away. The "zoom to step" switch stays: it picks the starting view.
+- In the in-game mode a swipe across the plan still turns the step. Once the plan is zoomed by hand (pinch or
+  double tap), one finger moves the plan instead, until the reset button is pressed. A second finger always
+  cancels the swipe.
+- A view chosen by hand survives a step change; it re-centres only when the blocks of the new step are
+  completely outside the window.
+
+Checked with real touch events (Chromium, CDP) on a phone-sized screen; not checked on phone hardware.

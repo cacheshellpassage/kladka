@@ -535,6 +535,11 @@ export function GuidePage({ id }: { id: string }) {
                       : t("guide.pillar")}
                   </span>
                 ) : null}
+                {cur.copies && cur.copies > 1 ? (
+                  <span className="small copies-hint" data-testid="copies-hint">
+                    {t(cur.mirrored ? "guide.copies.mirrored" : "guide.copies", { n: cur.copies })}
+                  </span>
+                ) : null}
                 <ul className="step-mats" aria-label={t("materials.scope.step")}>
                   {stepLines.slice(0, 4).map((l) => (
                     <li key={l.item}>

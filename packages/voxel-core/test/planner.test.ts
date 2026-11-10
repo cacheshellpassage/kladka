@@ -249,6 +249,123 @@ describe("planner edge cases", () => {
     expect(plan.steps[0]!.blocks).toHaveLength(4);
   });
 
+  /** A stone floor with one L-shaped piece of wall per entry: [x, z, mirrored along x, stairs facing]. */
+  function cornerPieces(pieces: Array<[number, number, boolean, string]>): VoxelModel {
+    const m = newTestModel(20, 3, 20);
+    m.roles = new Uint8Array(m.volume);
+    for (let x = 0; x < 20; x++)
+      for (let z = 0; z < 20; z++) {
+        m.set(x, 0, z, state("stone"));
+        m.roles[m.index(x, 0, z)] = 1; // foundation
+      }
+    for (const [x, z, flip, facing] of pieces) {
+      const dx = flip ? -1 : 1;
+      const cells: Array<[number, number, ReturnType<typeof state>]> = [
+        [x, z, state("stone_bricks")],
+        [x + dx, z, state("stone_bricks")],
+        [x + 2 * dx, z, state("stone_brick_stairs", { facing, half: "bottom" })],
+        [x, z + 1, state("stone_bricks")],
+        [x, z + 2, state("cobblestone")],
+      ];
+      for (const [cx, cz, st] of cells) {
+        m.set(cx, 1, cz, st);
+        m.roles[m.index(cx, 1, cz)] = 3; // walls
+      }
+    }
+    return m;
+  }
+
+  it("builds identical parts of a symmetric build in one step", () => {
+    const m = cornerPieces([
+      [1, 1, false, "east"],
+      [9, 1, false, "east"],
+      [1, 12, false, "east"],
+    ]);
+    const plan = planBuild(m);
+    expect(verifyPlacement(m, plan)).toEqual([]);
+    const walls = plan.steps.filter((s) => s.stage === "walls");
+    expect(walls).toHaveLength(1);
+    expect(walls[0]!.blocks).toHaveLength(15);
+    expect(walls[0]!.copies).toBe(3);
+    expect(walls[0]!.mirrored).toBeUndefined();
+    expect(walls[0]!.pillars).toBeUndefined();
+    // every block is still placed exactly once
+    expect(new Set(plan.steps.flatMap((s) => s.blocks)).size).toBe(plan.totalBlocks);
+    expect(plan.stages.find((s) => s.id === "walls")!.stepEnd).toBe(plan.steps.length);
+  });
+
+  it("treats a mirrored part as the same part, stairs included", () => {
+    // the mirror image has its stairs turned the other way: still the same piece of work
+    const m = cornerPieces([
+      [1, 1, false, "east"],
+      [18, 1, true, "west"],
+    ]);
+    const walls = planBuild(m).steps.filter((s) => s.stage === "walls");
+    expect(walls).toHaveLength(1);
+    expect(walls[0]!.copies).toBe(2);
+    expect(walls[0]!.mirrored).toBe(true);
+
+    // same outline, but the stairs are not mirrored: a different part, the steps stay apart
+    const odd = cornerPieces([
+      [1, 1, false, "east"],
+      [18, 1, true, "east"],
+    ]);
+    const apart = planBuild(odd).steps.filter((s) => s.stage === "walls");
+    expect(apart).toHaveLength(2);
+    expect(apart.every((s) => s.copies === undefined)).toBe(true);
+  });
+
+  it("keeps different parts and parts on different layers apart", () => {
+    const m = cornerPieces([[1, 1, false, "east"]]);
+    // an L of the same outline in another material, and a straight piece
+    for (const [x, z] of [
+      [10, 10],
+      [11, 10],
+      [12, 10],
+      [10, 11],
+      [10, 12],
+    ] as const) {
+      m.set(x, 1, z, state("oak_planks"));
+      m.roles![m.index(x, 1, z)] = 3;
+    }
+    const walls = planBuild(m).steps.filter((s) => s.stage === "walls");
+    expect(walls).toHaveLength(2);
+    expect(walls.some((s) => s.copies !== undefined)).toBe(false);
+  });
+
+  it("never merges a part ahead of what holds it (random symmetric builds)", () => {
+    // deterministic pseudo-random blobs, mirrored along x: many identical parts, some hanging on others
+    let seed = 12345;
+    const rnd = () => {
+      seed = (seed * 1103515245 + 12345) & 0x7fffffff;
+      return seed / 0x7fffffff;
+    };
+    let merged = 0;
+    for (let round = 0; round < 40; round++) {
+      const m = newTestModel(24, 6, 12);
+      m.roles = new Uint8Array(m.volume);
+      const put = (x: number, y: number, z: number, name: string) => {
+        for (const px of [x, 23 - x]) {
+          m.set(px, y, z, state(name));
+          m.roles![m.index(px, y, z)] = 3; // walls
+        }
+      };
+      for (let n = 0; n < 60; n++) {
+        const x = Math.floor(rnd() * 12);
+        const z = Math.floor(rnd() * 12);
+        const y = Math.floor(rnd() * 5);
+        const len = 1 + Math.floor(rnd() * 4);
+        const name = rnd() < 0.5 ? "stone_bricks" : "oak_planks";
+        for (let k = 0; k < len && x + k < 12; k++) put(x + k, y, z, name);
+      }
+      const plan = planBuild(m, { maxStepBlocks: 4 + (round % 5) * 3 });
+      expect(verifyPlacement(m, plan)).toEqual([]);
+      expect(plan.steps.flatMap((s) => s.blocks)).toHaveLength(plan.totalBlocks);
+      merged += plan.steps.filter((s) => s.copies).length;
+    }
+    expect(merged).toBeGreaterThan(20);
+  });
+
   it("handles an empty model", () => {
     const plan = planBuild(newTestModel(2, 2, 2));
     expect(plan.steps).toEqual([]);

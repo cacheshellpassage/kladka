@@ -246,6 +246,61 @@ test("plan letters are the same in the step card and the material list", async (
   await expect(zoom).toHaveAttribute("aria-pressed", "true");
 });
 
+test("the plan moves like a map and identical parts share a step", async ({ page }) => {
+  await page.goto("/#/b/mini-castle/guide");
+  await expect(page.getByTestId("step-label")).toContainText("Шаг 1 из");
+  const host = page.locator(".plan-wrap .plan-host");
+  const picture = () => host.locator("canvas").evaluate((c) => (c as HTMLCanvasElement).toDataURL());
+  await expect(host.locator("canvas")).toBeVisible();
+  await expect(page.locator(".plan-reset")).toHaveCount(0);
+  const box = (await host.boundingBox())!;
+  const cx = box.x + box.width / 2,
+    cy = box.y + box.height / 2;
+  const drag = async (dx: number, dy: number) => {
+    await page.mouse.move(cx, cy);
+    await page.mouse.down();
+    await page.mouse.move(cx + dx, cy + dy, { steps: 5 });
+    await page.mouse.up();
+  };
+
+  // the wheel zooms in around the cursor, a drag then moves the window, the button brings the layer back
+  const whole = await picture();
+  await page.mouse.move(cx, cy);
+  await page.mouse.wheel(0, -600);
+  await expect(page.locator(".plan-reset")).toBeVisible();
+  await expect(host).toHaveAttribute("data-grab", "1");
+  await expect.poll(picture).not.toBe(whole);
+  const zoomed = await picture();
+  await drag(-130, -70);
+  await expect.poll(picture).not.toBe(zoomed);
+  await page.locator(".plan-reset").click();
+  await expect(page.locator(".plan-reset")).toHaveCount(0);
+  await expect.poll(picture).toBe(whole);
+
+  // four towers of the castle are one step, not four
+  for (let i = 0; i < 80 && !(await page.getByTestId("copies-hint").isVisible()); i++)
+    await page.keyboard.press("ArrowRight");
+  await expect(page.getByTestId("copies-hint")).toContainText("Одинаковых частей: ");
+
+  // "in the game": a drag across the plan is a swipe until the plan is zoomed by hand
+  await page.getByTestId("enter-game").click();
+  const num = page.locator(".gm-num");
+  const before = Number(await num.innerText());
+  const gm = (await page.locator(".gm-visual .plan-host").boundingBox())!;
+  const swipe = async () => {
+    await page.mouse.move(gm.x + gm.width * 0.7, gm.y + gm.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(gm.x + gm.width * 0.7 - 160, gm.y + gm.height / 2 + 4, { steps: 5 });
+    await page.mouse.up();
+  };
+  await swipe();
+  await expect(num).toHaveText(String(before + 1));
+  await page.mouse.dblclick(gm.x + gm.width / 2, gm.y + gm.height / 2);
+  await expect(page.locator(".plan-reset")).toBeVisible();
+  await swipe();
+  await expect(num).toHaveText(String(before + 1));
+});
+
 test("a phone gets one view at a time and a sideways layout", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/#/b/mini-castle/guide");

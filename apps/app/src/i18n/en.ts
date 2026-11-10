@@ -127,6 +127,8 @@ export const en: Record<MessageKey, string> = {
   "guide.layer": "Layer Y = {y}",
   "guide.layers": "Layers Y = {y}–{to}",
   "guide.pillars": "{n} identical pillars: build each one bottom-up",
+  "guide.copies": "{n} identical parts: build one, the others are the same",
+  "guide.copies.mirrored": "{n} identical parts: the others are mirrored or turned",
   "guide.allDone": "All steps done",
   "guide.finishedStats": "Blocks placed: {blocks} · steps: {steps}",
   "guide.toCatalog": "To the catalog",
@@ -134,6 +136,7 @@ export const en: Record<MessageKey, string> = {
   "guide.view": "View",
   "guide.plan.zoom": "Zoom to step",
   "guide.plan.whole": "Whole layer",
+  "guide.plan.reset": "Reset plan zoom",
   "viewer.play": "Play",
   "guide.pillar": "Pillar: place it bottom-up",
   "guide.prev": "Back",
@@ -159,7 +162,8 @@ export const en: Record<MessageKey, string> = {
   "guide.exporting": "Preparing file…",
   "guide.stageJump": "Jump to stage",
   "guide.progressSaved": "Progress is saved automatically",
-  "guide.keys": "Keys: ← → steps, Space step done, WASD rotate, +/− zoom",
+  "guide.keys":
+    "Keys: ← → steps, Space step done, WASD rotate, +/− zoom. Plan: wheel to zoom, drag to move, double-click to zoom in",
 
   "plan.legend": "Legend",
   "plan.current": "Current step",
@@ -374,6 +378,8 @@ export const en: Record<MessageKey, string> = {
   "game.enter": "I'm in game",
   "game.exit": "Leave in-game mode",
   "game.awake": "screen stays on",
+  "game.copies": "{n} identical parts",
+  "game.copies.mirrored": "{n} identical parts, mirrored",
   "onboard.title": "Welcome",
   "onboard.1.title": "Build step by step",
   "onboard.1.text":
@@ -388,7 +394,8 @@ export const en: Record<MessageKey, string> = {
   "onboard.next": "Next",
   "onboard.start": "Start building",
   "guide.next.hint": "Next: {stage}, {n} {blocks}",
-  "guide.swipe": "Swipe left for the next step, right for the previous one",
+  "guide.swipe":
+    "Swipe left for the next step, right for the previous one. Drag the plan to move it, pinch to zoom",
   "guide.stageDone": "Stage “{stage}” complete!",
   "guide.stageDoneText": "Great job. Next stage: {next}.",
   "guide.buildDone": "Build complete!",

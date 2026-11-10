@@ -85,7 +85,12 @@ export function GameMode(p: GameModeProps) {
   const swipe = useRef<{ x: number; y: number } | null>(null);
 
   const onDown = (e: ReactPointerEvent) => {
-    if ((e.target as HTMLElement).closest(".viewer-host")) return; // let the 3D view rotate
+    if (!e.isPrimary) {
+      swipe.current = null; // a second finger: this is a pinch on the plan, not a swipe
+      return;
+    }
+    // let the 3D view rotate and a zoomed plan move under the finger
+    if ((e.target as HTMLElement).closest(".viewer-host, .plan-host[data-grab]")) return;
     swipe.current = { x: e.clientX, y: e.clientY };
   };
   const onUp = (e: ReactPointerEvent) => {
@@ -162,6 +167,7 @@ export function GameMode(p: GameModeProps) {
             y={cur.layer}
             currentStep={p.step}
             focus
+            swipeThrough
             symbols={p.symbols}
             label={t("guide.layer", { y: cur.layer })}
           />
@@ -189,6 +195,9 @@ export function GameMode(p: GameModeProps) {
           ) : null}
           <li className="sum">
             {cur.blocks.length} {blocksWord(locale, cur.blocks.length)}
+            {cur.copies && cur.copies > 1
+              ? ` · ${t(cur.mirrored ? "game.copies.mirrored" : "game.copies", { n: cur.copies })}`
+              : ""}
           </li>
         </ul>
       ) : null}

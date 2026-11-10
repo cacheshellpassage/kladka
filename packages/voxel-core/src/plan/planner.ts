@@ -31,6 +31,10 @@ export interface PlanStep {
   layerTo?: number;
   /** Number of identical pillars built in this step, when there are several. */
   pillars?: number;
+  /** Number of identical parts (towers, wings, bays) built in this step, when there are several. */
+  copies?: number;
+  /** Some of the parts are a mirrored or turned copy of the first one, not a shifted one. */
+  mirrored?: boolean;
   /** Voxel indices in placement order. */
   blocks: number[];
   /** Blocks that became placeable only after a later group (e.g. hanging lanterns). */
@@ -210,12 +214,13 @@ export function planBuild(m: VoxelModel, opts: PlanOptions = {}): BuildPlan {
     }
   }
 
-  const isSupported = (i: number): boolean => {
+  /** Can block `i` be placed when exactly the blocks accepted by `has` are already there? */
+  const supportedBy = (i: number, has: (j: number) => boolean): boolean => {
     const s = supportOf[i]!;
     const y = Math.floor(i / layer);
     if (s === -2) return true; // support would be outside the model: assume ground/wall
     if (s >= 0) {
-      if (placed[s]) return true;
+      if (has(s)) return true;
       // support position holds nothing placeable in the model → cannot wait for it
       return !roles[s];
     }
@@ -228,10 +233,12 @@ export function planBuild(m: VoxelModel, opts: PlanOptions = {}): BuildPlan {
         ny = y + dy,
         nz = z + dz;
       if (nx < 0 || ny < 0 || nz < 0 || nx >= sx || ny >= sy || nz >= sz) continue;
-      if (placed[nx + nz * sx + ny * layer]) return true;
+      if (has(nx + nz * sx + ny * layer)) return true;
     }
     return false;
   };
+  const isPlaced = (j: number) => placed[j] === 1;
+  const isSupported = (i: number): boolean => supportedBy(i, isPlaced);
 
   const steps: PlanStep[] = [];
   const stages: PlanStage[] = [];
@@ -363,10 +370,17 @@ export function planBuild(m: VoxelModel, opts: PlanOptions = {}): BuildPlan {
     return origStep[s]! >= 0 && origStep[s]! < base; // e.g. a ladder on a wall built earlier
   };
   const finalSteps: PlanStep[] = [];
+  /** Position of every block in the stage being merged: -1 in an earlier stage, RANK_LATER in a later one. */
+  const rank = new Int32Array(vol).fill(RANK_LATER);
   for (const st of stages) {
     let part = steps.slice(st.stepStart, st.stepEnd);
     part = mergePillars(m, part, Math.min(maxStep, PILLAR_LIMIT), canLift);
     part = mergeSameKindRows(m, part);
+    part.forEach((s, k) => {
+      for (const i of s.blocks) rank[i] = k;
+    });
+    part = mergeCopies(m, part, rank, supportedBy);
+    for (const s of part) for (const i of s.blocks) rank[i] = -1;
     st.stepStart = finalSteps.length;
     for (const s of part) finalSteps.push({ ...s, index: finalSteps.length });
     st.stepEnd = finalSteps.length;
@@ -504,6 +518,158 @@ function mergeSameKindRows(m: VoxelModel, steps: PlanStep[]): PlanStep[] {
       out.push(s);
       kinds.push(ks);
     }
+  }
+  return out;
+}
+
+const RANK_LATER = 0x3fffffff;
+/** Upper bound of blocks in a step that builds several identical parts. */
+const COPY_LIMIT = 96;
+/** Parts further apart than this (in blocks) stay separate steps even when they are identical. */
+const COPY_GAP = 64;
+/** A part of at most this many blocks is a "row" item (a lamp, a door), not a part worth announcing. */
+const ROW_UNIT = 2;
+
+/** The eight ways to turn or mirror a footprint: each maps a horizontal offset to another one. */
+const TURNS: Array<(x: number, z: number) => [number, number]> = [
+  (x, z) => [x, z],
+  (x, z) => [-x, z],
+  (x, z) => [x, -z],
+  (x, z) => [-x, -z],
+  (x, z) => [z, x],
+  (x, z) => [-z, x],
+  (x, z) => [z, -x],
+  (x, z) => [-z, -x],
+];
+const FACING_NAMES: Array<[string, number, number]> = [
+  ["east", 1, 0],
+  ["west", -1, 0],
+  ["south", 0, 1],
+  ["north", 0, -1],
+];
+
+/**
+ * Shape of a step that does not depend on where it stands: block names with their offsets from the corner
+ * of the bounding box, the way they face and the half they occupy. `turn` picks one of the eight
+ * orientations; the smallest string over all of them is the same for mirrored and turned copies.
+ */
+function shapeKey(m: VoxelModel, s: PlanStep, turn: number): string {
+  const t = TURNS[turn]!;
+  const [ax] = t(1, 0);
+  const swapAxes = ax === 0;
+  let minX = Infinity,
+    minZ = Infinity;
+  const cells = s.blocks.map((i) => {
+    const c = m.coords(i);
+    const [x, z] = t(c.x, c.z);
+    if (x < minX) minX = x;
+    if (z < minZ) minZ = z;
+    const st = m.palette[m.blocks[i]!]!;
+    const p = st.props;
+    let facing = p.facing ?? "";
+    const dir = FACING_NAMES.find((d) => d[0] === facing);
+    if (dir) {
+      const [fx, fz] = t(dir[1], dir[2]);
+      facing = FACING_NAMES.find((d) => d[1] === fx && d[2] === fz)![0];
+    }
+    let axis = p.axis ?? "";
+    if (swapAxes && axis !== "y" && axis) axis = axis === "x" ? "z" : "x";
+    return { x, y: c.y - s.layer, z, tag: `${st.name}/${facing}/${axis}/${p.half ?? p.type ?? ""}` };
+  });
+  return cells
+    .map((c) => `${c.x - minX},${c.y},${c.z - minZ},${c.tag}`)
+    .sort()
+    .join(";");
+}
+
+/**
+ * Symmetric builds repeat the same work: four corner towers, two wings, a row of bays. Steps of one stage
+ * that start on the same layer and have the same shape (shifted, mirrored or turned by 90°) become one step
+ * "N identical parts", so the builder reads the pattern once. The later parts move to the place of the first
+ * one, which never takes support away from anything else; a part moves only if every block of it is
+ * supported by what is already built at that moment.
+ */
+function mergeCopies(
+  m: VoxelModel,
+  steps: PlanStep[],
+  rank: Int32Array,
+  supportedBy: (i: number, has: (j: number) => boolean) => boolean,
+): PlanStep[] {
+  if (steps.length < 2) return steps;
+  const plain: Array<string | null> = [];
+  const keys = steps.map((s, k) => {
+    plain[k] = null;
+    if (s.deferred || s.scaffold || s.blocks.length > COPY_LIMIT / 2) return null;
+    let best = (plain[k] = shapeKey(m, s, 0));
+    for (let t = 1; t < TURNS.length; t++) {
+      const key = shapeKey(m, s, t);
+      if (key < best) best = key;
+    }
+    return `${s.layer}|${s.layerTo ?? ""}|${best}`;
+  });
+  const box = (blocks: number[]) => {
+    const b = { x0: Infinity, z0: Infinity, x1: -Infinity, z1: -Infinity };
+    for (const i of blocks) {
+      const c = m.coords(i);
+      b.x0 = Math.min(b.x0, c.x);
+      b.z0 = Math.min(b.z0, c.z);
+      b.x1 = Math.max(b.x1, c.x);
+      b.z1 = Math.max(b.z1, c.z);
+    }
+    return b;
+  };
+  const consumed = new Uint8Array(steps.length);
+  const out: PlanStep[] = [];
+  for (let k = 0; k < steps.length; k++) {
+    if (consumed[k]) continue;
+    const s = steps[k]!;
+    const key = keys[k];
+    if (!key) {
+      out.push(s);
+      continue;
+    }
+    const pillar = s.layerTo !== undefined;
+    const unit = s.blocks.length / (pillar ? (s.pillars ?? 1) : (s.copies ?? 1));
+    const limit = pillar ? PILLAR_GROUP_LIMIT : unit <= ROW_UNIT ? ROW_LIMIT : COPY_LIMIT;
+    let blocks = s.blocks;
+    let parts = 1;
+    let mirrored = false;
+    const gap = !pillar && unit <= ROW_UNIT ? ROW_GAP : COPY_GAP;
+    const first = box(s.blocks);
+    for (let j = k + 1; j < steps.length; j++) {
+      if (consumed[j] || keys[j] !== key) continue;
+      const next = steps[j]!;
+      if (blocks.length + next.blocks.length > limit) continue;
+      const nb = box(next.blocks);
+      if (Math.max(first.x0 - nb.x1, nb.x0 - first.x1, first.z0 - nb.z1, nb.z0 - first.z1) > gap) continue;
+      const added = new Set<number>();
+      const has = (q: number) => rank[q]! <= k || added.has(q);
+      let ok = true;
+      for (const i of next.blocks) {
+        if (!supportedBy(i, has)) {
+          ok = false;
+          break;
+        }
+        added.add(i);
+      }
+      if (!ok) continue;
+      consumed[j] = 1;
+      for (const i of next.blocks) rank[i] = k;
+      blocks = blocks.concat(next.blocks);
+      parts++;
+      if (plain[j] !== plain[k]) mirrored = true;
+    }
+    if (parts === 1) {
+      out.push(s);
+      continue;
+    }
+    const merged: PlanStep = { ...s, blocks };
+    if (pillar) merged.pillars = blocks.length / unit;
+    else if (unit > ROW_UNIT) {
+      merged.copies = blocks.length / unit;
+      if (mirrored || s.mirrored) merged.mirrored = true;
+    }
+    out.push(merged);
   }
   return out;
 }

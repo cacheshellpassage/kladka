@@ -118,7 +118,9 @@ export function CatalogPage() {
           <span className="section-title" style={{ margin: 0 }}>
             <Icon name="grid" size={18} /> {t("catalog.title")}
           </span>
-          <span className="muted small">{t("catalog.count", { n: list.length, builds: buildsWord(locale, list.length) })}</span>
+          <span className="muted small">
+            {t("catalog.count", { n: list.length, builds: buildsWord(locale, list.length) })}
+          </span>
         </div>
         <div className="searchbox">
           <Icon name="search" />

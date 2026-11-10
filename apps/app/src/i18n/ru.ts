@@ -125,6 +125,8 @@ export const ru = {
   "guide.layer": "Слой Y = {y}",
   "guide.layers": "Слои Y = {y}–{to}",
   "guide.pillars": "Одинаковых столбов: {n}. Каждый ставьте снизу вверх",
+  "guide.copies": "Одинаковых частей: {n}. Постройте одну — остальные такие же",
+  "guide.copies.mirrored": "Одинаковых частей: {n}. Остальные — зеркально или с поворотом",
   "guide.allDone": "Все шаги пройдены",
   "guide.finishedStats": "Поставлено блоков: {blocks} · шагов: {steps}",
   "guide.toCatalog": "К каталогу",
@@ -132,6 +134,7 @@ export const ru = {
   "guide.view": "Вид",
   "guide.plan.zoom": "К шагу",
   "guide.plan.whole": "Весь слой",
+  "guide.plan.reset": "Сбросить масштаб схемы",
   "viewer.play": "Запустить",
   "guide.pillar": "Столб: ставьте снизу вверх",
   "guide.prev": "Назад",
@@ -156,7 +159,8 @@ export const ru = {
   "guide.exporting": "Готовим файл…",
   "guide.stageJump": "Перейти к этапу",
   "guide.progressSaved": "Прогресс сохраняется автоматически",
-  "guide.keys": "Клавиши: ← → — шаги, пробел — шаг выполнен, WASD — вращение, +/− — масштаб",
+  "guide.keys":
+    "Клавиши: ← → — шаги, пробел — шаг выполнен, WASD — вращение, +/− — масштаб. Схема: колёсико — масштаб, перетаскивание — сдвиг, двойной щелчок — приблизить",
 
   "plan.legend": "Легенда",
   "plan.current": "Текущий шаг",
@@ -372,6 +376,8 @@ export const ru = {
   "game.enter": "Я в игре",
   "game.exit": "Выйти из режима «Я в игре»",
   "game.awake": "экран не гаснет",
+  "game.copies": "одинаковых частей: {n}",
+  "game.copies.mirrored": "одинаковых частей: {n}, зеркально",
   "onboard.title": "Добро пожаловать",
   "onboard.1.title": "Стройте по шагам",
   "onboard.1.text":
@@ -386,7 +392,8 @@ export const ru = {
   "onboard.next": "Дальше",
   "onboard.start": "Начать строить",
   "guide.next.hint": "Дальше: {stage}, {n} {blocks}",
-  "guide.swipe": "Свайп влево — следующий шаг, вправо — предыдущий",
+  "guide.swipe":
+    "Свайп влево — следующий шаг, вправо — предыдущий. Схему можно двигать пальцем и увеличивать щипком",
   "guide.stageDone": "Этап «{stage}» готов!",
   "guide.stageDoneText": "Отличная работа. Следующий этап: {next}.",
   "guide.buildDone": "Постройка завершена!",

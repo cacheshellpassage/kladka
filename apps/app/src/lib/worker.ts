@@ -25,6 +25,10 @@ export interface SerializedPlan {
     layerTo?: number;
     /** Number of identical pillars built in this step, when there are several. */
     pillars?: number;
+    /** Number of identical parts (towers, wings, bays) built in this step, when there are several. */
+    copies?: number;
+    /** Some of the parts are a mirrored or turned copy of the first one. */
+    mirrored?: boolean;
     blocks: Int32Array;
     deferred?: boolean;
     scaffold?: boolean;
@@ -68,6 +72,8 @@ function serialize(plan: ReturnType<typeof planBuild>): { plan: SerializedPlan; 
       layer: s.layer,
       layerTo: s.layerTo,
       pillars: s.pillars,
+      copies: s.copies,
+      mirrored: s.mirrored,
       blocks,
       deferred: s.deferred,
       scaffold: s.scaffold,

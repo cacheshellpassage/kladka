@@ -55,6 +55,66 @@
   left: 8px;
 }
 
+/* The plan moves like a map: only the visible window is drawn, the gestures belong to the plan. */
+.plan-host,
+.guide-stage .plan-host,
+.gm-visual .plan-host {
+  display: block;
+  overflow: hidden;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+.plan-host canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin: 0;
+}
+.plan-host[data-grab] {
+  cursor: grab;
+}
+.plan-host[data-grab]:active {
+  cursor: grabbing;
+}
+.plan-reset {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  z-index: 2;
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  backdrop-filter: blur(6px);
+  box-shadow: var(--shadow);
+}
+.left-handed .plan-reset,
+.game-mode.left .plan-reset {
+  right: auto;
+  left: 8px;
+}
+
+/* several identical parts in one step */
+.copies-hint {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 6px;
+  color: var(--accent-strong);
+  font-weight: 600;
+}
+.copies-hint::before {
+  content: "";
+  flex: none;
+  width: 14px;
+  height: 14px;
+  margin-top: 0.2em;
+  background:
+    linear-gradient(var(--accent), var(--accent)) left top / 6px 6px no-repeat,
+    linear-gradient(var(--accent), var(--accent)) right top / 6px 6px no-repeat,
+    linear-gradient(var(--accent), var(--accent)) left bottom / 6px 6px no-repeat,
+    linear-gradient(var(--accent), var(--accent)) right bottom / 6px 6px no-repeat;
+  border-radius: 2px;
+}
+
 /* ---------- what the current step needs ---------- */
 .step-card {
   align-items: start;
