@@ -284,3 +284,11 @@ Two follow-ups of the walkthrough in D-021.
   completely outside the window.
 
 Checked with real touch events (Chromium, CDP) on a phone-sized screen; not checked on phone hardware.
+
+## D-023 One version number, set by a script (2026-11-10)
+
+The version lives in ten files (package manifests, `app.config.json`, Tauri config, `Cargo.toml`, Android
+`build.gradle`). `pnpm set-version <x.y.z>` rewrites all of them and raises the Android `versionCode` by one, so a
+store update can never ship with a stale number. First public version: 1.0.0, `versionCode` 1. The contact e-mail
+is part of `app.config.json` and is shown on the privacy page. The release workflows got `contents: write` so a
+`v*` tag can attach the builds to a GitHub release. The whole release path is written down in `docs/RELEASE.md`.

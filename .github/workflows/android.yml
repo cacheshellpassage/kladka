@@ -6,6 +6,10 @@ on:
     tags: ["v*"]
   workflow_dispatch:
 
+# attaching the builds to a GitHub release (on a v* tag) needs write access to the repository contents
+permissions:
+  contents: write
+
 jobs:
   apk:
     name: APK (debug + release)

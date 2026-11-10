@@ -1,6 +1,6 @@
 [package]
 name = "kladka"
-version = "0.1.0"
+version = "1.0.0"
 description = "Kladka - offline step-by-step build guides"
 authors = ["Kladka contributors"]
 license = "MIT"

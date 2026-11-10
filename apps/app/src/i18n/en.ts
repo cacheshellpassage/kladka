@@ -360,6 +360,7 @@ export const en: Record<MessageKey, string> = {
     "This is an unofficial app. It is not approved by or associated with Mojang or Microsoft. Minecraft is a trademark of Mojang Synergies AB.",
 
   "privacy.title": "Privacy policy",
+  "privacy.contact": "Contact: {email}",
   "privacy.body":
     "The app does not collect, store on servers or transmit any personal data. There is no analytics, advertising, accounts or network traffic. Progress, favorites, settings and imported files are stored only locally on your device and are removed together with the app or via “Clear all data” in Settings.",
 

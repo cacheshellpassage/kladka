@@ -80,6 +80,7 @@ export function PrivacyPage() {
     <div className="stack prose">
       <h1>{t("privacy.title")}</h1>
       <p>{t("privacy.body")}</p>
+      <p data-testid="privacy-contact">{t("privacy.contact", { email: appConfig.contact })}</p>
       <p className="small muted">{t("about.disclaimer")}</p>
     </div>
   );

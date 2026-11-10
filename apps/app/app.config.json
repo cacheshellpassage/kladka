@@ -7,8 +7,9 @@
     "en": "Offline step-by-step building guides for Minecraft Java Edition: 3D view, layer plans, material lists, import and export of .schem/.litematic/.nbt."
   },
   "appId": "app.kladka.guide",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "disclaimer": "NOT AN OFFICIAL MINECRAFT PRODUCT. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT.",
   "website": "",
+  "contact": "sebastianvisconti38@gmail.com",
   "license": "MIT (code), CC0 1.0 (built-in content)"
 }

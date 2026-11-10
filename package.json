@@ -1,7 +1,7 @@
 {
   "name": "kladka-monorepo",
   "private": true,
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Offline step-by-step build guides for voxel games (Minecraft Java Edition first).",
   "license": "MIT",
   "type": "module",
@@ -22,7 +22,8 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "check:offline": "node tools/check-offline.mjs"
+    "check:offline": "node tools/check-offline.mjs",
+    "set-version": "node tools/set-version.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
