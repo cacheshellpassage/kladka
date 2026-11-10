@@ -1,0 +1,373 @@
+/*
+ * Usability pass: what a builder holding a phone actually touches and reads.
+ * Loaded after polish.css, so the rules here win on equal specificity.
+ */
+
+/* ---------- plan letters ---------- */
+.plan-sym {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 4px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1;
+}
+.plan-sym:empty {
+  display: none;
+}
+
+/* ---------- the plan and its zoom switch ---------- */
+.plan-wrap {
+  position: relative;
+  display: grid;
+  min-width: 0;
+  min-height: 0;
+}
+.plan-wrap > .plan-host {
+  min-height: 0;
+}
+.guide-stage.split .plan-wrap {
+  border-left: 1px solid var(--border);
+}
+.plan-zoom {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 2;
+  min-height: 36px;
+  padding: 0 12px;
+  gap: 6px;
+  border-radius: 999px;
+  font-size: var(--fs-xs);
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  backdrop-filter: blur(6px);
+  box-shadow: var(--shadow);
+}
+.left-handed .plan-zoom {
+  right: auto;
+  left: 8px;
+}
+
+/* ---------- what the current step needs ---------- */
+.step-card {
+  align-items: start;
+}
+.step-mats {
+  list-style: none;
+  margin: 6px 0 2px;
+  padding: 0;
+  display: grid;
+  gap: 4px;
+  font-size: var(--fs-sm);
+}
+.step-mats li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+.step-mats .nm {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.step-mats b {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.step-mats li.more {
+  color: var(--muted);
+  font-size: var(--fs-xs);
+}
+
+/* ---------- the build is finished ---------- */
+.finish-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  border-radius: 16px;
+  background: var(--accent-soft);
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border));
+  animation: fade-up var(--dur-slow) var(--ease-out) both;
+}
+.finish-card strong {
+  font-size: var(--fs-lg);
+}
+.finish-card .row {
+  gap: 8px;
+}
+.finish-card .btn {
+  background: var(--surface);
+}
+
+/* keyboard shortcuts are only worth the space where there is a keyboard */
+.keys-hint {
+  display: none;
+}
+@media (hover: hover) and (pointer: fine) {
+  .keys-hint {
+    display: block;
+  }
+}
+
+.btn.compact {
+  min-height: 36px;
+  padding: 0 10px;
+  font-size: var(--fs-xs);
+}
+
+/* ---------- fingers need room ---------- */
+.mats button.rowbtn {
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  min-height: 28px;
+}
+.check {
+  position: relative;
+  flex: none;
+}
+@media (pointer: coarse) {
+  .mats button.rowbtn {
+    min-height: 40px;
+  }
+  /* the box stays 24px, the area that takes the tap grows to 44px */
+  .check::before {
+    content: "";
+    position: absolute;
+    inset: -10px;
+  }
+  .stage-list button {
+    min-height: 40px;
+    padding: 6px 14px;
+  }
+  .segmented button,
+  .chip,
+  .btn.compact,
+  .plan-zoom {
+    min-height: 40px;
+  }
+  .viewer-overlay .btn {
+    width: 44px;
+    min-height: 44px;
+  }
+}
+
+/* ---------- catalog ---------- */
+/* a clipped style name ("Средневеков…") says less than a second line */
+.bcard .meta-top {
+  flex-wrap: wrap;
+  gap: 2px 8px;
+}
+.bcard .meta-top .style-name {
+  overflow: visible;
+  white-space: normal;
+}
+@media (max-width: 520px) {
+  .hero-banner {
+    padding: 16px 16px 14px;
+    border-radius: 18px;
+  }
+  .hero-banner h1 {
+    font-size: calc(1.4rem * var(--text-scale));
+  }
+  .hero-banner p {
+    font-size: var(--fs-sm);
+    max-width: 78%;
+  }
+}
+
+/* ---------- help: launcher tabs fit a narrow phone ---------- */
+.jar-help .segmented {
+  flex-wrap: wrap;
+  overflow: visible;
+  border-radius: 18px;
+}
+
+/* ---------- 3D view on a phone: the info card leaves the zoom buttons alone ---------- */
+@media (max-width: 720px) {
+  .view-stage .view-panel {
+    left: 10px;
+    right: 62px;
+    width: auto;
+    max-height: 55%;
+  }
+  .left-handed .view-stage .view-panel {
+    left: 62px;
+    right: 10px;
+  }
+}
+
+/* ---------- a phone held sideways ---------- */
+@media (orientation: landscape) and (max-height: 520px) {
+  /* the guide and the 3D view take the whole screen: both have their own "back" */
+  .immersive {
+    --topbar-h: 0px;
+  }
+  .immersive .topbar {
+    display: none;
+  }
+
+  .guide {
+    grid-template-columns: minmax(0, 1fr) minmax(280px, 40%);
+    grid-template-rows: minmax(0, 1fr);
+  }
+  .guide-side {
+    border-top: 0;
+    border-left: 1px solid var(--border);
+  }
+  .guide-side .scroll {
+    padding: 10px 12px;
+    gap: 10px;
+  }
+  .guide-controls {
+    padding: 8px 10px calc(8px + var(--safe-bottom));
+  }
+  .guide-controls .btn.big {
+    min-height: 48px;
+  }
+  .guide .viewer-host,
+  .view-page .viewer-host {
+    min-height: 0;
+  }
+
+  .view-page {
+    grid-template-columns: minmax(0, 1fr) minmax(260px, 38%);
+    grid-template-rows: minmax(0, 1fr);
+    height: calc(100dvh - var(--topbar-h) - var(--safe-top));
+  }
+  .view-tools {
+    border-top: 0;
+    border-left: 1px solid var(--border);
+    padding: 10px 12px calc(10px + var(--safe-bottom));
+    gap: 10px;
+  }
+  .view-stage .view-panel {
+    max-height: calc(100% - 24px);
+  }
+
+  /* build page: the cover next to the facts instead of a cover taller than the screen */
+  .build-layout {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 14px;
+  }
+
+  /* "I'm in the game": the picture on one side, the step and the big button on the other */
+  .game-mode {
+    grid-template-columns: minmax(0, 1fr) minmax(260px, 42%);
+    grid-template-rows: auto auto minmax(0, 1fr) auto;
+    gap: 6px 12px;
+    padding: calc(6px + var(--safe-top)) 12px calc(8px + var(--safe-bottom));
+  }
+  .game-mode > * {
+    grid-column: 2;
+  }
+  .game-mode > .gm-visual {
+    grid-column: 1;
+    grid-row: 1 / -1;
+  }
+  .game-mode.left {
+    grid-template-columns: minmax(260px, 42%) minmax(0, 1fr);
+  }
+  .game-mode.left > * {
+    grid-column: 1;
+  }
+  .game-mode.left > .gm-visual {
+    grid-column: 2;
+  }
+  .gm-top {
+    grid-row: 1;
+  }
+  .gm-step {
+    grid-row: 2;
+  }
+  .gm-mats {
+    grid-row: 3;
+    align-self: start;
+    max-height: 100%;
+    overflow: auto;
+    padding: 8px 12px;
+    gap: 4px;
+    font-size: var(--fs-sm);
+  }
+  .gm-controls {
+    grid-row: 4;
+  }
+  .gm-num {
+    font-size: calc(2.4rem * var(--text-scale));
+  }
+  .gm-nav {
+    flex-direction: row;
+    gap: 8px;
+  }
+  .gm-nav .btn {
+    width: 56px;
+    min-height: 68px;
+  }
+  .gm-done {
+    min-height: 68px;
+    flex-direction: row;
+    font-size: calc(1.15rem * var(--text-scale));
+  }
+}
+
+/* ---------- second pass after the phone walkthrough ---------- */
+/* on a phone the plan is as wide as the screen: the zoom switch shrinks to an icon in the corner */
+@media (max-width: 600px) {
+  .plan-zoom {
+    top: 2px;
+    right: 4px;
+    width: 36px;
+    min-height: 36px;
+    padding: 0;
+    gap: 0;
+    font-size: 0;
+  }
+  .left-handed .plan-zoom {
+    left: 4px;
+  }
+}
+.finish-card .btn {
+  flex: 1 1 auto;
+  padding: 0 12px;
+}
+@media (pointer: coarse) {
+  .segmented button {
+    min-width: 44px;
+  }
+  .plan-zoom {
+    min-height: 36px;
+  }
+  .plan-zoom::before {
+    content: "";
+    position: absolute;
+    inset: -6px;
+  }
+  .modal a.small,
+  .modal .small a {
+    display: inline-block;
+    padding: 10px 0;
+  }
+}
+@media (orientation: landscape) and (max-height: 520px) {
+  .gm-nav .btn {
+    padding: 0;
+  }
+  .stat b {
+    font-size: var(--fs-md);
+  }
+  .stats {
+    grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
+    gap: 8px;
+  }
+}

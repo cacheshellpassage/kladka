@@ -27,6 +27,16 @@ export function blocksWord(locale: Locale, n: number): string {
   return "блоков";
 }
 
+/** "постройка / постройки / построек" (ru) or "build / builds" (en). */
+export function buildsWord(locale: Locale, n: number): string {
+  if (locale === "en") return n === 1 ? "build" : "builds";
+  const m10 = n % 10,
+    m100 = n % 100;
+  if (m10 === 1 && m100 !== 11) return "постройка";
+  if (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) return "постройки";
+  return "построек";
+}
+
 export function nameOf(locale: Locale): (block: string) => string {
   return (b) => itemName(b, locale);
 }

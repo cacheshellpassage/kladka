@@ -14,6 +14,7 @@ import { PlanCanvas } from "./PlanCanvas";
 import { Viewer3D } from "./Viewer3D";
 import { BlockIcon } from "./Visual";
 import type { SerializedPlan } from "../lib/worker-client";
+import type { PlanSymbols } from "../lib/plan2d";
 
 type WakeLockSentinelLike = { release: () => Promise<void>; released?: boolean };
 
@@ -55,6 +56,8 @@ export interface GameModeProps {
   title: string;
   model: VoxelModel;
   plan: SerializedPlan;
+  /** Plan letters of the build, shown next to the materials of the step. */
+  symbols?: PlanSymbols;
   step: number;
   total: number;
   finished: boolean;
@@ -159,6 +162,7 @@ export function GameMode(p: GameModeProps) {
             y={cur.layer}
             currentStep={p.step}
             focus
+            symbols={p.symbols}
             label={t("guide.layer", { y: cur.layer })}
           />
         ) : (
@@ -172,12 +176,17 @@ export function GameMode(p: GameModeProps) {
             <li key={l.item}>
               <span className="gm-mat">
                 <BlockIcon block={l.item} size={26} />
+                {p.symbols?.byItem.get(l.item) ? (
+                  <span className="plan-sym">{p.symbols.byItem.get(l.item)}</span>
+                ) : null}
                 {nameOf(locale)(l.item)}
               </span>
               <b>{formatCount(t, l, units)}</b>
             </li>
           ))}
-          {lines.length > 4 ? <li className="more">+{lines.length - 4}</li> : null}
+          {lines.length > 4 ? (
+            <li className="more">{t("guide.moreItems", { n: lines.length - 4 })}</li>
+          ) : null}
           <li className="sum">
             {cur.blocks.length} {blocksWord(locale, cur.blocks.length)}
           </li>

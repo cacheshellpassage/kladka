@@ -5,6 +5,7 @@ import { platform } from "./platform/platform";
 import "@fontsource-variable/inter/wght.css";
 import "./styles/app.css";
 import "./styles/polish.css";
+import "./styles/ux.css";
 
 // press ripple starts where the finger/cursor touched the button
 document.addEventListener(

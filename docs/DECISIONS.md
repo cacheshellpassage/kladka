@@ -224,3 +224,38 @@ A review of shulkr.com (browser schematic viewer/editor) listed what Kladka lack
 Not taken (need a server, accounts or network, or out of scope): community catalogue and uploads, comments,
 duplicate detection, AI builder, test servers, URL import, Bedrock `.mcstructure`, a full editor, bundled
 game or mod textures.
+
+## D-021 Usability pass from a full user walkthrough (2026-11-10)
+
+The app was walked end to end as a builder (catalogue, build page, checklist, export, all 92 steps of the
+mini-castle, in-game mode, free 3D view, import, settings, help) on a phone in both orientations, a tablet and
+a desktop, in both themes and both languages. A script took a screenshot of every screen and listed clipped
+text, horizontal overflow, small tap targets and console errors. What changed:
+
+- **Plan letters belong to an item, not to a layer.** The most used item of a build is "A" everywhere: on every
+  layer of the plan, in the step card, in the material list, in the in-game mode and in PNG/PDF export (which
+  now prints the layer legend under the plan). Before, the same letter meant different blocks on different
+  layers, and stairs had four letters, one per facing.
+- **The step card says what to place**: icon, letter, name and count for the blocks of the step (up to four
+  lines, then "and N more"), so the builder does not have to scroll to the material list.
+- **Same-kind rows are joined** in the planner (`mergeSameKindRows`), and a step with several identical pillars
+  says how many there are. The mini-castle went from 99 steps to 92, the whole catalogue from 1320 to 1235.
+- **Finishing a build is a state, not a dead end**: a finish card with totals, links to the 3D view and to the
+  catalogue, and "all steps done" instead of "step 92 of 92"; the main button leads to the catalogue.
+- **Phones get one view at a time** (3D or plan). The side-by-side view needs about 600 px of width, so it is
+  offered on tablets and desktops only; a saved "3D + plan" choice falls back to 3D on a phone.
+- **The plan fits the whole layer by default** (cells may shrink to 5 px and drop their letters) with a switch
+  to zoom to the blocks of the step. Before, a 25-block-wide layer was cut off on a phone.
+- **A phone held sideways** gets its own layouts: the guide, the 3D view, the build page and the in-game mode
+  put the picture on one side and the text and buttons on the other, and the top bar is hidden on the
+  full-screen pages (each has its own "back").
+- **Tap targets** on touch screens are at least 40-44 px (checkboxes keep their 24 px look and get a larger hit
+  area), the block card in the 3D view no longer covers the zoom buttons, launcher tabs in the help wrap
+  instead of scrolling sideways.
+- **Catalogue**: easiest builds first by default, correct Russian plurals ("36 построек"), style names wrap
+  instead of being clipped.
+- Keyboard hints are shown only where there is a keyboard; loading states replace empty panels.
+- The root `pnpm build` script failed (no package has a `build` script); it now builds the app.
+
+Not verifiable here: real phone hardware (touch, notches, performance) and the Android/Tauri builds, which
+run in CI only.

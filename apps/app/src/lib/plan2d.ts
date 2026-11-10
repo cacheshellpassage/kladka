@@ -1,5 +1,5 @@
 /** 2D layer plan rendering (canvas): grid, coordinates, block colours, symbols and step state. */
-import { blockInfo, layerGrid, shortId, type VoxelModel } from "@kladka/voxel-core";
+import { blockInfo, gameAdapter, layerGrid, shortId, type VoxelModel } from "@kladka/voxel-core";
 
 export interface PlanColors {
   bg: string;
@@ -20,6 +20,31 @@ export interface LegendEntry {
 }
 
 const SYMBOLS = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789";
+
+/**
+ * Plan letters of one build. A letter belongs to an item (not to a block state), so stairs keep one
+ * letter whatever way they face, and it is the same on every layer, in the lists and in exports.
+ */
+export interface PlanSymbols {
+  byItem: Map<string, string>;
+  byPalette: Map<number, string>;
+}
+
+/** Letters in the order of the material list (the most used item gets "A"). */
+export function planSymbols(model: VoxelModel, materials: ReadonlyArray<{ item: string }>): PlanSymbols {
+  const byItem = new Map<string, string>();
+  materials.forEach((l, i) => byItem.set(l.item, SYMBOLS[i % SYMBOLS.length]!));
+  const game = gameAdapter(model.game);
+  const byPalette = new Map<number, string>();
+  model.palette.forEach((st, p) => {
+    if (p === 0) return;
+    // the upper half of a door or the head of a bed costs nothing: it shares the letter of its item
+    const item = game.itemsFor(st)[0]?.item ?? shortId(st.name);
+    const sym = byItem.get(item);
+    if (sym) byPalette.set(p, sym);
+  });
+  return { byItem, byPalette };
+}
 
 function hex(c: number): string {
   return `#${c.toString(16).padStart(6, "0")}`;
@@ -43,6 +68,10 @@ export interface DrawPlanOptions {
   /** Margin for axis labels (px). */
   margin?: number;
   title?: string;
+  /** Letters shared by the whole build; without them letters are given per layer. */
+  symbols?: PlanSymbols;
+  /** Draw the list of the layer's blocks (letter, name, count) under the plan: for PNG and PDF export. */
+  legend?: boolean;
   /** Draw only this window of the layer (x0/z0 inclusive, x1/z1 exclusive); labels keep real coordinates. */
   region?: PlanRegion;
 }
@@ -99,7 +128,12 @@ export function stepRegion(
   return { x0, z0, x1, z1 };
 }
 
-export function legendFor(model: VoxelModel, y: number, nameOf: (n: string) => string): LegendEntry[] {
+export function legendFor(
+  model: VoxelModel,
+  y: number,
+  nameOf: (n: string) => string,
+  symbols?: PlanSymbols,
+): LegendEntry[] {
   const g = layerGrid(model, null, y);
   const counts = new Map<number, number>();
   for (const p of g.cells) if (p) counts.set(p, (counts.get(p) ?? 0) + 1);
@@ -110,11 +144,26 @@ export function legendFor(model: VoxelModel, y: number, nameOf: (n: string) => s
       return {
         palette,
         count,
-        symbol: SYMBOLS[i % SYMBOLS.length]!,
+        symbol: symbols ? (symbols.byPalette.get(palette) ?? "") : SYMBOLS[i % SYMBOLS.length]!,
         color: hex(blockInfo(st.name).color),
         name: nameOf(st.name),
       };
     });
+}
+
+const LEGEND_ROW = 22;
+const LEGEND_COL = 250;
+
+/** Legend rows: block states that share a letter and a name (stairs facing four ways) become one row. */
+function legendRows(legend: LegendEntry[]): LegendEntry[] {
+  const rows = new Map<string, LegendEntry>();
+  for (const l of legend) {
+    const key = l.symbol + "|" + l.name;
+    const row = rows.get(key);
+    if (row) row.count += l.count;
+    else rows.set(key, { ...l });
+  }
+  return [...rows.values()].sort((a, b) => b.count - a.count);
 }
 
 /** Draws the plan; returns the canvas size actually used. */
@@ -131,11 +180,16 @@ export function drawPlan(
   const SW = model.size.x;
   const W = rg.x1 - rg.x0,
     D = rg.z1 - rg.z0;
-  const width = margin + W * cell + 8;
-  const height = top + D * cell + 8;
   const grid = layerGrid(model, null, y);
-  const legend = legendFor(model, y, o.nameOf);
+  const legend = legendFor(model, y, o.nameOf, o.symbols);
   const sym = new Map(legend.map((l) => [l.palette, l.symbol]));
+  const rows = o.legend ? legendRows(legend) : [];
+  const planWidth = margin + W * cell + 8;
+  const planHeight = top + D * cell + 8;
+  const width = rows.length ? Math.max(planWidth, margin + LEGEND_COL + 8) : planWidth;
+  const legendCols = Math.max(1, Math.floor((width - margin - 8) / LEGEND_COL));
+  const perCol = Math.ceil(rows.length / legendCols);
+  const height = planHeight + (rows.length ? perCol * LEGEND_ROW + 14 : 0);
   ctx.save();
   ctx.fillStyle = colors.bg;
   ctx.fillRect(0, 0, width, height);
@@ -217,7 +271,7 @@ export function drawPlan(
           ctx.stroke();
         } else if (cell >= 14) {
           ctx.fillStyle = luminance(info.color) > 0.55 ? "#111" : "#fff";
-          ctx.fillText(sym.get(p) ?? "?", px + cell / 2, pz + cell / 2 + 1);
+          ctx.fillText(sym.get(p) ?? "", px + cell / 2, pz + cell / 2 + 1);
         }
       }
       if (current) {
@@ -252,6 +306,31 @@ export function drawPlan(
   for (let z = 0; z < D; z++)
     if ((OZ + z) % every === 0) ctx.fillText(String(OZ + z), -4, z * cell + cell / 2);
   ctx.restore();
+  if (rows.length) {
+    ctx.save();
+    ctx.textBaseline = "middle";
+    rows.forEach((l, i) => {
+      const lx = margin + Math.floor(i / perCol) * LEGEND_COL;
+      const ly = planHeight + 6 + (i % perCol) * LEGEND_ROW;
+      ctx.fillStyle = l.color;
+      ctx.fillRect(lx, ly + 2, 18, 18);
+      ctx.strokeStyle = colors.gridStrong;
+      ctx.lineWidth = 1;
+      ctx.strokeRect(lx + 0.5, ly + 2.5, 17, 17);
+      ctx.font = "700 11px 'Inter Variable', system-ui, sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillStyle = luminance(parseInt(l.color.slice(1), 16)) > 0.55 ? "#111" : "#fff";
+      ctx.fillText(l.symbol, lx + 9, ly + 12);
+      ctx.font = "13px 'Inter Variable', system-ui, sans-serif";
+      ctx.textAlign = "left";
+      ctx.fillStyle = colors.text;
+      let text = l.name + " × " + l.count;
+      while (text.length > 4 && ctx.measureText(text).width > LEGEND_COL - 34)
+        text = text.slice(0, -2).trimEnd() + "…";
+      ctx.fillText(text, lx + 26, ly + 12);
+    });
+    ctx.restore();
+  }
   return { width, height, legend };
 }
 

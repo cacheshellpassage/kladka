@@ -1,7 +1,7 @@
 import { useMemo, useState, type CSSProperties } from "react";
 import { useT, type MessageKey } from "../i18n";
 import { previewUrl, type LibraryItem } from "../lib/content";
-import { formatMinutes } from "../lib/format";
+import { buildsWord, formatMinutes } from "../lib/format";
 import { Link } from "../router";
 import { useLibrary } from "../store/library";
 import { useSettings } from "../store/settings";
@@ -27,7 +27,8 @@ export function CatalogPage() {
   const [size, setSize] = useState<SizeFilter>("all");
   const [diff, setDiff] = useState<number>(0);
   const [favOnly, setFavOnly] = useState(false);
-  const [sort, setSort] = useState<Sort>("name");
+  // easy builds first: a newcomer should not meet the biggest castle at the top of the list
+  const [sort, setSort] = useState<Sort>("difficulty");
   const [filtersOpen, setFiltersOpen] = useState(() => !matchMedia("(max-width: 720px)").matches);
 
   const all = useMemo(() => [...imports, ...core], [core, imports]);
@@ -84,7 +85,7 @@ export function CatalogPage() {
         <section className="hero-banner">
           <Cubes className="cubes" />
           <h1>{t("catalog.heroTitle")}</h1>
-          <p>{t("catalog.heroLead", { n: all.length })}</p>
+          <p>{t("catalog.heroLead", { n: all.length, builds: buildsWord(locale, all.length) })}</p>
         </section>
         {inProgress.length ? (
           <section aria-label={t("catalog.continue")}>
@@ -117,7 +118,7 @@ export function CatalogPage() {
           <span className="section-title" style={{ margin: 0 }}>
             <Icon name="grid" size={18} /> {t("catalog.title")}
           </span>
-          <span className="muted small">{t("catalog.count", { n: list.length })}</span>
+          <span className="muted small">{t("catalog.count", { n: list.length, builds: buildsWord(locale, list.length) })}</span>
         </div>
         <div className="searchbox">
           <Icon name="search" />
@@ -190,9 +191,9 @@ export function CatalogPage() {
             <label className="row small">
               {t("catalog.sort")}
               <select value={sort} onChange={(e) => setSort(e.target.value as Sort)}>
-                <option value="name">{t("catalog.sort.name")}</option>
-                <option value="blocks">{t("catalog.sort.blocks")}</option>
                 <option value="difficulty">{t("catalog.sort.difficulty")}</option>
+                <option value="blocks">{t("catalog.sort.blocks")}</option>
+                <option value="name">{t("catalog.sort.name")}</option>
               </select>
             </label>
           </div>

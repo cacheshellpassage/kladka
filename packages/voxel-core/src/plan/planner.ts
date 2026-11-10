@@ -29,6 +29,8 @@ export interface PlanStep {
   layer: number;
   /** Top layer when the step builds a pillar over several layers (bottom-up). */
   layerTo?: number;
+  /** Number of identical pillars built in this step, when there are several. */
+  pillars?: number;
   /** Voxel indices in placement order. */
   blocks: number[];
   /** Blocks that became placeable only after a later group (e.g. hanging lanterns). */
@@ -438,20 +440,38 @@ function mergePillars(
   return out;
 }
 
-/** Single blocks of one kind on one layer (corner posts, eave slabs, lamps) within this distance become one step. */
+/** Small steps of one kind on one layer (corner posts, eave slabs, lamps, window panes) within this distance become one step. */
 const ROW_GAP = 32;
 const ROW_LIMIT = 16;
+/** Upper bound of blocks in a step that builds several identical pillars. */
+const PILLAR_GROUP_LIMIT = 48;
 
 /**
- * Consecutive tiny steps (≤ 2 blocks) on the same layer that use one block type and lie close together are
- * placed in one go, e.g. the posts of a fence line or the lanterns along a path. Parts are independent
- * regions in valid order, so the merged step stays buildable.
+ * Consecutive tiny steps that start on the same layer, use the same blocks and lie close together are
+ * placed in one go: the posts of a fence line, the lanterns along a path, the panes of several windows,
+ * and also identical pillars (four flag poles, a row of window columns). Blocks are compared by name, not
+ * by state, so panes or torches that only differ in the wall they touch still count as one kind. Parts
+ * are independent regions in valid order, so the merged step stays buildable.
  */
 function mergeSameKindRows(m: VoxelModel, steps: PlanStep[]): PlanStep[] {
-  const kind = (s: PlanStep) => {
-    if (s.deferred || s.scaffold || s.layerTo !== undefined || s.blocks.length > 2) return -1;
-    const p = m.blocks[s.blocks[0]!]!;
-    return s.blocks.every((i) => m.blocks[i] === p) ? p : -1;
+  const layer = m.size.x * m.size.z;
+  const nameAt = (i: number) => m.palette[m.blocks[i]!]!.name;
+  /** What one unit of the step is made of; null when the step must stay on its own. */
+  const kind = (s: PlanStep): string | null => {
+    if (s.deferred || s.scaffold) return null;
+    const pillar = s.layerTo !== undefined;
+    if (!pillar && s.blocks.length > 2) return null;
+    if (!pillar) {
+      const n = nameAt(s.blocks[0]!);
+      return s.blocks.every((i) => nameAt(i) === n) ? `row|${n}` : null;
+    }
+    return (
+      `${s.layerTo}|` +
+      s.blocks
+        .map((i) => `${Math.floor(i / layer) - s.layer}:${nameAt(i)}`)
+        .sort()
+        .join(",")
+    );
   };
   const dist = (a: number[], b: number[]) => {
     let best = Infinity;
@@ -464,22 +484,26 @@ function mergeSameKindRows(m: VoxelModel, steps: PlanStep[]): PlanStep[] {
     return best;
   };
   const out: PlanStep[] = [];
+  const kinds: Array<string | null> = [];
   for (const s of steps) {
     const prev = out[out.length - 1];
     const ks = kind(s);
+    const same = ks !== null && kinds[kinds.length - 1] === ks;
     if (
       prev &&
-      ks >= 0 &&
+      same &&
       prev.layer === s.layer &&
-      prev.layerTo === undefined &&
-      !prev.deferred &&
-      !prev.scaffold &&
-      prev.blocks.every((i) => m.blocks[i] === ks) &&
-      prev.blocks.length + s.blocks.length <= ROW_LIMIT &&
+      prev.layerTo === s.layerTo &&
+      prev.blocks.length + s.blocks.length <= (s.layerTo === undefined ? ROW_LIMIT : PILLAR_GROUP_LIMIT) &&
       dist(prev.blocks, s.blocks) <= ROW_GAP
     ) {
-      out[out.length - 1] = { ...prev, blocks: prev.blocks.concat(s.blocks) };
-    } else out.push(s);
+      const merged: PlanStep = { ...prev, blocks: prev.blocks.concat(s.blocks) };
+      if (s.layerTo !== undefined) merged.pillars = (prev.pillars ?? 1) + 1;
+      out[out.length - 1] = merged;
+    } else {
+      out.push(s);
+      kinds.push(ks);
+    }
   }
   return out;
 }

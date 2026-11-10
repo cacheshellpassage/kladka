@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import type { VoxelModel } from "@kladka/voxel-core";
-import { drawPlan, planColors, stepRegion, type LegendEntry } from "../lib/plan2d";
+import { drawPlan, planColors, stepRegion, type LegendEntry, type PlanSymbols } from "../lib/plan2d";
 import { nameOf } from "../lib/format";
 import { effectiveTheme, useSettings } from "../store/settings";
 
@@ -12,6 +12,7 @@ export function PlanCanvas({
   onLegend,
   label,
   focus = false,
+  symbols,
 }: {
   model: VoxelModel;
   stepOf: Int32Array | null;
@@ -21,6 +22,8 @@ export function PlanCanvas({
   label: string;
   /** Zoom to the blocks of the current step (with a few cells of context) instead of the whole layer. */
   focus?: boolean;
+  /** Letters shared by the whole build (see planSymbols). */
+  symbols?: PlanSymbols;
 }) {
   const host = useRef<HTMLDivElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
@@ -38,8 +41,9 @@ export function PlanCanvas({
       if (!c || !h) return;
       const avail = Math.max(160, h.clientWidth - 16);
       const availH = Math.max(160, h.clientHeight - 16);
+      // small cells drop the letters but keep the whole layer on screen, which matters more on a phone
       const cell = Math.max(
-        10,
+        focus ? 10 : 5,
         Math.min(focus ? 56 : 30, Math.floor(Math.min((avail - 30) / cols, (availH - 30) / rows))),
       );
       const dpr = Math.min(2, window.devicePixelRatio || 1);
@@ -63,6 +67,7 @@ export function PlanCanvas({
         nameOf: nameOf(locale),
         margin,
         region,
+        symbols,
       });
       onLegend?.(r.legend);
     };
@@ -70,7 +75,7 @@ export function PlanCanvas({
     const ro = new ResizeObserver(draw);
     if (host.current) ro.observe(host.current);
     return () => ro.disconnect();
-  }, [model, stepOf, y, currentStep, dark, locale, onLegend, focus]);
+  }, [model, stepOf, y, currentStep, dark, locale, onLegend, focus, symbols]);
 
   return (
     <div className="plan-host" ref={host}>

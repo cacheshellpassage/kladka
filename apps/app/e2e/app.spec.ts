@@ -217,6 +217,62 @@ test("free 3D view: section and layer controls", async ({ page }) => {
   await expect(page.getByText("Слои до Y: 5")).toBeVisible();
 });
 
+test("the last step ends with a finish card that leads somewhere", async ({ page }) => {
+  await page.goto("/#/b/starter-hut/guide");
+  await expect(page.getByTestId("step-label")).toContainText("Шаг 1 из");
+  // jump to the last stage and finish it
+  await page.locator(".stage-list button").last().click();
+  for (let i = 0; i < 60 && !(await page.getByTestId("finish-catalog").isVisible()); i++)
+    await page.getByTestId("done").click();
+  await expect(page.locator(".finish-card")).toBeVisible();
+  await expect(page.getByTestId("step-label")).toHaveText("Все шаги пройдены");
+  await expect(page.locator(".finish-card").getByRole("link", { name: /3D/ })).toBeVisible();
+  await page.getByTestId("finish-catalog").click();
+  await expect(page.locator('[data-testid^="build-"]').first()).toBeVisible();
+});
+
+test("plan letters are the same in the step card and the material list", async ({ page }) => {
+  await page.goto("/#/b/mini-castle/guide");
+  await expect(page.getByTestId("step-label")).toContainText("Шаг 1 из");
+  const inCard = page.locator(".step-mats li").first();
+  await expect(inCard.locator(".plan-sym")).toHaveText(/^[A-Za-z0-9]$/);
+  const letter = await inCard.locator(".plan-sym").innerText();
+  const name = await inCard.locator(".nm").innerText();
+  await expect(page.locator(".mats tr", { hasText: name }).first().locator(".plan-sym")).toHaveText(letter);
+  // the plan can be zoomed to the blocks of the step and back
+  const zoom = page.locator(".plan-zoom");
+  await expect(zoom).toHaveAttribute("aria-pressed", "false");
+  await zoom.click();
+  await expect(zoom).toHaveAttribute("aria-pressed", "true");
+});
+
+test("a phone gets one view at a time and a sideways layout", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/#/b/mini-castle/guide");
+  await expect(page.getByTestId("step-label")).toBeVisible();
+  await expect(page.getByRole("button", { name: "3D + схема" })).toHaveCount(0);
+  await expect(page.locator(".plan-wrap")).toHaveCount(0); // the default "3D + plan" becomes 3D
+  await page.getByRole("button", { name: "Схема", exact: true }).click();
+  await expect(page.locator(".plan-wrap canvas")).toBeVisible();
+  await expect(page.locator(".guide .viewer-host")).toHaveCount(0);
+
+  // held sideways: the picture on the left, the step on the right, no top bar
+  await page.setViewportSize({ width: 844, height: 390 });
+  await expect(page.locator(".topbar")).toBeHidden();
+  const stage = (await page.locator(".guide-stage").boundingBox())!;
+  const side = (await page.locator(".guide-side").boundingBox())!;
+  expect(side.x).toBeGreaterThanOrEqual(stage.x + stage.width - 1);
+  expect(stage.height).toBeGreaterThan(380);
+  await expect(page.getByTestId("done")).toBeInViewport();
+
+  await page.getByTestId("enter-game").click();
+  const visual = (await page.locator(".gm-visual").boundingBox())!;
+  expect(visual.height).toBeGreaterThan(300);
+  await expect(page.getByTestId("game-done")).toBeInViewport();
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+  expect(overflow).toBeLessThanOrEqual(1);
+});
+
 const SIZES = [
   { name: "phone", width: 390, height: 844 },
   { name: "tablet", width: 820, height: 1180 },

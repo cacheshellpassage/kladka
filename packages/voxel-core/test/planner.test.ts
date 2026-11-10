@@ -161,15 +161,47 @@ describe("planner edge cases", () => {
       }
     const plan = planBuild(m);
     expect(verifyPlacement(m, plan)).toEqual([]);
-    expect(plan.steps).toHaveLength(4);
-    for (const s of plan.steps) {
-      expect(s.blocks).toHaveLength(5);
-      expect([s.layer, s.layerTo]).toEqual([0, 4]);
-      // bottom-up order inside the step
-      const ys = s.blocks.map((i) => m.coords(i).y);
-      expect(ys).toEqual([...ys].sort((a, b) => a - b));
+    // four identical posts are one step: "4 pillars, each bottom-up"
+    expect(plan.steps).toHaveLength(1);
+    const s = plan.steps[0]!;
+    expect(s.blocks).toHaveLength(20);
+    expect(s.pillars).toBe(4);
+    expect([s.layer, s.layerTo]).toEqual([0, 4]);
+    for (let k = 0; k < 4; k++) {
+      // one pillar after another, bottom-up inside each
+      const part = s.blocks.slice(k * 5, k * 5 + 5).map((i) => m.coords(i));
+      expect(part.map((c) => c.y)).toEqual([0, 1, 2, 3, 4]);
+      expect(new Set(part.map((c) => `${c.x},${c.z}`)).size).toBe(1);
     }
-    expect(plan.stages[0]!.layers).toEqual([{ y: 0, stepStart: 0, stepEnd: 4 }]);
+    expect(plan.stages[0]!.layers).toEqual([{ y: 0, stepStart: 0, stepEnd: 1 }]);
+  });
+
+  it("joins small steps of one block even when their states differ", () => {
+    const m = newTestModel(9, 4, 9);
+    m.roles = new Uint8Array(m.volume);
+    for (let x = 0; x < 9; x++)
+      for (let z = 0; z < 9; z++) {
+        m.set(x, 0, z, state("stone"));
+        m.roles[m.index(x, 0, z)] = 1; // foundation
+      }
+    // panes on two different walls have different connection states
+    m.set(1, 1, 4, state("glass_pane", { north: "true", south: "true" }));
+    m.set(7, 1, 4, state("glass_pane", { north: "true", south: "true" }));
+    m.set(4, 1, 1, state("glass_pane", { east: "true", west: "true" }));
+    m.set(4, 1, 7, state("glass_pane", { east: "true", west: "true" }));
+    for (const [x, z] of [
+      [1, 4],
+      [7, 4],
+      [4, 1],
+      [4, 7],
+    ] as Array<[number, number]>)
+      m.roles[m.index(x, 1, z)] = 4; // openings
+    const plan = planBuild(m);
+    expect(verifyPlacement(m, plan)).toEqual([]);
+    const panes = plan.steps.filter((st) => st.stage === "openings");
+    expect(panes).toHaveLength(1);
+    expect(panes[0]!.blocks).toHaveLength(4);
+    expect(panes[0]!.pillars).toBeUndefined();
   });
 
   it("places a ladder column on an existing wall in one step", () => {

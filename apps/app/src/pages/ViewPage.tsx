@@ -5,6 +5,7 @@ import { buildGif, recordVideo, videoSupported } from "../lib/media";
 import { useBuild } from "../lib/useBuild";
 import { safeFileName, saveBlob, saveDataUrl, saveFile } from "../platform/platform";
 import { Link } from "../router";
+import { useLibrary } from "../store/library";
 import { useSettings, type ModePref, type QualityPref } from "../store/settings";
 import { useUi } from "../store/ui";
 import { BuildNotFound, MaterialsTable, Segmented, Switch } from "../components/Common";
@@ -20,6 +21,7 @@ export function ViewPage({ id }: { id: string }) {
   const settings = useSettings();
   const showToast = useUi((s) => s.showToast);
   const { build, error, item } = useBuild(id);
+  const libraryStatus = useLibrary((s) => s.status);
   const viewer = useRef<VoxelViewer | null>(null);
   const [mode, setMode] = useState<ModePref>(settings.renderMode);
   const [time, setTime] = useState<TimeOfDay>("day");
@@ -79,7 +81,14 @@ export function ViewPage({ id }: { id: string }) {
     [tool, measure],
   );
 
-  if (!item) return <BuildNotFound />;
+  if (!item)
+    return libraryStatus === "ready" || libraryStatus === "error" ? (
+      <BuildNotFound />
+    ) : (
+      <p className="muted" style={{ padding: 16 }}>
+        {t("build.loading")}
+      </p>
+    );
   if (error)
     return (
       <div className="banner error" style={{ margin: 16 }}>
@@ -330,7 +339,7 @@ export function ViewPage({ id }: { id: string }) {
           <legend>{t("viewer.animate")}</legend>
           <div className="row">
             <button className="btn" type="button" onClick={animate}>
-              <Icon name={animating ? "stop" : "play"} /> {animating ? t("viewer.stop") : t("viewer.animate")}
+              <Icon name={animating ? "stop" : "play"} /> {animating ? t("viewer.stop") : t("viewer.play")}
             </button>
             <button className="btn" type="button" onClick={screenshot}>
               <Icon name="camera" /> {t("viewer.screenshot")}

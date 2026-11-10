@@ -11,7 +11,7 @@
   },
   "scripts": {
     "dev": "pnpm --filter @kladka/app dev",
-    "build": "pnpm -r --filter ./packages/** run build && pnpm --filter @kladka/app build",
+    "build": "pnpm --filter @kladka/app build",
     "build:web": "pnpm --filter @kladka/app build",
     "content:build": "pnpm --filter @kladka/content build-pack",
     "render:previews": "pnpm --filter @kladka/renderer-cli render",

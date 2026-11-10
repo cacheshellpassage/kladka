@@ -126,6 +126,7 @@ export function MaterialsTable({
   onSelect,
   checklistId,
   title,
+  symbols,
 }: {
   lines: MaterialLine[];
   model: VoxelModel;
@@ -135,6 +136,8 @@ export function MaterialsTable({
   checklistId?: string;
   /** Build title used for exported checklists. */
   title?: string;
+  /** Plan letters by item: shown next to the icon so the list reads together with the layer plan. */
+  symbols?: Map<string, string>;
 }) {
   const [checked, setChecked] = useState<Set<string>>(new Set());
   useEffect(() => {
@@ -261,7 +264,7 @@ export function MaterialsTable({
               <b>{t("materials.collected", { n: collected, total: lines.length })}</b>
             </span>
             {collected ? (
-              <button className="btn ghost" type="button" onClick={reset} style={{ minHeight: 32 }}>
+              <button className="btn ghost compact" type="button" onClick={reset}>
                 {t("materials.reset")}
               </button>
             ) : null}
@@ -296,6 +299,11 @@ export function MaterialsTable({
                 <td style={{ width: 26 }}>
                   <BlockIcon block={pal ? model.palette[pal]!.name : l.item} color={color} />
                 </td>
+                {symbols ? (
+                  <td style={{ width: 24 }}>
+                    {symbols.get(l.item) ? <span className="plan-sym">{symbols.get(l.item)}</span> : null}
+                  </td>
+                ) : null}
                 <td>
                   {onSelect && pal !== undefined ? (
                     <button
@@ -304,6 +312,10 @@ export function MaterialsTable({
                       onClick={() => onSelect(sel ? null : pal)}
                       title={t("materials.highlight")}
                     >
+                      {itemName(l.item, locale)}
+                    </button>
+                  ) : checklistId ? (
+                    <button className="rowbtn" type="button" tabIndex={-1} onClick={() => toggle(l.item)}>
                       {itemName(l.item, locale)}
                     </button>
                   ) : (

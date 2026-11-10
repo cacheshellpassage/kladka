@@ -23,6 +23,8 @@ export interface SerializedPlan {
     layer: number;
     /** Top layer of a pillar step (built bottom-up over several layers). */
     layerTo?: number;
+    /** Number of identical pillars built in this step, when there are several. */
+    pillars?: number;
     blocks: Int32Array;
     deferred?: boolean;
     scaffold?: boolean;
@@ -65,6 +67,7 @@ function serialize(plan: ReturnType<typeof planBuild>): { plan: SerializedPlan; 
       stage: s.stage,
       layer: s.layer,
       layerTo: s.layerTo,
+      pillars: s.pillars,
       blocks,
       deferred: s.deferred,
       scaffold: s.scaffold,

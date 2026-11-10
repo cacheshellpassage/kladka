@@ -10,9 +10,10 @@ import { countItems, toLines, type MaterialLine } from "@kladka/voxel-core";
 import type { VoxelViewer } from "@kladka/viewer";
 import { useT, type MessageKey } from "../i18n";
 import { canvasToJpeg, buildPdf, type PdfPage } from "../lib/pdf";
-import { drawPlan, planColors } from "../lib/plan2d";
+import { drawPlan, planColors, planSymbols } from "../lib/plan2d";
 import { blocksWord, nameOf, stepLayerLabel } from "../lib/format";
 import { useBuild } from "../lib/useBuild";
+import { SMALL_SCREEN, useMedia } from "../lib/useMedia";
 import { safeFileName, saveFile } from "../platform/platform";
 import { Link } from "../router";
 import { useLibrary } from "../store/library";
@@ -31,7 +32,7 @@ import { PlanCanvas } from "../components/PlanCanvas";
 import { Viewer3D } from "../components/Viewer3D";
 import { Celebrate } from "../components/Celebrate";
 import { GameMode } from "../components/GameMode";
-import { haptic } from "../components/Visual";
+import { BlockIcon, haptic } from "../components/Visual";
 
 type Scope = "step" | "layer" | "stage" | "all";
 
@@ -42,10 +43,14 @@ export function GuidePage({ id }: { id: string }) {
   const { build, error, item } = useBuild(id);
   const saved = useLibrary((s) => s.progress.get(id));
   const saveProgress = useLibrary((s) => s.saveProgress);
+  const libraryStatus = useLibrary((s) => s.status);
+  const small = useMedia(SMALL_SCREEN);
   const showToast = useUi((s) => s.showToast);
   const [step, setStep] = useState<number>(saved?.step ?? 0);
   const [done, setDone] = useState<number>(saved?.done ?? 0);
-  const [scope, setScope] = useState<Scope>("step");
+  // the step card already lists what the step needs, so the table starts one level up
+  const [scope, setScope] = useState<Scope>("stage");
+  const [planFocus, setPlanFocus] = useState(false);
   const [selected, setSelected] = useState<number | null>(null);
   const [busy, setBusy] = useState(false);
   const viewer = useRef<VoxelViewer | null>(null);
@@ -236,6 +241,13 @@ export function GuidePage({ id }: { id: string }) {
     return toLines(build.model, countItems(build.model, blocks));
   }, [build, cur, stage, scope]);
 
+  // what the current step needs (shown right in the step card)
+  const stepLines: MaterialLine[] = useMemo(
+    () => (build && cur ? toLines(build.model, countItems(build.model, cur.blocks)) : []),
+    [build, cur],
+  );
+  const symbols = useMemo(() => (build ? planSymbols(build.model, build.materials) : undefined), [build]);
+
   const exportPng = async () => {
     if (!build || !cur) return;
     setBusy(true);
@@ -256,6 +268,8 @@ export function GuidePage({ id }: { id: string }) {
         colors: planColors(false),
         nameOf: nameOf(locale),
         title,
+        symbols,
+        legend: true,
       });
       c.width = size.width;
       c.height = size.height;
@@ -268,6 +282,8 @@ export function GuidePage({ id }: { id: string }) {
         colors: planColors(false),
         nameOf: nameOf(locale),
         title,
+        symbols,
+        legend: true,
       });
       const blob: Blob = await new Promise((r) => c.toBlob((b) => r(b!), "image/png"));
       await saveFile(
@@ -313,6 +329,8 @@ export function GuidePage({ id }: { id: string }) {
           colors: planColors(false),
           nameOf: nameOf(locale),
           title,
+          symbols,
+          legend: true,
         });
         c.width = probe.width;
         c.height = probe.height;
@@ -325,6 +343,8 @@ export function GuidePage({ id }: { id: string }) {
           colors: planColors(false),
           nameOf: nameOf(locale),
           title,
+          symbols,
+          legend: true,
         });
         pages.push({ jpeg: await canvasToJpeg(c, 0.9), width: c.width, height: c.height });
       }
@@ -337,7 +357,14 @@ export function GuidePage({ id }: { id: string }) {
     }
   };
 
-  if (!item) return <BuildNotFound />;
+  if (!item)
+    return libraryStatus === "ready" || libraryStatus === "error" ? (
+      <BuildNotFound />
+    ) : (
+      <p className="muted" style={{ padding: 16 }}>
+        {t("build.loading")}
+      </p>
+    );
   if (error)
     return (
       <div className="banner error" style={{ margin: 16 }}>
@@ -352,7 +379,9 @@ export function GuidePage({ id }: { id: string }) {
     );
 
   const pct = total ? Math.round((Math.min(done, total) / total) * 100) : 0;
-  const view = settings.guideView;
+  // a phone has no room for two views at once; a finished build is shown whole in 3D
+  const view = finished || (small && settings.guideView === "split") ? "3d" : settings.guideView;
+  const hasPlan = view !== "3d" && !!cur;
   const showStep = finished ? null : step;
   const nextStep = !finished && step + 1 < total ? build.plan.steps[step + 1] : undefined;
   const layerY = cur?.layer ?? 0;
@@ -373,6 +402,7 @@ export function GuidePage({ id }: { id: string }) {
           title={item.meta.title[locale]}
           model={build.model}
           plan={build.plan}
+          symbols={symbols}
           step={step}
           total={total}
           finished={finished}
@@ -424,14 +454,27 @@ export function GuidePage({ id }: { id: string }) {
             label={item.meta.title[locale]}
           />
         ) : null}
-        {view !== "3d" && cur ? (
-          <PlanCanvas
-            model={build.model}
-            stepOf={build.plan.stepOf}
-            y={layerY}
-            currentStep={step}
-            label={t("guide.layer", { y: layerY })}
-          />
+        {hasPlan ? (
+          <div className="plan-wrap">
+            <PlanCanvas
+              model={build.model}
+              stepOf={build.plan.stepOf}
+              y={layerY}
+              currentStep={step}
+              label={t("guide.layer", { y: layerY })}
+              symbols={symbols}
+              focus={planFocus}
+            />
+            <button
+              className="btn plan-zoom"
+              type="button"
+              aria-pressed={planFocus}
+              onClick={() => setPlanFocus(!planFocus)}
+            >
+              <Icon name={planFocus ? "grid" : "search"} size={16} />
+              {planFocus ? t("guide.plan.whole") : t("guide.plan.zoom")}
+            </button>
+          </div>
         ) : null}
       </div>
 
@@ -466,9 +509,8 @@ export function GuidePage({ id }: { id: string }) {
                 </span>
               ) : null}
               <span className="small bump" key={step} data-testid="step-label">
-                {finished ? t("guide.finished") : t("guide.step", { n: step + 1, total })}
+                {finished ? t("guide.allDone") : t("guide.step", { n: step + 1, total })}
               </span>
-              {cur ? <span className="small muted">{stepLayerLabel(t, cur)}</span> : null}
             </div>
             <StageProgress stages={build.plan.stages} step={done} label={`${pct}%`} />
           </div>
@@ -487,8 +529,27 @@ export function GuidePage({ id }: { id: string }) {
                 </strong>
                 <span className="small muted">{stepLayerLabel(t, cur)}</span>
                 {cur.layerTo !== undefined && cur.layerTo > cur.layer ? (
-                  <span className="small pillar-hint">{t("guide.pillar")}</span>
+                  <span className="small pillar-hint">
+                    {cur.pillars && cur.pillars > 1
+                      ? t("guide.pillars", { n: cur.pillars })
+                      : t("guide.pillar")}
+                  </span>
                 ) : null}
+                <ul className="step-mats" aria-label={t("materials.scope.step")}>
+                  {stepLines.slice(0, 4).map((l) => (
+                    <li key={l.item}>
+                      <BlockIcon block={l.item} size={20} />
+                      {symbols?.byItem.get(l.item) ? (
+                        <span className="plan-sym">{symbols.byItem.get(l.item)}</span>
+                      ) : null}
+                      <span className="nm">{nameOf(locale)(l.item)}</span>
+                      <b>×{l.count}</b>
+                    </li>
+                  ))}
+                  {stepLines.length > 4 ? (
+                    <li className="more">{t("guide.moreItems", { n: stepLines.length - 4 })}</li>
+                  ) : null}
+                </ul>
                 {nextStep ? (
                   <span className="next-hint">
                     {t("guide.next.hint", {
@@ -501,7 +562,23 @@ export function GuidePage({ id }: { id: string }) {
               </span>
             </div>
           ) : null}
-          <p className="swipe-hint">{t("guide.swipe")}</p>
+          {cur ? <p className="swipe-hint">{t("guide.swipe")}</p> : null}
+          {finished ? (
+            <div className="finish-card">
+              <strong>{t("guide.finished")}</strong>
+              <span className="small muted">
+                {t("guide.finishedStats", { blocks: build.plan.totalBlocks, steps: total })}
+              </span>
+              <div className="row">
+                <Link className="btn" to={{ name: "view", id }}>
+                  <Icon name="cube" /> {t("build.view3d")}
+                </Link>
+                <button className="btn" type="button" onClick={() => (setStep(0), setDone(0))}>
+                  <Icon name="reset" /> {t("guide.restart")}
+                </button>
+              </div>
+            </div>
+          ) : null}
 
           <div className="stage-list" aria-label={t("guide.stageJump")}>
             {build.plan.stages.map((s) => (
@@ -517,25 +594,25 @@ export function GuidePage({ id }: { id: string }) {
             ))}
           </div>
 
-          {finished ? (
-            <div className="stack">
-              <p>{t("guide.finished")}</p>
-              <button className="btn" type="button" onClick={() => (setStep(0), setDone(0))}>
-                <Icon name="reset" /> {t("guide.restart")}
-              </button>
-            </div>
-          ) : null}
-
-          <Segmented<"3d" | "2d" | "split">
-            label="view"
-            value={view}
-            onChange={(v) => settings.set({ guideView: v })}
-            options={[
-              { value: "3d", label: t("guide.view.3d") },
-              { value: "split", label: t("guide.view.split") },
-              { value: "2d", label: t("guide.view.2d") },
-            ]}
-          />
+          {finished ? null : (
+            <Segmented<"3d" | "2d" | "split">
+              label={t("guide.view")}
+              value={view}
+              onChange={(v) => settings.set({ guideView: v })}
+              options={
+                small
+                  ? [
+                      { value: "3d", label: t("guide.view.3d") },
+                      { value: "2d", label: t("guide.view.2d") },
+                    ]
+                  : [
+                      { value: "3d", label: t("guide.view.3d") },
+                      { value: "split", label: t("guide.view.split") },
+                      { value: "2d", label: t("guide.view.2d") },
+                    ]
+              }
+            />
+          )}
 
           <div className="stack" style={{ gap: 8 }}>
             <Segmented<Scope>
@@ -554,6 +631,7 @@ export function GuidePage({ id }: { id: string }) {
               model={build.model}
               selected={selected}
               onSelect={setSelected}
+              symbols={symbols?.byItem}
             />
           </div>
 
@@ -588,7 +666,7 @@ export function GuidePage({ id }: { id: string }) {
               <Icon name="download" /> {t("guide.exportPdf")}
             </button>
           </div>
-          <p className="small muted">{t("guide.keys")}</p>
+          <p className="small muted keys-hint">{t("guide.keys")}</p>
         </div>
 
         <div className="guide-controls">
@@ -602,15 +680,15 @@ export function GuidePage({ id }: { id: string }) {
           >
             <Icon name="back" />
           </button>
-          <button
-            className="btn primary big"
-            type="button"
-            onClick={markDone}
-            disabled={finished}
-            data-testid="done"
-          >
-            <Icon name="check" /> {t("guide.done")}
-          </button>
+          {finished ? (
+            <Link className="btn primary big" to={{ name: "catalog" }} data-testid="finish-catalog">
+              <Icon name="grid" /> {t("guide.toCatalog")}
+            </Link>
+          ) : (
+            <button className="btn primary big" type="button" onClick={markDone} data-testid="done">
+              <Icon name="check" /> {t("guide.done")}
+            </button>
+          )}
           <button
             className="btn big"
             type="button"
