@@ -63,6 +63,16 @@ jobs:
             echo "::error title=Gradle failed::$msg"
           fi
           exit "$status"
+      # a public annotation says whether the release APK is signed and with which certificate
+      - name: Report the release signature
+        run: |
+          apk=$(ls apps/app/android/app/build/outputs/apk/release/*.apk | head -1)
+          bt=$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -1)
+          if "$bt/apksigner" verify --print-certs "$apk" > "$RUNNER_TEMP/cert.txt" 2>&1; then
+            echo "::notice title=Release APK signed::$(basename "$apk") $(grep -m1 'SHA-256' "$RUNNER_TEMP/cert.txt")"
+          else
+            echo "::warning title=Release APK not signed::$(basename "$apk") - add the four KLADKA_* secrets (docs/RELEASE.md, step 4)"
+          fi
       - uses: actions/upload-artifact@v4
         with:
           name: android-apk
