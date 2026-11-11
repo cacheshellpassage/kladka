@@ -153,7 +153,8 @@ export const en: Record<MessageKey, string> = {
   "guide.autoCamera": "Auto camera: follow new blocks",
   "guide.autoCutaway": "Cutaway for indoor work (hide roof and upper floors)",
   "guide.cutaway": "Cutaway: everything above layer Y = {y} is hidden",
-  "guide.deferred": "These blocks go in after the block that holds them (e.g. hanging lanterns).",
+  "guide.deferred":
+    "These blocks go in only now: before this step there was nothing to hold them. The support is a neighbouring block, or one above, as for a hanging lantern.",
   "guide.scaffold":
     "These blocks have nothing to rest on — place a temporary support and remove it afterwards.",
   "guide.exportLayer": "Export plan",
