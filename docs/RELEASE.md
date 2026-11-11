@@ -108,7 +108,7 @@ mkdir C:\keys
 Создайте ключ (на этом компьютере `keytool` уже есть в составе Java):
 
 ```powershell
-& "C:\Program Files\Java\jre1.8.0_501\bin\keytool.exe" -J-Duser.language=en -genkeypair -v -keystore C:\keys\kladka-release.jks -alias kladka -keyalg RSA -keysize 4096 -validity 10000 -dname "CN=Kladka"
+& "C:\Program Files\Java\jre1.8.0_501\bin\keytool.exe" "-J-Duser.language=en" -genkeypair -v -keystore C:\keys\kladka-release.jks -alias kladka -keyalg RSA -keysize 4096 -validity 10000 -dname "CN=Kladka"
 ```
 
 Программа спросит:
