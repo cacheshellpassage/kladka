@@ -63,7 +63,7 @@ importers:
         specifier: workspace:*
         version: link:../../packages/voxel-core
       '@tauri-apps/api':
-        specifier: 2.12.4
+        specifier: ^2.12.4
         version: 2.12.4
       '@tauri-apps/plugin-dialog':
         specifier: ^2.8.4
@@ -72,7 +72,7 @@ importers:
         specifier: ^2.7.1
         version: 2.7.1
       '@tauri-apps/plugin-opener':
-        specifier: 2.7.2
+        specifier: ^2.7.2
         version: 2.7.2
       fflate:
         specifier: ^0.8.3
