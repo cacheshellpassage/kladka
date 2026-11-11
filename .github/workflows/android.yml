@@ -53,7 +53,16 @@ jobs:
           KLADKA_KEY_PASSWORD: ${{ secrets.KLADKA_KEY_PASSWORD }}
         run: |
           chmod +x gradlew
-          ./gradlew --no-daemon assembleDebug assembleRelease bundleRelease
+          set +e
+          ./gradlew --no-daemon assembleDebug assembleRelease bundleRelease 2>&1 | tee "$RUNNER_TEMP/gradle.log"
+          status=${PIPESTATUS[0]}
+          if [ "$status" -ne 0 ]; then
+            # job logs need a sign-in; annotations are public, so the cause is readable from the API too
+            grep -E -A30 "What went wrong|^e: |error:" "$RUNNER_TEMP/gradle.log" | head -60 > "$RUNNER_TEMP/gradle-error.txt"
+            msg=$(tr -d '\r' < "$RUNNER_TEMP/gradle-error.txt" | sed -e 's/%/%25/g' | sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/%0A/g')
+            echo "::error title=Gradle failed::$msg"
+          fi
+          exit "$status"
       - uses: actions/upload-artifact@v4
         with:
           name: android-apk
