@@ -9,7 +9,8 @@ if (keystorePropertiesFile.exists()) {
 }
 def signingValue = { String key, String env -> keystoreProperties.getProperty(key) ?: System.getenv(env) }
 def releaseStoreFile = signingValue("storeFile", "KLADKA_KEYSTORE_FILE")
-def hasReleaseSigning = releaseStoreFile != null && file(releaseStoreFile).exists()
+// an unset secret reaches Gradle as an empty string, so test Groovy truth, not null
+def hasReleaseSigning = releaseStoreFile && file(releaseStoreFile).exists()
 
 android {
     namespace = "app.kladka.guide"
