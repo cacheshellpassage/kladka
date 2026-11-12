@@ -84,7 +84,10 @@ base64 -w0 kladka-release.jks > keystore.b64
 > • 36 оригинальных построек разных стилей и размеров
 > • 3D-просмотр с подсветкой текущего шага и режимом «Шейдеры» (тени, свечение, закат и ночь)
 > • Схема каждого слоя с сеткой и координатами, экспорт в PNG и PDF
-> • Список материалов в штуках, стаках и шалкерах — на шаг, слой, этап или всю постройку
+> • Список материалов в штуках, стаках и шалкерах — на шаг, слой, этап или всю постройку, с чек-листом «собрано»
+> • Режим «Я в игре»: экран не гаснет, а приложение подсказывает, сколько в постройке одинаковых частей
+> • Паспорт постройки: размер, число типов блоков и с какой версии Java она подходит
+> • Шаги листаются свайпом, схему можно двигать пальцем и увеличивать щипком
 > • Импорт своих файлов .schem, .litematic и .nbt и экспорт для Litematica, WorldEdit и структурных блоков
 > • Работает без интернета. Без рекламы, покупок и регистрации. Приложение не собирает никаких данных.
 >
@@ -102,7 +105,10 @@ base64 -w0 kladka-release.jks > keystore.b64
 > • 36 original builds in different styles and sizes
 > • 3D view highlighting the current step, plus a "Shaders" mode (shadows, glow, sunset and night)
 > • A plan of every layer with grid and coordinates, PNG and PDF export
-> • Material lists in pieces, stacks and shulker boxes — per step, layer, stage or the whole build
+> • Material lists in pieces, stacks and shulker boxes — per step, layer, stage or the whole build, with a "collected" checklist
+> • "I'm in the game" mode: the screen stays on, and the app tells you how many identical parts the build has
+> • Build passport: size, number of block types and the Java version it works in
+> • Swipe through the steps; drag the plan with a finger and pinch to zoom
 > • Import your own .schem, .litematic and .nbt files and export for Litematica, WorldEdit and structure blocks
 > • Works offline. No ads, purchases or sign-up. The app collects no data.
 >
