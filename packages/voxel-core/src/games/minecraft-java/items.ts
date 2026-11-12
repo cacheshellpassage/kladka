@@ -49,6 +49,8 @@ const DIRECT: Record<string, string | null> = {
   powder_snow_cauldron: "cauldron",
   farmland: "dirt",
   dirt_path: "dirt",
+  // a grass block drops dirt without Silk Touch; dirt next to grass turns into grass by itself
+  grass_block: "dirt",
   structure_void: null,
   barrier: null,
   light: null,

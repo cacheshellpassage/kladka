@@ -3,6 +3,7 @@
  * step visibility (built / current / future), section clipping, ghosting of lower layers,
  * block-type highlighting and Minecraft-like face shading for the classic mode.
  */
+import { ROLES } from "@kladka/voxel-core";
 import * as THREE from "three";
 
 export interface ViewerUniforms {
@@ -41,8 +42,10 @@ export function createUniforms(): ViewerUniforms {
 /**
  * "Colour by stage" in 3D: one blue ramp from foundation (darkest) to decor (lightest), in build order;
  * lights stay amber. Validated as an ordinal ramp (monotone lightness, ΔL ≥ 0.06 between neighbours).
+ * The ground of the plot is green: it is not part of the building, and its stage can be skipped.
  */
 export const ROLE_COLORS_3D: Record<string, string> = {
+  site: "#4f8a3c",
   foundation: "#013271",
   frame: "#034393",
   walls: "#1a57ad",
@@ -51,6 +54,9 @@ export const ROLE_COLORS_3D: Record<string, string> = {
   interior: "#5a98f3",
   decor: "#7baffc",
 };
+
+/** Lamps, torches and other lights in "colour by stage" (sRGB of the former vec3(1.0, 0.85, 0.3) in linear). */
+const LIGHT_3D = "#ffed95";
 
 function glslColor(hex: string): string {
   const n = parseInt(hex.slice(1), 16);
@@ -102,10 +108,8 @@ varying vec3 vNrmW;
 
 vec3 roleColor(float r) {
   if (r < 0.5) return vec3(0.7);
-${Object.values(ROLE_COLORS_3D)
-  .map((c, i) => `  if (r < ${i + 1}.5) return ${glslColor(c)};`)
-  .join("\n")}
-  return vec3(1.0, 0.85, 0.3);
+${ROLES.map((role, i) => `  if (r < ${i + 1}.5) return ${glslColor(ROLE_COLORS_3D[role] ?? LIGHT_3D)};`).join("\n")}
+  return vec3(0.7);
 }
 
 bool kladkaDither(float keepEvery) {

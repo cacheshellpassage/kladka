@@ -98,6 +98,8 @@ export const en: Record<MessageKey, string> = {
   "difficulty.4": "Hard",
   "difficulty.5": "Very hard",
 
+  "stage.site": "Plot",
+  "stage.shell": "Walls, windows & floors",
   "stage.foundation": "Foundation",
   "stage.frame": "Frame",
   "stage.walls": "Walls & floors",
@@ -396,6 +398,9 @@ export const en: Record<MessageKey, string> = {
   "onboard.next": "Next",
   "onboard.start": "Start building",
   "guide.next.hint": "Next: {stage}, {n} {blocks}",
+  "guide.site.hint":
+    "The lawn, soil and paths of the plot. If the ground is already there, you can skip this stage",
+  "guide.site.skip": "Skip the plot",
   "guide.swipe":
     "Swipe left for the next step, right for the previous one. Drag the plan to move it, pinch to zoom",
   "guide.stageDone": "Stage “{stage}” complete!",

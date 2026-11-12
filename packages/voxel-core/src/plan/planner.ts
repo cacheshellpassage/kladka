@@ -3,8 +3,12 @@
  * by hand in survival mode.
  *
  * Algorithm (documented in docs/ARCHITECTURE.md):
- *  - every block gets a role (explicit from generators, or `classifyRoles` heuristics) → stage;
- *  - groups are processed in order stage → layer (bottom-up);
+ *  - every block gets a role (explicit from generators, or `classifyRoles` heuristics) → stage; the frame,
+ *    walls and openings are one stage built floor by floor, ladders and indoor stairs come with the walls,
+ *    and uncovered lawn and paths become the optional "site" stage;
+ *  - groups are processed in order stage → layer (bottom-up); the interior and decor stages are one group
+ *    each, so the small things of one room or spot (chests, lamps, flowers) are placed together whatever
+ *    their layer;
  *  - inside a group a "placement simulation" runs a BFS: a block can be placed when its support rule
  *    is satisfied (attachables need their specific support block, gravity blocks need the block below,
  *    other blocks need any already placed face neighbour or the ground);
@@ -18,7 +22,16 @@ import { blockInfo, type BlockInfo } from "../games/minecraft-java/blocks";
 import { shortId } from "../model/blockstate";
 import type { VoxelModel } from "../model/model";
 import { analyze, classifyRoles } from "./classify";
-import { ROLES, STAGES, roleCode, roleFromCode, stageOfRole, type Role, type StageId } from "./roles";
+import {
+  ROLES,
+  STAGES,
+  roleCode,
+  roleFromCode,
+  stageIndex,
+  stageOfRole,
+  type Role,
+  type StageId,
+} from "./roles";
 
 export const MAX_STEP_BLOCKS = 48;
 
@@ -29,6 +42,8 @@ export interface PlanStep {
   layer: number;
   /** Top layer when the step builds a pillar over several layers (bottom-up). */
   layerTo?: number;
+  /** Top layer of a step that is not a pillar but still spans several layers (the decor of one spot). */
+  layerMax?: number;
   /** Number of identical pillars built in this step, when there are several. */
   pillars?: number;
   /** Number of identical parts (towers, wings, bays) built in this step, when there are several. */
@@ -185,15 +200,25 @@ export function planBuild(m: VoxelModel, opts: PlanOptions = {}): BuildPlan {
     }
   }
 
-  // Group blocks by (stage, y)
-  const groups = new Map<string, number[]>();
-  const keyOf = (stage: number, y: number) => `${stage}:${y}`;
+  markSite(m, roles, a.groundY);
+
+  // Stage of every block. Ladders and indoor stairs are built with the walls of their floor: they are the
+  // way up to the next floor, so they must not wait for the interior stage after the roof.
+  const shellStage = stageIndex("shell");
+  const interior = roleCode("interior");
+  const stageOfBlock = new Int8Array(vol).fill(-1);
   for (let i = 0; i < vol; i++) {
     if (!roles[i] || companionPartner[i]! >= 0) continue;
-    const role = roleFromCode(roles[i]!) as Role;
-    const stage = STAGES.indexOf(stageOfRole(role));
-    const y = Math.floor(i / layer);
-    const k = keyOf(stage, y);
+    const sh = infos[m.blocks[i]!]!.shape;
+    const climb = sh === "ladder" || (sh === "stairs" && roles[i] === interior);
+    stageOfBlock[i] = climb ? shellStage : STAGES.indexOf(stageOfRole(roleFromCode(roles[i]!) as Role));
+  }
+  // Blocks of every (stage, layer)
+  const groups = new Map<number, number[]>();
+  const keyOf = (stage: number, y: number) => stage * 4096 + y;
+  for (let i = 0; i < vol; i++) {
+    if (stageOfBlock[i]! < 0) continue;
+    const k = keyOf(stageOfBlock[i]!, Math.floor(i / layer));
     let g = groups.get(k);
     if (!g) groups.set(k, (g = []));
     g.push(i);
@@ -272,60 +297,88 @@ export function planBuild(m: VoxelModel, opts: PlanOptions = {}): BuildPlan {
     return out;
   };
 
-  for (let si = 0; si < STAGES.length; si++) {
+  /** Places one group (one layer, or the whole of a flat stage when y < 0) and adds its steps. */
+  const runGroup = (si: number, y: number, group: number[] | undefined, stage: PlanStage) => {
     const stageId = STAGES[si]!;
+    const flat = y < 0;
+    const inGroup = new Set(group ?? []);
+    const order: number[] = [];
+    const extra: number[] = [];
+    const queue: number[] = [];
+    let qh = 0;
+    const enq = new Set<number>();
+    for (const i of [...inGroup, ...deferred]) {
+      if (isSupported(i)) {
+        queue.push(i);
+        enq.add(i);
+      }
+    }
+    // BFS placement simulation
+    while (qh < queue.length) {
+      const i = queue[qh++]!;
+      if (placed[i]) continue;
+      const isExtra = !inGroup.has(i);
+      placeWithCompanions(i, isExtra ? extra : order);
+      if (isExtra) deferred.delete(i);
+      for (const n of neighbours(i)) {
+        if (placed[n] || enq.has(n)) continue;
+        if (!inGroup.has(n) && !deferred.has(n)) continue;
+        if (isSupported(n)) {
+          queue.push(n);
+          enq.add(n);
+        }
+      }
+    }
+    for (const i of inGroup) if (!placed[i]) deferred.add(i);
+    if (order.length === 0 && extra.length === 0) return;
+
+    const tag = (step: PlanStep): PlanStep => {
+      if (flat) {
+        let lo = Infinity,
+          hi = -Infinity;
+        for (const i of step.blocks) {
+          const by = Math.floor(i / layer);
+          if (by < lo) lo = by;
+          if (by > hi) hi = by;
+        }
+        step.layer = lo;
+        if (hi > lo) step.layerMax = hi;
+      }
+      return step;
+    };
+    for (const blocks of splitIntoSteps(
+      m,
+      order,
+      maxStep,
+      cursor,
+      flat ? ZONE_GAP : MERGE_GAP,
+      flat ? CLIMB : 1,
+    )) {
+      steps.push(tag({ index: steps.length, stage: stageId, layer: y, blocks }));
+      cursor = centroid(m, blocks);
+    }
+    for (const blocks of chunksOf(extra, maxStep, companionPartner))
+      steps.push(tag({ index: steps.length, stage: stageId, layer: y, blocks, deferred: true }));
+    stage.blockCount += order.length + extra.length;
+  };
+
+  for (let si = 0; si < STAGES.length; si++) {
     const stage: PlanStage = {
-      id: stageId,
+      id: STAGES[si]!,
       layers: [],
       stepStart: steps.length,
       stepEnd: steps.length,
       blockCount: 0,
     };
-    for (let y = 0; y < sy; y++) {
-      const group = groups.get(keyOf(si, y));
-      if (!group && deferred.size === 0) continue;
-      const inGroup = new Set(group ?? []);
-      const order: number[] = [];
-      const extra: number[] = [];
-      const queue: number[] = [];
-      let qh = 0;
-      const enq = new Set<number>();
-      for (const i of [...inGroup, ...deferred]) {
-        if (isSupported(i)) {
-          queue.push(i);
-          enq.add(i);
-        }
+    if (FLAT_STAGES.has(stage.id)) {
+      const all: number[] = [];
+      for (let y = 0; y < sy; y++) for (const i of groups.get(keyOf(si, y)) ?? []) all.push(i);
+      if (all.length || deferred.size) runGroup(si, -1, all, stage);
+    } else
+      for (let y = 0; y < sy; y++) {
+        const group = groups.get(keyOf(si, y));
+        if (group || deferred.size) runGroup(si, y, group, stage);
       }
-      // BFS placement simulation
-      while (qh < queue.length) {
-        const i = queue[qh++]!;
-        if (placed[i]) continue;
-        const isExtra = !inGroup.has(i);
-        placeWithCompanions(i, isExtra ? extra : order);
-        if (isExtra) deferred.delete(i);
-        for (const n of neighbours(i)) {
-          if (placed[n] || enq.has(n)) continue;
-          if (!inGroup.has(n) && !deferred.has(n)) continue;
-          if (isSupported(n)) {
-            queue.push(n);
-            enq.add(n);
-          }
-        }
-      }
-      for (const i of inGroup) if (!placed[i]) deferred.add(i);
-      if (order.length === 0 && extra.length === 0) continue;
-
-      const layerInfo: PlanLayer = { y, stepStart: steps.length, stepEnd: steps.length };
-      for (const blocks of splitIntoSteps(m, order, maxStep, cursor)) {
-        steps.push({ index: steps.length, stage: stageId, layer: y, blocks });
-        cursor = centroid(m, blocks);
-      }
-      if (extra.length)
-        steps.push({ index: steps.length, stage: stageId, layer: y, blocks: extra, deferred: true });
-      layerInfo.stepEnd = steps.length;
-      stage.layers.push(layerInfo);
-      stage.blockCount += order.length + extra.length;
-    }
     stage.stepEnd = steps.length;
     if (stage.stepEnd > stage.stepStart) stages.push(stage);
   }
@@ -367,7 +420,8 @@ export function planBuild(m: VoxelModel, opts: PlanOptions = {}): BuildPlan {
     if (s < 0) return true; // any neighbour (the slice below) or outside the model
     if (s === i - layer) return true; // stands on the block below: part of the same pillar
     if (!roles[s]) return true;
-    return origStep[s]! >= 0 && origStep[s]! < base; // e.g. a ladder on a wall built earlier
+    // a ladder on a wall built earlier, or on the wall of its own slice (placed before it in the slice)
+    return origStep[s]! >= 0 && (origStep[s]! < base || origStep[s] === origStep[i]);
   };
   const finalSteps: PlanStep[] = [];
   /** Position of every block in the stage being merged: -1 in an earlier stage, RANK_LATER in a later one. */
@@ -388,7 +442,15 @@ export function planBuild(m: VoxelModel, opts: PlanOptions = {}): BuildPlan {
   }
 
   for (const s of finalSteps) for (const i of s.blocks) stepOf[i] = s.index;
-  return { steps: finalSteps, stages, stepOf, roles, totalBlocks: total, groundY: a.groundY, warnings };
+  return {
+    steps: finalSteps,
+    stages,
+    stepOf,
+    roles,
+    totalBlocks: total,
+    groundY: a.groundY,
+    warnings,
+  };
 }
 
 /** Upper bound of blocks in a merged pillar step. */
@@ -706,6 +768,8 @@ function splitIntoSteps(
   order: number[],
   maxStep: number,
   start: [number, number, number],
+  mergeGap: number,
+  climb = 1,
 ): number[][] {
   if (order.length === 0) return [];
   const pos = new Map<number, number>();
@@ -768,7 +832,8 @@ function splitIntoSteps(
       // only the first unused chunk of each component is eligible (keeps intra-component order)
       if (k > 0 && compOfChunk[k - 1] === compOfChunk[k] && !used[k - 1]) continue;
       const c = cents[k]!;
-      const d = (c[0] - cur[0]) ** 2 + (c[1] - cur[1]) ** 2 + (c[2] - cur[2]) ** 2;
+      // climbing up and down costs more than walking: in a flat stage (decor) stay at one height first
+      const d = (c[0] - cur[0]) ** 2 + (climb * (c[1] - cur[1])) ** 2 + (c[2] - cur[2]) ** 2;
       if (d < bestD) {
         bestD = d;
         best = k;
@@ -778,19 +843,30 @@ function splitIntoSteps(
     result.push(chunks[best]!);
     cur = cents[best]!;
   }
-  return mergeSmallNeighbours(m, result, Math.min(maxStep, MERGE_LIMIT));
+  return mergeSmallNeighbours(m, result, maxStep, mergeGap);
 }
 
 /** Small regions closer than this many blocks (bounding-box gap) are merged into one step. */
 const MERGE_GAP = 3;
+/** The same for interior and decor: the things of one room or spot (a porch, a flower bed) are one step. */
+const ZONE_GAP = 6;
+/**
+ * Stages planned as one group instead of layer by layer: furniture and decor stand on what is built already,
+ * so the things of one room or one spot are placed together whatever their layer.
+ */
+const FLAT_STAGES = new Set<StageId>(["interior", "decor"]);
+/** In the tour of a flat stage one block up or down weighs as much as this many blocks of walking. */
+const CLIMB = 3;
 const MERGE_LIMIT = 24;
+/** A piece this small (a bit of a round wall that touches the rest only by an edge) joins a step up to the size limit. */
+const MERGE_PIECE = 6;
 
 /**
  * Merges consecutive small steps that are spatially close (e.g. the panes of neighbouring windows),
  * so the user gets fewer, more meaningful steps. Order inside each part is preserved, so the merged
  * step is still buildable (parts are independent regions).
  */
-function mergeSmallNeighbours(m: VoxelModel, steps: number[][], limit: number): number[][] {
+function mergeSmallNeighbours(m: VoxelModel, steps: number[][], maxStep: number, maxGap: number): number[][] {
   if (steps.length < 2) return steps;
   const box = (s: number[]) => {
     const b = { x0: Infinity, y0: Infinity, z0: Infinity, x1: -Infinity, y1: -Infinity, z1: -Infinity };
@@ -813,7 +889,11 @@ function mergeSmallNeighbours(m: VoxelModel, steps: number[][], limit: number): 
   for (let k = 1; k < steps.length; k++) {
     const next = steps[k]!;
     const nb = box(next);
-    if (cur.length + next.length <= limit && gap(curBox, nb) <= MERGE_GAP) {
+    const n = cur.length + next.length;
+    const fits =
+      n <= Math.min(maxStep, MERGE_LIMIT) ||
+      (Math.min(cur.length, next.length) <= MERGE_PIECE && n <= maxStep);
+    if (fits && gap(curBox, nb) <= maxGap) {
       cur = cur.concat(next);
       curBox = {
         x0: Math.min(curBox.x0, nb.x0),
@@ -831,6 +911,61 @@ function mergeSmallNeighbours(m: VoxelModel, steps: number[][], limit: number): 
   }
   out.push(cur);
   return out;
+}
+
+/** Cuts blocks (in placement order) into chunks of at most `max`, never between the halves of a door or bed. */
+function chunksOf(blocks: number[], max: number, partnerOf: Int32Array): number[][] {
+  if (blocks.length <= max) return blocks.length ? [blocks] : [];
+  const size = Math.ceil(blocks.length / Math.ceil(blocks.length / max));
+  const out: number[][] = [];
+  let cur: number[] = [];
+  for (const i of blocks) {
+    if (cur.length >= size && partnerOf[i]! < 0) {
+      out.push(cur);
+      cur = [];
+    }
+    cur.push(i);
+  }
+  if (cur.length) out.push(cur);
+  return out;
+}
+
+/** Soil that is usually already there: the lawn, the paths and the beds around a build. */
+const TERRAIN = new Set([
+  "grass_block",
+  "dirt",
+  "coarse_dirt",
+  "rooted_dirt",
+  "podzol",
+  "mycelium",
+  "dirt_path",
+  "farmland",
+  "moss_block",
+  "mud",
+]);
+
+/**
+ * The ground of the plot (the lawn, the paths, the soil under the house) is not part of the building: on most
+ * plots it is already there. Soil that rises from the bottom of the build gets the role "site": in every column
+ * the soil from the lowest block upwards, up to the first block that is not soil. A grass roof or a raised
+ * flower bed stands on the building, so it stays part of the building.
+ */
+function markSite(m: VoxelModel, roles: Uint8Array, groundY: number): void {
+  const { x: sx, y: sy, z: sz } = m.size;
+  const layer = sx * sz;
+  const site = roleCode("site");
+  const soilRoles = new Set([roleCode("foundation"), roleCode("walls"), roleCode("decor")]);
+  const soil = m.palette.map((p) => TERRAIN.has(shortId(p.name)));
+  for (let c = 0; c < layer; c++) {
+    let y = 0;
+    while (y < sy && m.blocks[c + y * layer] === 0) y++;
+    if (y > groundY + 1) continue;
+    for (; y < sy; y++) {
+      const i = c + y * layer;
+      if (!soil[m.blocks[i]!] || !soilRoles.has(roles[i]!)) break;
+      roles[i] = site;
+    }
+  }
 }
 
 /** Steps index range of the full plan, convenient for UI. */

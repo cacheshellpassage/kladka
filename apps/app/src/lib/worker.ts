@@ -23,6 +23,8 @@ export interface SerializedPlan {
     layer: number;
     /** Top layer of a pillar step (built bottom-up over several layers). */
     layerTo?: number;
+    /** Top layer of a step that spans several layers without being a pillar. */
+    layerMax?: number;
     /** Number of identical pillars built in this step, when there are several. */
     pillars?: number;
     /** Number of identical parts (towers, wings, bays) built in this step, when there are several. */
@@ -71,6 +73,7 @@ function serialize(plan: ReturnType<typeof planBuild>): { plan: SerializedPlan; 
       stage: s.stage,
       layer: s.layer,
       layerTo: s.layerTo,
+      layerMax: s.layerMax,
       pillars: s.pillars,
       copies: s.copies,
       mirrored: s.mirrored,

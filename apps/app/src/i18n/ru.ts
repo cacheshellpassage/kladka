@@ -96,6 +96,8 @@ export const ru = {
   "difficulty.4": "Сложно",
   "difficulty.5": "Очень сложно",
 
+  "stage.site": "Участок",
+  "stage.shell": "Стены, окна и этажи",
   "stage.foundation": "Фундамент",
   "stage.frame": "Каркас",
   "stage.walls": "Стены и перекрытия",
@@ -394,6 +396,8 @@ export const ru = {
   "onboard.next": "Дальше",
   "onboard.start": "Начать строить",
   "guide.next.hint": "Дальше: {stage}, {n} {blocks}",
+  "guide.site.hint": "Газон, земля и тропинки участка. Если земля на месте уже есть, этап можно пропустить",
+  "guide.site.skip": "Пропустить участок",
   "guide.swipe":
     "Свайп влево — следующий шаг, вправо — предыдущий. Схему можно двигать пальцем и увеличивать щипком",
   "guide.stageDone": "Этап «{stage}» готов!",

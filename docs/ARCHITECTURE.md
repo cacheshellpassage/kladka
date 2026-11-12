@@ -53,9 +53,19 @@ Hytale (`.prefab.json`) can be added as another adapter plus an importer in `for
      enclosed air (flat roofs) and the layers below them; stairs/slabs directly under roof blocks (eave undersides);
    - _corner pillars_: vertical runs (≥ 3) of one block at convex outside corners whose material differs from
      the adjacent wall → frame;
-   - fences/walls inside → interior, outside → decor; everything else structural → walls (incl. floors).
-2. **Stages.** Role → stage: foundation, frame, walls, openings, roof, interior, decor (lighting is placed in decor).
-3. **Placement simulation.** Groups (stage, layer) are processed bottom-up. Inside a group a BFS places a block only
+   - fences/walls inside → interior, outside → decor; everything else structural → walls (incl. floors);
+   - _site_ (in the planner, for every build): soil (grass, dirt, paths, farmland, podzol, mud…) that rises from
+     the bottom of a column, up to the first block that is not soil — the lawn, the paths and the soil under the
+     house. A grass roof or a raised bed stands on the building and stays part of it.
+2. **Stages.** site → foundation → shell → roof → interior → decor. The site comes first and the guide offers to
+   skip it ("the ground is already there"). Frame, walls and openings are one stage, _shell_, built layer by layer,
+   so a house rises floor by floor and the builder stands on the floor below; ladders and indoor stairs go with the
+   shell too (they are the way up). Lighting is placed in decor. Measured with `src/dev/reach-report.ts` on the
+   catalogue: blocks out of reach from the ground and finished floors 40 → 26 % (houses with floors 41–60 → 19–25 %),
+   steps 1153 → 812, single-block steps 118 → 28, walking between steps −44 %, up-and-down swings 65 → 13.
+3. **Placement simulation.** Groups (stage, layer) are processed bottom-up; interior and decor are one group each,
+   so the things of one room or spot are placed together whatever their layer (`layerMax` = top layer of such a
+   step), and their tour weighs one block of climbing like three of walking. Inside a group a BFS places a block only
    when its support rule holds:
    - attachables need their specific support (`wall_torch`/`ladder`/wall signs → block behind; torches, carpets,
      plants, doors, beds, rails → block below; hanging lanterns/signs → block above; buttons/levers by `face`);
@@ -66,12 +76,13 @@ Hytale (`.prefab.json`) can be added as another adapter plus an importer in `for
      get support are emitted at the end with a **scaffolding** hint.
 4. **Steps.** Placed blocks of a group are split into connected regions (6-connectivity), big regions are cut into
    chunks of ≤ 48 blocks (placement order preserved), chunks are ordered by a nearest-neighbour tour, and small
-   neighbouring regions (≤ 24 blocks, gap ≤ 3) are merged into one step.
+   neighbouring regions (≤ 24 blocks, or a piece of ≤ 6 blocks up to 48; gap ≤ 3, in interior and decor ≤ 6) are
+   merged into one step. Deferred blocks are cut into steps of ≤ 48 too, never between two halves of a door or bed.
    Then, per stage: **pillars** — chains of small steps (≤ 4 blocks) with the same footprint on consecutive
    layers become one step built bottom-up (`layerTo` = top layer, ≤ 24 blocks), but only if every lifted block is
    still supported (it stands on the block below, or its support was built in an earlier step, e.g. a ladder on a
    finished wall); and **same-kind singles** — consecutive 1–2 block steps of one block type on one layer (corner
-   posts, eave slabs, lamps; ≤ 16 blocks, ≤ 32 apart) become one step. Built-in catalogue: 1823 → 1320 steps.
+   posts, eave slabs, lamps; ≤ 16 blocks, ≤ 32 apart) become one step.
 5. **Companions.** Upper door halves, bed heads and upper halves of tall plants join their partner's step.
 
 Tests (`packages/voxel-core/test/planner.test.ts`) re-simulate every plan and assert that each block is placeable

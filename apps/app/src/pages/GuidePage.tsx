@@ -166,7 +166,7 @@ export function GuidePage({ id }: { id: string }) {
   useEffect(() => {
     const v = viewer.current;
     if (!settings.autoCamera || !stepBox || !cur || !v) return;
-    const lookDown = stepBox.inside || cur.stage === "foundation";
+    const lookDown = stepBox.inside || cur.stage === "foundation" || cur.stage === "site";
     v.focusOn(stepBox.min, stepBox.max, {
       interior: lookDown ? true : undefined,
       closeness: stepBox.inside ? 0.7 : 1,
@@ -565,6 +565,22 @@ export function GuidePage({ id }: { id: string }) {
                   </span>
                 ) : null}
               </span>
+            </div>
+          ) : null}
+          {cur && stage?.id === "site" ? (
+            <div className="site-hint" data-testid="site-hint">
+              <span className="small">{t("guide.site.hint")}</span>
+              <button
+                className="btn"
+                type="button"
+                onClick={() => {
+                  setDone((d) => Math.max(d, stage.stepEnd));
+                  go(stage.stepEnd);
+                }}
+                data-testid="skip-site"
+              >
+                <Icon name="next" /> {t("guide.site.skip")}
+              </button>
             </div>
           ) : null}
           {cur ? <p className="swipe-hint">{t("guide.swipe")}</p> : null}

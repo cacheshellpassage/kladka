@@ -86,6 +86,22 @@ describe("planner on the test cottage", () => {
     expect(plan.stages[0]!.id).toBe("foundation");
   });
 
+  it("builds frame, walls and windows together, floor by floor", () => {
+    const shell = plan.stages.find((s) => s.id === "shell")!;
+    for (const [x, y, z] of [
+      [1, 2, 1], // oak log corner
+      [2, 2, 1], // planks
+      [4, 2, 1], // glass pane
+    ] as const) {
+      const k = plan.stepOf[m.index(x, y, z)]!;
+      expect(k).toBeGreaterThanOrEqual(shell.stepStart);
+      expect(k).toBeLessThan(shell.stepEnd);
+    }
+    // nothing of a higher layer of the shell comes before the window of layer 2
+    const pane = plan.stepOf[m.index(4, 2, 1)]!;
+    for (const s of plan.steps.slice(shell.stepStart, pane)) expect(s.layer).toBeLessThanOrEqual(2);
+  });
+
   it("every step is buildable when reached (supports before attachments)", () => {
     expect(verifyPlacement(m, plan)).toEqual([]);
   });
@@ -198,13 +214,13 @@ describe("planner edge cases", () => {
       m.roles[m.index(x, 1, z)] = 4; // openings
     const plan = planBuild(m);
     expect(verifyPlacement(m, plan)).toEqual([]);
-    const panes = plan.steps.filter((st) => st.stage === "openings");
+    const panes = plan.steps.filter((st) => st.stage === "shell");
     expect(panes).toHaveLength(1);
     expect(panes[0]!.blocks).toHaveLength(4);
     expect(panes[0]!.pillars).toBeUndefined();
   });
 
-  it("places a ladder column on an existing wall in one step", () => {
+  it("builds a ladder together with the wall it hangs on, not after the roof", () => {
     const m = newTestModel(5, 7, 5);
     m.roles = new Uint8Array(m.volume);
     for (let y = 0; y < 6; y++) {
@@ -217,10 +233,13 @@ describe("planner edge cases", () => {
     }
     const plan = planBuild(m);
     expect(verifyPlacement(m, plan)).toEqual([]);
-    const ladders = plan.steps.filter((s) => s.stage === "interior");
-    expect(ladders).toHaveLength(1);
-    expect(ladders[0]!.blocks).toHaveLength(5);
-    expect(ladders[0]!.layerTo).toBe(5);
+    // the ladder is the way up, so it grows with its wall: one pillar step "wall + ladder", bottom-up
+    const ladderSteps = new Set([1, 2, 3, 4, 5].map((y) => plan.stepOf[m.index(2, y, 3)]!));
+    expect(ladderSteps.size).toBe(1);
+    const step = plan.steps[[...ladderSteps][0]!]!;
+    expect(step.stage).toBe("shell");
+    expect(step.blocks).toHaveLength(10);
+    expect([step.layer, step.layerTo]).toEqual([1, 5]);
   });
 
   it("does not lift an attachment above its support", () => {
@@ -283,7 +302,7 @@ describe("planner edge cases", () => {
     ]);
     const plan = planBuild(m);
     expect(verifyPlacement(m, plan)).toEqual([]);
-    const walls = plan.steps.filter((s) => s.stage === "walls");
+    const walls = plan.steps.filter((s) => s.stage === "shell");
     expect(walls).toHaveLength(1);
     expect(walls[0]!.blocks).toHaveLength(15);
     expect(walls[0]!.copies).toBe(3);
@@ -291,7 +310,7 @@ describe("planner edge cases", () => {
     expect(walls[0]!.pillars).toBeUndefined();
     // every block is still placed exactly once
     expect(new Set(plan.steps.flatMap((s) => s.blocks)).size).toBe(plan.totalBlocks);
-    expect(plan.stages.find((s) => s.id === "walls")!.stepEnd).toBe(plan.steps.length);
+    expect(plan.stages.find((s) => s.id === "shell")!.stepEnd).toBe(plan.steps.length);
   });
 
   it("treats a mirrored part as the same part, stairs included", () => {
@@ -300,7 +319,7 @@ describe("planner edge cases", () => {
       [1, 1, false, "east"],
       [18, 1, true, "west"],
     ]);
-    const walls = planBuild(m).steps.filter((s) => s.stage === "walls");
+    const walls = planBuild(m).steps.filter((s) => s.stage === "shell");
     expect(walls).toHaveLength(1);
     expect(walls[0]!.copies).toBe(2);
     expect(walls[0]!.mirrored).toBe(true);
@@ -310,7 +329,7 @@ describe("planner edge cases", () => {
       [1, 1, false, "east"],
       [18, 1, true, "east"],
     ]);
-    const apart = planBuild(odd).steps.filter((s) => s.stage === "walls");
+    const apart = planBuild(odd).steps.filter((s) => s.stage === "shell");
     expect(apart).toHaveLength(2);
     expect(apart.every((s) => s.copies === undefined)).toBe(true);
   });
@@ -328,7 +347,7 @@ describe("planner edge cases", () => {
       m.set(x, 1, z, state("oak_planks"));
       m.roles![m.index(x, 1, z)] = 3;
     }
-    const walls = planBuild(m).steps.filter((s) => s.stage === "walls");
+    const walls = planBuild(m).steps.filter((s) => s.stage === "shell");
     expect(walls).toHaveLength(2);
     expect(walls.some((s) => s.copies !== undefined)).toBe(false);
   });
@@ -428,6 +447,94 @@ describe("materials and estimates", () => {
     expect(e.difficulty).toBeGreaterThanOrEqual(1);
     expect(e.difficulty).toBeLessThanOrEqual(3);
     expect(e.minutes).toBeGreaterThanOrEqual(5);
+  });
+});
+
+describe("plot, decor and long deferred steps", () => {
+  /** A 12×12 lawn (dirt under grass) with a 4×4 stone hut and flowers on the lawn. */
+  function plot(): VoxelModel {
+    const m = newTestModel(12, 6, 12);
+    for (let x = 0; x < 12; x++)
+      for (let z = 0; z < 12; z++) {
+        m.set(x, 0, z, state("dirt"));
+        m.set(x, 1, z, state("grass_block"));
+      }
+    for (let x = 4; x < 8; x++)
+      for (let z = 4; z < 8; z++) {
+        m.set(x, 1, z, state("cobblestone"));
+        for (let y = 2; y < 5; y++)
+          if (x === 4 || x === 7 || z === 4 || z === 7) m.set(x, y, z, state("stone_bricks"));
+        m.set(x, 5, z, state("stone_bricks"));
+      }
+    m.set(1, 2, 1, state("poppy"));
+    m.set(2, 2, 1, state("dandelion"));
+    m.set(10, 2, 10, state("poppy"));
+    return m;
+  }
+
+  it("puts the ground of the plot into the first stage, and the soil under the hut too", () => {
+    const m = plot();
+    const plan = planBuild(m);
+    expect(verifyPlacement(m, plan)).toEqual([]);
+    expect(plan.stages[0]!.id).toBe("site");
+    const site = plan.stages[0]!;
+    expect(site.blockCount).toBe(12 * 12 * 2 - 16); // all the soil, except where the cobblestone floor is
+    expect(roleFromCode(plan.roles[m.index(5, 0, 5)]!)).toBe("site"); // dirt under the hut
+    expect(roleFromCode(plan.roles[m.index(5, 1, 5)]!)).toBe("foundation"); // the floor itself
+    // the hut does not wait for the lawn around it: nothing of the building is in the site stage
+    for (const s of plan.steps.slice(site.stepStart, site.stepEnd))
+      for (const i of s.blocks) expect(roleFromCode(plan.roles[i]!)).toBe("site");
+  });
+
+  it("keeps a grass roof part of the building", () => {
+    const m = plot();
+    for (let x = 4; x < 8; x++) for (let z = 4; z < 8; z++) m.set(x, 5, z, state("grass_block"));
+    const plan = planBuild(m);
+    expect(roleFromCode(plan.roles[m.index(5, 5, 5)]!)).not.toBe("site");
+  });
+
+  it("asks for dirt instead of grass blocks", () => {
+    const items = materialList(plot());
+    expect(items.find((l) => l.item.endsWith("grass_block"))).toBeUndefined();
+  });
+
+  it("places flowers of one spot in one step and says which layers it spans", () => {
+    const m = plot();
+    m.set(2, 3, 2, state("lantern")); // on nothing… hangs from nothing: placed on a block below
+    m.set(2, 2, 2, state("oak_fence"));
+    const plan = planBuild(m);
+    expect(verifyPlacement(m, plan)).toEqual([]);
+    const near = plan.stepOf[m.index(1, 2, 1)]!;
+    expect(plan.stepOf[m.index(2, 2, 1)]).toBe(near);
+    expect(plan.stepOf[m.index(2, 3, 2)]).toBe(near);
+    expect(plan.steps[near]!.layerMax).toBe(3);
+    expect(plan.steps[near]!.layerTo).toBeUndefined(); // not a pillar
+  });
+
+  it("cuts a long list of blocks that waited for support into steps of at most 48", () => {
+    // 64 lanterns hang from a ceiling one layer above them: they wait for it and come right after it
+    const m = newTestModel(10, 7, 10);
+    m.roles = new Uint8Array(m.volume);
+    const set = (x: number, y: number, z: number, st: ReturnType<typeof state>) => {
+      m.set(x, y, z, st);
+      m.roles![m.index(x, y, z)] = 3; // walls
+    };
+    for (const [x, z] of [
+      [0, 0],
+      [9, 0],
+      [0, 9],
+      [9, 9],
+    ] as const)
+      for (let y = 0; y < 5; y++) set(x, y, z, state("stone_bricks"));
+    for (let x = 0; x < 10; x++) for (let z = 0; z < 10; z++) set(x, 5, z, state("stone_bricks"));
+    for (let x = 1; x < 9; x++)
+      for (let z = 1; z < 9; z++) set(x, 4, z, state("lantern", { hanging: "true" }));
+    const plan = planBuild(m);
+    expect(verifyPlacement(m, plan)).toEqual([]);
+    const waited = plan.steps.filter((st) => st.deferred);
+    expect(waited.reduce((n, st) => n + st.blocks.length, 0)).toBe(64);
+    expect(waited.length).toBeGreaterThan(1);
+    for (const st of plan.steps) expect(st.blocks.length).toBeLessThanOrEqual(48);
   });
 });
 

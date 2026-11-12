@@ -47,9 +47,13 @@ export function formatBytes(n: number): string {
   return `${(n / 1024 / 1024).toFixed(1)} MB`;
 }
 
-/** "Layer Y = 3" or, for a pillar step built over several layers, "Layers Y = 3–7". */
-export function stepLayerLabel(t: TFunction, step: { layer: number; layerTo?: number }): string {
-  return step.layerTo !== undefined && step.layerTo > step.layer
-    ? t("guide.layers", { y: step.layer, to: step.layerTo })
+/** "Layer Y = 3" or, for a step over several layers (a pillar, the lamps of a porch), "Layers Y = 3–7". */
+export function stepLayerLabel(
+  t: TFunction,
+  step: { layer: number; layerTo?: number; layerMax?: number },
+): string {
+  const top = step.layerTo ?? step.layerMax;
+  return top !== undefined && top > step.layer
+    ? t("guide.layers", { y: step.layer, to: top })
     : t("guide.layer", { y: step.layer });
 }

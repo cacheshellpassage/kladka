@@ -7,21 +7,10 @@
  * block counts as reachable when some walkable cell has the eye (1.62 above the feet) within 4.5 blocks of
  * the block and a clear line of sight to it through what is built at that moment. Everything else needs the
  * builder to pillar up or put up scaffolding.
- *
- * Experiments with the stage order, via the ORDER environment variable:
- *  - ORDER=ladders — ladders and indoor stairs go up with the walls instead of after the roof;
- *  - ORDER=floors  — the same, and frame and openings too, so a house rises floor by floor.
  */
 import { readFileSync } from "node:fs";
 import { basename } from "node:path";
-import {
-  blockInfo,
-  importBytes,
-  planBuild,
-  roleCode,
-  roleFromCode,
-  type VoxelModel,
-} from "@kladka/voxel-core";
+import { blockInfo, importBytes, planBuild, type VoxelModel } from "@kladka/voxel-core";
 import { CATALOG, buildEntry } from "../catalog";
 
 const REACH = 4.5;
@@ -79,19 +68,7 @@ interface Report {
 }
 
 function analyse(id: string, m: VoxelModel, detail: boolean): Report {
-  let plan = planBuild(m);
-  const order = process.env.ORDER;
-  if (order === "ladders" || order === "floors") {
-    const roles = Uint8Array.from(plan.roles);
-    const wallsCode = roleCode("walls");
-    for (let i = 0; i < m.volume; i++) {
-      const sh = blockInfo(m.palette[m.blocks[i]!]!.name).shape;
-      const r = roleFromCode(roles[i]!);
-      const climb = sh === "ladder" || (sh === "stairs" && r === "interior");
-      if (climb || (order === "floors" && (r === "openings" || r === "frame"))) roles[i] = wallsCode;
-    }
-    plan = planBuild(m, { roles });
-  }
+  const plan = planBuild(m);
   const { x: sx, y: sy, z: sz } = m.size;
   const gx = sx + 2 * MARGIN,
     gz = sz + 2 * MARGIN,

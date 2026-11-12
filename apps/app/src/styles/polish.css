@@ -578,6 +578,17 @@
     box-shadow: 0 0 0 18px rgb(var(--ok-rgb) / 0);
   }
 }
+.site-hint {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  border-left: 4px solid var(--st-site);
+  background: var(--surface-2, transparent);
+}
 .swipe-hint {
   font-size: var(--fs-xs);
   color: var(--muted);
@@ -1087,6 +1098,8 @@ h3,
    decor the lightest. Both ramps pass the dataviz ordinal checks (one hue, monotone lightness, adjacent
    ΔL ≥ 0.06, light end ≥ 2:1 against the surface). Labels always stay in text colours. */
 :root {
+  --st-site: #4f8a3c;
+  --st-shell: #1a57ad;
   --st-foundation: #013271;
   --st-frame: #034393;
   --st-walls: #1a57ad;
@@ -1096,6 +1109,8 @@ h3,
   --st-decor: #7baffc;
 }
 :root[data-theme="dark"] {
+  --st-site: #7fbf68;
+  --st-shell: #72aafd;
   --st-foundation: #b7d3fc;
   --st-frame: #94bffd;
   --st-walls: #72aafd;
