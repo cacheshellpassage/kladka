@@ -1,7 +1,7 @@
 {
   "name": "kladka-monorepo",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Offline step-by-step build guides for voxel games (Minecraft Java Edition first).",
   "license": "MIT",
   "type": "module",
