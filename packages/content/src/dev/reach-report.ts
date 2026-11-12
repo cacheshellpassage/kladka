@@ -1,6 +1,6 @@
 /**
  * Dev report: how convenient the step plan is to follow by hand in survival.
- * `pnpm --filter @kladka/content exec tsx src/dev/reach-report.ts [id...] [--detail]`
+ * `pnpm --filter @kladka/content exec tsx src/dev/reach-report.ts [id | file.litematic ...] [--detail]`
  *
  * The plan is replayed step by step. Before every step the walkable cells are found from the ground around
  * the build (walk, jump one block up, fall, climb ladders and vines, pass doors, gates and trapdoors). A
@@ -12,7 +12,16 @@
  *  - ORDER=ladders — ladders and indoor stairs go up with the walls instead of after the roof;
  *  - ORDER=floors  — the same, and frame and openings too, so a house rises floor by floor.
  */
-import { blockInfo, planBuild, roleCode, roleFromCode, type VoxelModel } from "@kladka/voxel-core";
+import { readFileSync } from "node:fs";
+import { basename } from "node:path";
+import {
+  blockInfo,
+  importBytes,
+  planBuild,
+  roleCode,
+  roleFromCode,
+  type VoxelModel,
+} from "@kladka/voxel-core";
 import { CATALOG, buildEntry } from "../catalog";
 
 const REACH = 4.5;
@@ -308,13 +317,25 @@ function analyse(id: string, m: VoxelModel, detail: boolean): Report {
 const args = process.argv.slice(2);
 const detail = args.includes("--detail");
 const ids = args.filter((a) => !a.startsWith("--"));
-const list = ids.length ? CATALOG.filter((c) => ids.includes(c.id)) : CATALOG;
+/** An argument with a file extension is a schematic file to import; anything else is a catalogue id. */
+const files = ids.filter((a) => /.(litematic|schem|schematic|nbt|kbuild)$/i.test(a));
+const list: Array<{ id: string; model: () => VoxelModel }> = [
+  ...files.map((f) => ({
+    id: basename(f),
+    model: () => importBytes(new Uint8Array(readFileSync(f)), f).model,
+  })),
+  ...(ids.length > files.length || !ids.length
+    ? CATALOG.filter((c) => !ids.length || ids.includes(c.id)).map((c) => ({
+        id: c.id,
+        model: () => buildEntry(c).model,
+      }))
+    : []),
+];
 console.log(
   "build               blocks steps med 1blk  height  out-of-reach (steps)   by stage                         travel swings",
 );
 for (const e of list) {
-  const { model } = buildEntry(e);
-  const r = analyse(e.id, model, detail);
+  const r = analyse(e.id, e.model(), detail);
   const pct = ((100 * r.unreachable) / r.blocks).toFixed(1);
   const st = [...r.byStage].map(([k, v]) => `${k} ${v}`).join(", ");
   console.log(
