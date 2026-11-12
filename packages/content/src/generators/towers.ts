@@ -1,6 +1,6 @@
 /** Towers: square watchtower, round wizard tower, lighthouse, windmill. */
 import { Builder, STONE, roofSet, woodSet, type Wood } from "../lib/builder";
-import { coneRoof, door, hipRoof, lantern, wallTorch, windowRow } from "../lib/parts";
+import { coneRoof, door, hipRoof, ladder, lantern, wallTorch, windowRow } from "../lib/parts";
 
 export interface WatchtowerParams {
   size: number;
@@ -43,7 +43,7 @@ export function watchtower(p: WatchtowerParams): Builder {
   }
   door(b, mid, 1, z1, "south", "spruce_door");
   // internal ladder on the north wall
-  for (let y = 1; y <= p.height; y++) b.set(mid, y, z0 + 1, "ladder", "interior", { facing: "south" });
+  for (let y = 1; y <= p.height; y++) ladder(b, mid, y, z0 + 1, "south", st.block);
   // lookout platform (overhanging)
   const py = p.height + 1;
   b.fill(x0 - 1, py, z0 - 1, x1 + 1, py, z1 + 1, w.planks, "walls");
@@ -116,10 +116,7 @@ export function wizardTower(p: RoundTowerParams): Builder {
   }
   door(b, c, 1, c + R, "south", w.door);
   // ladder through floors along the north wall
-  for (let y = 1; y <= p.height; y++) {
-    b.clear(c, y, c - R + 1);
-    b.set(c, y, c - R + 1, "ladder", "interior", { facing: "south" });
-  }
+  for (let y = 1; y <= p.height; y++) ladder(b, c, y, c - R + 1, "south", st.block);
   // overhanging rim
   const top = p.height + 1;
   b.circle(c, c, R + 1, false, (x, z) => b.set(x, top, z, st.block, "walls"));
@@ -162,12 +159,13 @@ export function lighthouse(p: LighthouseParams): Builder {
   }
   for (let y = 4; y < p.height; y += 5) b.set(c, y, c + R, "glass_pane", "openings");
   door(b, c, 2, c + R, "south", "spruce_door");
-  for (let y = 2; y <= p.height; y++) b.set(c, y, c - R + 1, "ladder", "interior", { facing: "south" });
+  // the ladder runs one block in from the north wall: the wall narrows near the top, so lower down a column
+  // of stone inside the tower carries it
+  for (let y = 2; y <= p.height; y++) ladder(b, c, y, c - R + 2, "south", st.block);
   // gallery
   const g = p.height + 1;
   b.circle(c, c, R + 1, true, (x, z) => b.set(x, g, z, st.block, "walls"));
-  b.clear(c, g, c - R + 1);
-  b.set(c, g, c - R + 1, "ladder", "interior", { facing: "south" });
+  ladder(b, c, g, c - R + 2, "south", st.block);
   b.circle(c, c, R + 1, false, (x, z) => b.set(x, g + 1, z, "iron_bars", "decor"));
   // lantern room
   const lr = Math.max(1, R - 1);

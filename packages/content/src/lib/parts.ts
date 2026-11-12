@@ -1,4 +1,5 @@
 /** Reusable building parts: roofs, openings, furniture, lighting, decoration. */
+import { blockInfo } from "@kladka/voxel-core";
 import { DIRV, OPP, bs, type B, type Builder, type Facing, type MatSet, type WoodSet } from "./builder";
 
 /* ---------------------------------------------------------------- */
@@ -278,6 +279,20 @@ export function shutters(
 /* ---------------------------------------------------------------- */
 
 /** Wall torch attached to the wall at (x, y, z) - dir; the torch block is at (x, y, z). */
+/**
+ * One block of a ladder. In the game a ladder hangs only on a solid block: a window pane, iron bars or a gap
+ * behind it becomes `wall`, otherwise the ladder could not be placed.
+ */
+export function ladder(b: Builder, x: number, y: number, z: number, facing: Facing, wall: B): void {
+  const [dx, dz] = DIRV[facing];
+  const bx = x - dx,
+    bz = z - dz;
+  const behind = blockInfo(b.isAir(bx, y, bz) ? "air" : b.name(bx, y, bz));
+  if (!(behind.full && behind.shape === "cube")) b.set(bx, y, bz, wall, "walls");
+  b.clear(x, y, z);
+  b.set(x, y, z, "ladder", "interior", { facing, waterlogged: "false" });
+}
+
 export function wallTorch(b: Builder, x: number, y: number, z: number, facing: Facing): void {
   b.set(x, y, z, "wall_torch", "lighting", { facing });
 }

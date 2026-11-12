@@ -15,6 +15,7 @@ import {
   furniture,
   gableRoof,
   hipRoof,
+  ladder,
   lantern,
   shutters,
   table,
@@ -176,10 +177,7 @@ export function house(p: HouseParams): Builder {
     // ladder to the next floor (inside, along the west wall)
     if (f < p.floors - 1) {
       const lz = z0 + 1;
-      for (let y = fy + 1; y <= fy + fh; y++) {
-        b.clear(x0 + 1, y, lz);
-        b.set(x0 + 1, y, lz, "ladder", "interior", { facing: "east", waterlogged: "false" });
-      }
+      for (let y = fy + 1; y <= fy + fh; y++) ladder(b, x0 + 1, y, lz, "east", wall);
     }
   }
 
